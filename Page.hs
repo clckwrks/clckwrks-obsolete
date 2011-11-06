@@ -16,6 +16,6 @@ page :: XMLGenT CMS XML
   <h1><% getPageTitle   %></h1>
   <p><%  getPageText    %></p>
   <p><%  getCurrentTime %></p>
-  <p>Powered by Awesome!</p>
+  <p><a href=(Admin Console)>admin</a></p>
  </body>
 </html>

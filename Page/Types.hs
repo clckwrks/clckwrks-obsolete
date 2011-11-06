@@ -12,7 +12,6 @@ instance PathInfo PageId where
     toPathSegments (PageId i) = toPathSegments i
     fromPathSegments = PageId <$> fromPathSegments
 
-
 newtype PageId = PageId { unPageId :: Integer }
     deriving (Eq, Ord, Show, Read, Data, Typeable)
 $(deriveSafeCopy 1 'base ''PageId)

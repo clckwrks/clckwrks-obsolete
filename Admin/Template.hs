@@ -12,6 +12,7 @@ template title headers body =
    toResponse <$> (unXMLGenT $
     <html>
      <head>
+      <link type="text/css" href="/static/style.css" rel="stylesheet" />
       <title><% title %></title>
       <% headers %>
      </head>

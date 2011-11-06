@@ -1,0 +1,9 @@
+form fieldset
+{
+    border: none;
+}
+
+form ol
+{
+    list-style-type: none;
+}

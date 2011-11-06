@@ -25,7 +25,6 @@ instance GetAcidState ProfileState where
 
 instance GetAcidState PageState where
     getAcidState = acidPage
-    
 
 withAcid :: Maybe FilePath -> (Acid -> IO a) -> IO a
 withAcid mBasePath f =

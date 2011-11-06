@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleInstances, TypeSynonymInstances, TypeFamilies #-}
 module CMS 
     ( module Acid
+    , module Admin.URL
     , module Control.Applicative
     , module Control.Monad
     , module Control.Monad.Trans
@@ -10,9 +11,12 @@ module CMS
     , module HSP 
     , module HSP.ServerPartT
     , module Happstack.Server
+    , module Web.Routes
+    , module Web.Routes.Happstack
     ) where
 
 import Acid
+import Admin.URL
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans
@@ -25,4 +29,4 @@ import Happstack.Server
 import Happstack.Server.HSP.HTML
 import Web.Routes
 import Web.Routes.XMLGenT ()
-import Web.Routes.Happstack
+import Web.Routes.Happstack (seeOtherURL)

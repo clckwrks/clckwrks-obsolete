@@ -9,7 +9,7 @@ import Web.Routes.TH
 
 
 data CMSURL 
-    = Page PageId
+    = ViewPage PageId
     | Admin AdminURL
       deriving (Eq, Ord, Read, Show)
 
