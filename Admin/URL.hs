@@ -9,6 +9,7 @@ import Web.Routes.TH
 data AdminURL
     = Console
     | EditPage PageId
+    | NewPage
       deriving (Eq, Ord, Read, Show, Data, Typeable)
 
 $(derivePathInfo ''AdminURL)

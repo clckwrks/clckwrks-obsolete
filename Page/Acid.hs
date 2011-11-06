@@ -1,10 +1,11 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, TypeFamilies, RecordWildCards #-}
+{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, TypeFamilies, RecordWildCards, OverloadedStrings #-}
 module Page.Acid 
     ( module Page.Types
       -- * state
     , PageState
     , initialPageState
       -- * events
+    , NewPage(..)
     , PageById(..)
     , PagesSummary(..)
     , UpdatePage(..)
@@ -15,9 +16,10 @@ import Control.Monad.Reader (ask)
 import Control.Monad.State (get, put)
 import Data.Acid (AcidState, Query, Update, makeAcidic)
 import Data.Data (Data, Typeable)
-import Data.IxSet (Indexable, IxSet, (@=), empty, fromList, getOne, ixSet, ixFun, toList, updateIx)
+import Data.IxSet (Indexable, IxSet, (@=), empty, fromList, getOne, ixSet, ixFun, insert, toList, updateIx)
 import Data.SafeCopy
-import Data.Text (Text, pack)
+import Data.Text (Text)
+import qualified Data.Text as Text
 import Page.Types
 
 data PageState  = PageState 
@@ -31,8 +33,8 @@ initialPageState :: PageState
 initialPageState = 
     PageState { nextPageId = PageId 2
               , pages = fromList [ Page { pageId    = PageId 1
-                                        , pageTitle = pack "This title rocks!"
-                                        , pageSrc   = Markdown $ pack "This is the body!"
+                                        , pageTitle = "This title rocks!"
+                                        , pageSrc   = Markdown $ "This is the body!"
                                         } 
                                  ]
               }
@@ -56,8 +58,21 @@ updatePage page =
              do put $ ps { pages = updateIx (pageId page) page pages }
                 return Nothing
 
+newPage :: Update PageState Page
+newPage =
+    do ps@PageState{..} <- get
+       let page = Page { pageId = nextPageId
+                       , pageTitle = "Untitled"
+                       , pageSrc   = Markdown $ Text.empty
+                       }
+       put $ PageState { nextPageId = PageId $ succ $ unPageId nextPageId
+                       , pages = insert page pages
+                       }
+       return page
+
 $(makeAcidic ''PageState 
-  [ 'pageById
+  [ 'newPage
+  , 'pageById
   , 'pagesSummary
   , 'updatePage
   ])

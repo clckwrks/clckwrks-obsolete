@@ -11,8 +11,10 @@ page :: XMLGenT CMS XML
 <html>
  <head>
   <title><% getPageTitle %></title>
+  <link type="text/css" href="/static/theme.css" rel="stylesheet" />
  </head>
  <body>
+  <% getPageMenu %>
   <h1><% getPageTitle   %></h1>
   <p><%  getPageText    %></p>
   <p><%  getCurrentTime %></p>
