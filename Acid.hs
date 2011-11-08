@@ -4,6 +4,7 @@ import Control.Exception           (bracket)
 import Data.Acid                   (AcidState, openAcidStateFrom, createCheckpointAndClose)
 import Data.Maybe                  (fromMaybe)
 import Page.Acid                   (PageState       , initialPageState)
+import ProfileData.Acid            (ProfileDataState, initialProfileDataState)
 import Happstack.Auth.Core.Auth    (AuthState       , initialAuthState)
 import Happstack.Auth.Core.Profile (ProfileState    , initialProfileState)
 import System.FilePath             ((</>))
@@ -11,6 +12,7 @@ import System.FilePath             ((</>))
 data Acid = Acid
     { acidAuth        :: AcidState AuthState
     , acidProfile     :: AcidState ProfileState
+    , acidProfileData :: AcidState ProfileDataState
     , acidPage        :: AcidState PageState
     }
 
@@ -23,6 +25,9 @@ instance GetAcidState AuthState where
 instance GetAcidState ProfileState where
     getAcidState = acidProfile
 
+instance GetAcidState ProfileDataState where
+    getAcidState = acidProfileData
+
 instance GetAcidState PageState where
     getAcidState = acidPage
 
@@ -31,5 +36,6 @@ withAcid mBasePath f =
     let basePath = fromMaybe "_state" mBasePath in
     bracket (openAcidStateFrom (basePath </> "auth")        initialAuthState)        (createCheckpointAndClose) $ \auth ->
     bracket (openAcidStateFrom (basePath </> "profile")     initialProfileState)     (createCheckpointAndClose) $ \profile ->
+    bracket (openAcidStateFrom (basePath </> "profileData") initialProfileDataState) (createCheckpointAndClose) $ \profileData ->
     bracket (openAcidStateFrom (basePath </> "page")        initialPageState)        (createCheckpointAndClose) $ \page ->
-        f (Acid auth profile page)
+        f (Acid auth profile profileData page)

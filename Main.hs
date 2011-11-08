@@ -1,19 +1,12 @@
 module Main where
 
-import Acid
-import Admin.Route (routeAdmin)
-import Control.Applicative
-import Control.Monad.State
-import Control.Monad.Trans
+import Admin.Route         (routeAdmin)
+import Control.Monad.State (evalStateT)
 import CMS
 import qualified Data.Text as Text
-import Happstack.Server
-import Happstack.Plugins.Plugins
-import HSP
-import HSP.ServerPartT
-import Happstack.Server.HSP.HTML
-import Web.Routes
-import Web.Routes.Happstack
+import Happstack.Plugins.Plugins (PluginHandle, func, initPlugins)
+import ProfileData.Route    (routeProfileData)
+import Web.Routes.Happstack (implSite)
 
 main :: IO ()
 main = 
@@ -42,6 +35,8 @@ route ph url =
              withSymbol ph "Page.hs" "page" page
       (Admin adminURL) ->
           routeAdmin adminURL
+      (Profile profileDataURL) ->
+          nestURL Profile $ routeProfileData profileDataURL
 
 cms :: PluginHandle -> CMSState -> Site SiteURL (ServerPart Response)
 cms ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
