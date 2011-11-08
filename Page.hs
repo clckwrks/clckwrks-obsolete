@@ -16,7 +16,7 @@ page :: XMLGenT CMS XML
  <body>
   <% getPageMenu %>
   <h1><% getPageTitle   %></h1>
-  <p><%  getPageText    %></p>
+  <p><%  getPageContent %></p>
   <p><%  getCurrentTime %></p>
   <p><a href=(Admin Console)>admin</a></p>
  </body>

@@ -2,6 +2,7 @@ module Markdown where
 
 import           Control.Concurrent      (forkIO)
 import           Control.Concurrent.MVar (newEmptyMVar, readMVar, putMVar)
+import           Control.Monad.Trans     (MonadIO(liftIO))
 import           Data.Text               (Text)
 import qualified Data.Text               as T
 import qualified Data.Text.IO            as T
@@ -10,8 +11,13 @@ import           System.Exit             (ExitCode(ExitFailure, ExitSuccess))
 import           System.IO               (hClose, hGetContents)
 import           System.Process          (waitForProcess, runInteractiveProcess)
 
-markdown :: Text -> IO (Either Text Text)
-markdown txt =
+-- | run the text through the 'markdown' executable and, if
+-- successful, run the output through xss-sanitize / sanitizeBalance
+-- to prevent injection attacks.
+markdown :: (MonadIO m) =>
+            Text -- ^ markdown text
+         -> m (Either Text Text) -- ^ Left error, Right html
+markdown txt = liftIO $
     do (inh, outh, errh, ph) <- runInteractiveProcess "markdown" ["--html4tags"] Nothing Nothing
        _ <- forkIO $ do T.hPutStr inh txt 
                         hClose inh

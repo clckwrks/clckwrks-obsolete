@@ -1,7 +1,8 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleInstances, TypeSynonymInstances, FlexibleContexts, TypeFamilies, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleInstances, TypeSynonymInstances, FlexibleContexts, TypeFamilies, ScopedTypeVariables #-}
 module CMSMonad
     ( CMS(..)
     , CMSState(..)
+    , Content(..)
     , setCurrentPage
     , query
     , update
@@ -18,6 +19,7 @@ import Data.Acid                     (AcidState, EventState, EventResult, QueryE
 import Page.Acid
 import Data.ByteString.Lazy          as LB (ByteString)
 import Data.ByteString.Lazy.UTF8     as LB (toString)
+import Data.Data
 import qualified Data.Text           as T
 import qualified Data.Text.Lazy      as TL
 
@@ -218,3 +220,12 @@ instance SetAttr CMS XML where
          Element n as cs -> return $ Element n (foldr (:) as (map unFAttr attrs)) cs
 
 instance XMLGenerator CMS
+
+data Content 
+    = TrustedHtml T.Text
+    | PlainText   T.Text
+      deriving (Eq, Ord, Read, Show, Data, Typeable)
+
+instance EmbedAsChild CMS Content where
+    asChild (TrustedHtml html) = asChild $ cdata (T.unpack html)
+    asChild (PlainText txt)    = asChild $ pcdata (T.unpack txt)

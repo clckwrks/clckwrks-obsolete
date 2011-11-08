@@ -4,7 +4,7 @@ module Page.API
     ( PageId(..)
     , getPage
     , getPageTitle
-    , getPageText
+    , getPageContent
     , getPagesSummary
     , getPageMenu
     ) where
@@ -15,9 +15,10 @@ import Control.Monad.State
 import Control.Monad.Trans (MonadIO)
 import CMSMonad
 import CMSURL
-import HSP hiding (escape)
 import Data.Text
 import Happstack.Server
+import HSP hiding (escape)
+import Markdown
 import Page.Acid
 
 getPage :: CMS Page
@@ -31,8 +32,13 @@ getPage =
 getPageTitle :: CMS Text
 getPageTitle = pageTitle <$> getPage
 
-getPageText :: CMS Text
-getPageText = (toText . pageSrc) <$> getPage
+getPageContent :: CMS Content
+getPageContent = 
+    do src <- (toText . pageSrc) <$> getPage
+       e <- markdown src
+       case e of
+         (Left e)     -> return $ PlainText e
+         (Right html) -> return $ TrustedHtml html
 
 getPagesSummary :: CMS [(PageId, Text)]
 getPagesSummary = query PagesSummary
