@@ -19,6 +19,7 @@ page :: XMLGenT (CMS SiteURL) XML
   <h1><% getPageTitle   %></h1>
   <p><%  getPageContent %></p>
   <p><%  getCurrentTime %></p>
+  <p><% show <$> whoami %></p>
   <p><a href=(Admin Console)>admin</a></p>
  </body>
 </html>
