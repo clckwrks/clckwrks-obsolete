@@ -14,14 +14,14 @@ import Control.Applicative
 import Control.Monad.State
 import Control.Monad.Trans (MonadIO)
 import CMSMonad
-import CMSURL
 import Data.Text
 import Happstack.Server
 import HSP hiding (escape)
 import Markdown
 import Page.Acid
+import URL
 
-getPage :: CMS Page
+getPage :: CMS url Page
 getPage = 
     do CMSState{..} <- get
        mPage <- query (PageById currentPage)
@@ -29,10 +29,10 @@ getPage =
          Nothing -> escape $ internalServerError $ toResponse ("getPage: invalid PageId " ++ show (unPageId currentPage))
          (Just p) -> return p
 
-getPageTitle :: CMS Text
+getPageTitle :: CMS url Text
 getPageTitle = pageTitle <$> getPage
 
-getPageContent :: CMS Content
+getPageContent :: CMS url Content
 getPageContent = 
     do src <- (toText . pageSrc) <$> getPage
        e <- markdown src
@@ -40,10 +40,10 @@ getPageContent =
          (Left e)     -> return $ PlainText e
          (Right html) -> return $ TrustedHtml html
 
-getPagesSummary :: CMS [(PageId, Text)]
+getPagesSummary :: CMS url [(PageId, Text)]
 getPagesSummary = query PagesSummary
 
-getPageMenu :: GenXML CMS 
+getPageMenu :: GenXML (CMS SiteURL)
 getPageMenu = 
     do ps <- XMLGenT $ query PagesSummary
        case ps of
@@ -51,4 +51,3 @@ getPageMenu =
          _ -> <ul class="page-menu">
                 <% mapM (\(pid, ttl) -> <li><a href=(ViewPage pid) title=ttl><% ttl %></a></li>) ps %>
               </ul>
-    

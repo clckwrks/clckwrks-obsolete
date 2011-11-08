@@ -34,7 +34,7 @@ handlers ph cmsState =
         , implSite (Text.pack "http://localhost:8000") (Text.pack "") (cms ph cmsState)
         ]
 
-route :: PluginHandle -> CMSURL -> CMS Response
+route :: PluginHandle -> SiteURL -> CMS SiteURL Response
 route ph url =
     case url of
       (ViewPage pid) -> 
@@ -43,7 +43,7 @@ route ph url =
       (Admin adminURL) ->
           routeAdmin adminURL
 
-cms :: PluginHandle -> CMSState -> Site CMSURL (ServerPart Response)
+cms :: PluginHandle -> CMSState -> Site SiteURL (ServerPart Response)
 cms ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =
@@ -56,5 +56,5 @@ withSymbol ph fp sym f =
          (Left e)  -> error (unlines e)
          (Right a) -> f a
 
-page :: XMLGenT CMS XML -> CMS Response
+page :: XMLGenT (CMS url) XML -> CMS url Response
 page (XMLGenT part) = toResponse <$> part

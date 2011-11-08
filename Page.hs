@@ -1,10 +1,11 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 <%
 module Page where
+
 import CMS
 import Data.Time.Clock
 
-page :: XMLGenT CMS XML
+page :: XMLGenT (CMS SiteURL) XML
 
 %>
 

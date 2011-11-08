@@ -6,7 +6,7 @@ module CMS
     , module Control.Monad
     , module Control.Monad.Trans
     , module CMSMonad
-    , module CMSURL
+    , module URL
     , module Page.API
     , module HSP 
     , module HSP.ServerPartT
@@ -21,12 +21,12 @@ import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans
 import CMSMonad
-import CMSURL
+import URL
 import Page.API
 import HSP hiding (Request, escape)
 import HSP.ServerPartT
 import Happstack.Server
 import Happstack.Server.HSP.HTML
-import Web.Routes
+import Web.Routes hiding (nestURL)
 import Web.Routes.XMLGenT ()
 import Web.Routes.Happstack (seeOtherURL)

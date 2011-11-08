@@ -7,18 +7,18 @@ import CMS
 import Data.Text (Text)
 import Page.Acid (PagesSummary(..))
 
-consolePage :: CMS Response
+consolePage :: CMS AdminURL Response
 consolePage =
     do pages <- query PagesSummary
        template "Administration" () $
          <div>
-          <form action=(Admin NewPage) method="POST" enctype="multipart/form-data">
+          <form action=NewPage method="POST" enctype="multipart/form-data">
            <button type="submit">Create New Page</button>
           </form>
           <% editList pages %>
          </div>
 
-editList ::  [(PageId, Text)] -> GenChildList CMS
+editList ::  [(PageId, Text)] -> GenChildList (CMS AdminURL)
 editList [] = <%><p>There are currently no pages.</p></%>
 editList pgs =
     <%>
@@ -28,6 +28,6 @@ editList pgs =
      </ul>
     </%>
     where
-      editPageLI :: (PageId, Text) -> GenXML CMS
+      editPageLI :: (PageId, Text) -> GenXML (CMS AdminURL)
       editPageLI (pid, ttl) =
-          <li><a href=(Admin $ EditPage pid)><% ttl %></a></li>
+          <li><a href=(EditPage pid)><% ttl %></a></li>

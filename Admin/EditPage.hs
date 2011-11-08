@@ -11,7 +11,7 @@ import Page.Acid
 import Text.Digestive
 import Text.Digestive.HSP.Html4 hiding (inputTextArea)
 
-editPage :: CMSURL -> PageId -> CMS Response
+editPage :: SiteURL -> PageId -> CMS SiteURL Response
 editPage here pid =
     do mPage <- query $ PageById pid
        case mPage of
@@ -20,12 +20,12 @@ editPage here pid =
              do action <- showURL here
                 template "edit page" () $ multiFormPart "ep" action updatePage Nothing (pageFormlet page)
     where
-      updatePage :: Page -> CMS Response
+      updatePage :: Page -> CMS SiteURL Response
       updatePage page =
           do update (UpdatePage page)
              seeOtherURL (ViewPage (pageId page)) 
 
-pageFormlet :: Page -> FormDF CMS Page
+pageFormlet :: Page -> FormDF (CMS SiteURL) Page
 pageFormlet page =
     (fieldset $
        ol $ (,) <$> ((li $ label "title:") ++> (li $ inputText (Just (pageTitle page)) `setAttrs` ("size" := "80")))

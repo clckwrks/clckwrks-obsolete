@@ -6,9 +6,9 @@ import Admin.EditPage
 import Admin.NewPage
 import CMS
 
-routeAdmin :: AdminURL -> CMS Response
+routeAdmin :: AdminURL -> CMS SiteURL Response
 routeAdmin url =
     case url of
-      Console        -> consolePage
+      Console        -> nestURL Admin $ consolePage
       (EditPage pid) -> editPage (Admin url) pid
-      NewPage        -> newPage
+      NewPage        -> nestURL Admin $ newPage

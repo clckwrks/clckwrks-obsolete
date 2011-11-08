@@ -4,8 +4,8 @@ module Admin.NewPage where
 import CMS
 import Page.Acid as Acid
 
-newPage :: CMS Response
+newPage :: CMS AdminURL Response
 newPage =
     do methodOnly POST
        page <- update Acid.NewPage
-       seeOtherURL (Admin $ EditPage (pageId page))
+       seeOtherURL (EditPage (pageId page))

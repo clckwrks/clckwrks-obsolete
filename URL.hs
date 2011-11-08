@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module CMSURL where
+module URL where
 
 import Control.Applicative ((<$>))
 import Page.Acid (PageId(..))
@@ -8,9 +8,9 @@ import Web.Routes
 import Web.Routes.TH
 
 
-data CMSURL 
+data SiteURL
     = ViewPage PageId
     | Admin AdminURL
       deriving (Eq, Ord, Read, Show)
 
-$(derivePathInfo ''CMSURL)
+$(derivePathInfo ''SiteURL)

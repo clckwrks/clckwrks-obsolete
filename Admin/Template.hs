@@ -5,9 +5,9 @@ module Admin.Template where
 import CMS
 
 template :: 
-    ( EmbedAsChild CMS headers
-    , EmbedAsChild CMS body
-    ) => String -> headers -> body -> CMS Response
+    ( EmbedAsChild (CMS url) headers
+    , EmbedAsChild (CMS url) body
+    ) => String -> headers -> body -> CMS url Response
 template title headers body =
    toResponse <$> (unXMLGenT $
     <html>
