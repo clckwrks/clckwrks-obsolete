@@ -37,6 +37,8 @@ import Web.Routes         hiding (nestURL)
 import qualified Web.Routes as R
 import Web.Routes.XMLGenT ()
 import Web.Routes.Happstack
+import Text.Blaze (Html)
+import Text.Blaze.Renderer.String (renderHtml)
 
 data CMSState 
     = CMSState { acidState   :: Acid 
@@ -200,12 +202,12 @@ instance (EmbedAsChild (CMS url) a) => EmbedAsChild (CMS url) (IO a) where
 {-
 instance EmbedAsChild CMS TextHtml where
     asChild = XMLGenT . return . (:[]) . CMSChild . cdata . T.unpack . unTextHtml
-
-instance EmbedAsChild CMS FbXML where
-    asChild = XMLGenT . return . (:[]) . CMSChild
 -}
 instance EmbedAsChild (CMS url) XML where
     asChild = XMLGenT . return . (:[]) . CMSChild
+
+instance EmbedAsChild (CMS url) Html where
+    asChild = XMLGenT . return . (:[]) . CMSChild . cdata . renderHtml
 
 instance EmbedAsChild (CMS url) () where
     asChild () = return []

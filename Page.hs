@@ -21,5 +21,6 @@ page :: XMLGenT (CMS SiteURL) XML
   <p><%  getCurrentTime %></p>
   <p><% show <$> whoami %></p>
   <p><a href=(Admin Console)>admin</a></p>
+  <p><a href=(Auth $ AuthURL A_Login)>login</a></p>
  </body>
 </html>

@@ -1,11 +1,15 @@
+{-# LANGUAGE RecordWildCards #-}
 module Main where
 
-import Admin.Route         (routeAdmin)
-import Control.Monad.State (evalStateT)
+import Admin.Route          (routeAdmin)
+import Admin.Template       (template)
+import Control.Monad.State  (get, evalStateT)
 import CMS
 import qualified Data.Text as Text
+import Happstack.Auth
 import Happstack.Plugins.Plugins (PluginHandle, func, initPlugins)
 import ProfileData.Route    (routeProfileData)
+import ProfileData.URL      (ProfileDataURL(..))
 import Web.Routes.Happstack (implSite)
 
 main :: IO ()
@@ -37,6 +41,10 @@ route ph url =
           routeAdmin adminURL
       (Profile profileDataURL) ->
           nestURL Profile $ routeProfileData profileDataURL
+      (Auth apURL) ->
+          do Acid{..} <- acidState <$> get
+             u <- showURL $ Profile CreateNewProfileData
+             nestURL Auth $ handleAuthProfile acidAuth acidProfile template Nothing Nothing u apURL
 
 cms :: PluginHandle -> CMSState -> Site SiteURL (ServerPart Response)
 cms ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
