@@ -29,12 +29,13 @@ editPage here pid =
 pageFormlet :: Page -> FormDF (CMS SiteURL) Page
 pageFormlet page =
     (fieldset $
-       ol $ (,,) <$> (li $ inputCheckBox False <++ label "Highlight Haskell code with HsColour")
+       ol $ (,,) <$> (li $ inputCheckBox hsColour <++ label "Highlight Haskell code with HsColour")
                  <*> ((li $ label "title:") ++> (li $ inputText (Just (pageTitle page)) `setAttrs` ("size" := "80")))
                  <*> ((li $ label "body:") ++> (li $ inputTextArea (Just 80) (Just 50) (Just (markup (pageSrc page)))))
                  <*  submit "update")
     `transform` (transformEitherM toPage)
     where
+      hsColour = HsColour `elem` (preProcessors $ pageSrc page)
       toPage :: (MonadIO m) => (Bool, Text, Text) -> m (Either e Page)
       toPage (haskell, ttl, bdy) =
           do now <- liftIO $ getCurrentTime
