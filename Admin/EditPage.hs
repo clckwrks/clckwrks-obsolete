@@ -6,6 +6,7 @@ import Admin.Template
 import Control.Applicative ((<$>), (<*>), (<*))
 import CMS
 import Data.Text (Text)
+import Data.Time.Clock (getCurrentTime)
 import FormPart (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
 import Page.Acid
 import Text.Digestive
@@ -28,14 +29,22 @@ editPage here pid =
 pageFormlet :: Page -> FormDF (CMS SiteURL) Page
 pageFormlet page =
     (fieldset $
-       ol $ (,) <$> ((li $ label "title:") ++> (li $ inputText (Just (pageTitle page)) `setAttrs` ("size" := "80")))
-                <*> ((li $ label "body:") ++> (li $ inputTextArea (Just 80) (Just 50) (Just (toText (pageSrc page)))))
-                <*  submit "update")
-    `transform` (transformEither toPage)
+       ol $ (,,) <$> (li $ inputCheckBox False <++ label "Highlight Haskell code with HsColour")
+                 <*> ((li $ label "title:") ++> (li $ inputText (Just (pageTitle page)) `setAttrs` ("size" := "80")))
+                 <*> ((li $ label "body:") ++> (li $ inputTextArea (Just 80) (Just 50) (Just (markup (pageSrc page)))))
+                 <*  submit "update")
+    `transform` (transformEitherM toPage)
     where
-      toPage :: (Text, Text) -> Either e Page
-      toPage (ttl, bdy) = Right $
-          Page { pageId    = pageId page
-               , pageTitle = ttl
-               , pageSrc   = Markdown bdy
-               }
+      toPage :: (MonadIO m) => (Bool, Text, Text) -> m (Either e Page)
+      toPage (haskell, ttl, bdy) =
+          do now <- liftIO $ getCurrentTime
+             return $ Right $ 
+               Page { pageId    = pageId page
+                    , pageTitle = ttl
+                    , pageSrc   = Markup { preProcessors =  (if haskell then ([ HsColour ] ++) else id) [ Markdown ]
+                                         , markup = bdy
+                                         }
+                    , pageExcerpt = Nothing
+                    , pageDate    = Just now
+                    , pageStatus  = Published
+                    }

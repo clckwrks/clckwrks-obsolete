@@ -28,7 +28,7 @@ handlers ph cmsState =
        msum 
         [ dir "favicon.ico" $ notFound (toResponse ())
         , dir "static"      $ serveDirectory DisableBrowsing [] "static"
-        , implSite (Text.pack "http://localhost:8000") (Text.pack "") (cms ph cmsState)
+        , implSite (Text.pack "http://192.168.0.6:8000") (Text.pack "") (cms ph cmsState)
         ]
 
 route :: PluginHandle -> SiteURL -> CMS SiteURL Response
@@ -36,7 +36,7 @@ route ph url =
     case url of
       (ViewPage pid) -> 
           do setCurrentPage pid
-             withSymbol ph "Page.hs" "page" page
+             withSymbol ph "PageMapper.hs" "pageMapper" page
       (Admin adminURL) ->
           routeAdmin adminURL
       (Profile profileDataURL) ->

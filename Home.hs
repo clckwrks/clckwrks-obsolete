@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 <%
-module Page where
+module Home where
 
 import CMS
 import Data.Time.Clock
@@ -21,18 +21,30 @@ page :: XMLGenT (CMS SiteURL) XML
     <span id="clckwrks-byline">for secure, reliable, & <br />integrated websites</span>
     <% getPageMenu %>
   </div>
-
   <div id="clckwrks-body">
    <h1><% getPageTitle   %></h1>
-   <p><%  getPageContent %></p>
-{-
+
    <div class="bluebox">
     <div class="bluebox-inside">
       <span>I got a big old blue box.</span>
     </div>
    </div>
+  
+   <div class="the-path-you-follow">
+    <div class="summary-box">
+     <% getPageSummary (PageId 2) %>
+    </div>
 
-   <p><%  getPageContent %></p>
+    <div class="summary-box">
+     <% getPageSummary (PageId 3) %>
+    </div>
+
+    <div class="summary-box">
+     <% getPageSummary (PageId 4) %>
+    </div>
+   </div>
+
+{-
    <p><%  getCurrentTime %></p>
    <p><% show <$> whoami %></p>
 -}

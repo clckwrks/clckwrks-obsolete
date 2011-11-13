@@ -1,8 +1,9 @@
-{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleInstances, TypeSynonymInstances, FlexibleContexts, TypeFamilies, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleInstances, TypeSynonymInstances, FlexibleContexts, TypeFamilies, RecordWildCards, ScopedTypeVariables #-}
 module CMSMonad
     ( CMS(..)
     , CMSState(..)
     , Content(..)
+    , markupToContent
     , setCurrentPage
     , query
     , update
@@ -16,17 +17,17 @@ import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Trans
-import Data.Acid                     (AcidState, EventState, EventResult, QueryEvent, UpdateEvent, query', update')
+import Data.Acid                     (AcidState, EventState, EventResult, QueryEvent, UpdateEvent)
+import Data.Acid.Advanced            (query', update')
 import Page.Acid
+import Page.Types                    (Markup(..))
 import Data.ByteString.Lazy          as LB (ByteString)
 import Data.ByteString.Lazy.UTF8     as LB (toString)
 import Data.Data
 import qualified Data.Text           as T
 import qualified Data.Text.Lazy      as TL
-
 import Data.Time.Clock               (UTCTime)
 import Data.Time.Format              (formatTime)
-
 import HSP hiding (Request, escape)
 import HSP.ServerPartT
 import qualified HSX.XMLGenerator as HSX
@@ -55,12 +56,12 @@ instance MonadRoute (CMS url) where
     type URL (CMS url) = url
     askRouteFn = CMS $ askRouteFn
 
-query :: forall url event. (QueryEvent event, GetAcidState (EventState event)) => event -> CMS url (EventResult event)
+query :: forall event m. (QueryEvent event, GetAcidState (EventState event), Functor m, MonadIO m, MonadState CMSState m) => event -> m (EventResult event)
 query event =
     do as <- (getAcidState . acidState) <$> get
        query' (as :: AcidState (EventState event)) event
 
-update :: forall url event. (UpdateEvent event, GetAcidState (EventState event)) => event -> CMS url (EventResult event)
+update :: forall event m. (UpdateEvent event, GetAcidState (EventState event), Functor m, MonadIO m, MonadState CMSState m) => event -> m (EventResult event)
 update event =
     do as <- (getAcidState . acidState) <$> get
        update' (as :: AcidState (EventState event)) event
@@ -209,6 +210,9 @@ instance EmbedAsChild (CMS url) XML where
 instance EmbedAsChild (CMS url) Html where
     asChild = XMLGenT . return . (:[]) . CMSChild . cdata . renderHtml
 
+instance EmbedAsChild (CMS url) Markup where
+    asChild mrkup = asChild =<< markupToContent mrkup
+
 instance EmbedAsChild (CMS url) () where
     asChild () = return []
 
@@ -239,3 +243,11 @@ data Content
 instance EmbedAsChild (CMS url) Content where
     asChild (TrustedHtml html) = asChild $ cdata (T.unpack html)
     asChild (PlainText txt)    = asChild $ pcdata (T.unpack txt)
+
+markupToContent :: (MonadIO m) => Markup -> m Content
+markupToContent Markup{..} =
+    do e <- runPreProcessors preProcessors markup
+       case e of
+         (Left err)   -> return (PlainText err)
+         (Right html) -> return (TrustedHtml html)
+

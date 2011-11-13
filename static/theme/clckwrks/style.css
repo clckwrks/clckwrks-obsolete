@@ -1,0 +1,112 @@
+@import url(http://fonts.googleapis.com/css?family=Francois+One);
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans);
+@import url(http://fonts.googleapis.com/css?family=Lobster+Two:400,700);
+body
+{
+    font-family: 'Droid Sans', sans-serif;
+    font-size: 10pt;
+    padding: 0;
+    margin: 0;
+}
+
+#clck
+{
+    font-family: 'Lobster Two', cursive;
+    color: #ffffff;
+    font-size: 36pt;
+    font-weight: 700;
+}
+#wrks
+{
+    font-family: 'Lobster Two', cursive;
+    color: #C1272D;
+    font-size: 36pt;
+    font-weight: 700;
+}
+
+#clckwrks-byline
+{
+
+}
+
+h1
+{
+    font-family: 'Lobster Two', cursive;
+    font-weight: 700;
+}
+
+.bluebox
+{
+    width: 739px;
+    height: 318px;
+    background-image: url('bluebox.png');
+}
+
+.bluebox-inside
+{
+    padding: 3em;
+    color: white;
+    font-size: 18pt;
+    font-family: 'Droid Sans', sans-serif;
+}
+
+#clckwrks-menu
+{
+    width: 279px;
+    height: 1014px;
+    background-image: url('sidebar-background-01.png');
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #ffffff;
+    text-align: right;
+    padding-right: 20px;
+}
+
+#clckwrks-body
+{
+    margin-left: 320px;
+}
+
+ul.page-menu
+{
+    list-style-type: none;
+    font-family: 'Francois One', sans-serif;
+    font-size: 18pt;
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
+    margin-top: 3em;
+}
+
+
+.page-menu li
+{
+    padding: 0;
+}
+
+.page-menu a
+{
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.summary-box
+{
+    float: left;
+    width: 233px;
+    margin-top: 3em;
+    margin-right: 20px;
+    margin-bottom: 3em;
+}
+
+.summary-box p
+{
+    margin: 0;
+}
+
+.the-path-you-follow
+{
+    overflow: auto;
+    width: 100%;
+}
