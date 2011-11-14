@@ -5,6 +5,14 @@ module Home where
 import CMS
 import Data.Time.Clock
 
+summaryBox :: PageId -> GenXML (CMS SiteURL)
+summaryBox pid =
+    <div class="summary-box">
+     <% getPageSummary pid %>
+     <span class="read-more"><a href=(ViewPage pid)>read more...</a></span>
+    </div>
+
+
 page :: XMLGenT (CMS SiteURL) XML
 
 %>
@@ -31,19 +39,10 @@ page :: XMLGenT (CMS SiteURL) XML
    </div>
   
    <div class="the-path-you-follow">
-    <div class="summary-box">
-     <% getPageSummary (PageId 2) %>
-    </div>
-
-    <div class="summary-box">
-     <% getPageSummary (PageId 3) %>
-    </div>
-
-    <div class="summary-box">
-     <% getPageSummary (PageId 4) %>
-    </div>
+    <% summaryBox (PageId 2) %>
+    <% summaryBox (PageId 3) %>
+    <% summaryBox (PageId 4) %>
    </div>
-
 {-
    <p><%  getCurrentTime %></p>
    <p><% show <$> whoami %></p>

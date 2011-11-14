@@ -105,6 +105,12 @@ ul.page-menu
     margin: 0;
 }
 
+.read-more
+{
+    display: block;
+    text-align: right;
+}
+
 .the-path-you-follow
 {
     overflow: auto;

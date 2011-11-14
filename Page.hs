@@ -25,17 +25,7 @@ page :: XMLGenT (CMS SiteURL) XML
   <div id="clckwrks-body">
    <h1><% getPageTitle   %></h1>
    <p><%  getPageContent %></p>
-{-
-   <div class="bluebox">
-    <div class="bluebox-inside">
-      <span>I got a big old blue box.</span>
-    </div>
-   </div>
 
-   <p><%  getPageContent %></p>
-   <p><%  getCurrentTime %></p>
-   <p><% show <$> whoami %></p>
--}
    <p><a href=(Admin Console)>admin</a></p>
    <p><a href=(Auth $ AuthURL A_Login)>login</a></p>
 
