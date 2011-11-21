@@ -26,7 +26,7 @@ import qualified Data.Text        as Text
 import           Data.Text        (Text)
 import Data.Traversable           (sequenceA)
 import Happstack.Server           (Happstack, Request(rqMethod), ToMessage(..)
-                                  , Method(..), Input, escape, methodM, methodOnly, getDataFn, look, localRq)
+                                  , Method(..), Input, escape, method, getDataFn, look, localRq)
 import HSP                        (XMLGenerator, XMLGenT(..), Attr(..), EmbedAsAttr(..), EmbedAsChild(..), SetAttr, GenXML, (<@), genElement, genEElement, unXMLGenT)
 import Happstack.Server.HSX       () -- instance (ServerMonad XMLGenT)
 import qualified HSX.XMLGenerator as HSX
@@ -49,13 +49,13 @@ formPart ::
   -> XMLGenT m (HSX.XML m)
 formPart prefix action handleSuccess mHandleFailure form =
   XMLGenT $ 
-    msum [ do methodM [GET, HEAD]
+    msum [ do method [GET, HEAD]
               v <- viewForm form prefix
               unXMLGenT $ 
                 <form action=action method="POST" enctype="multipart/form-data" accept-charset="UTF-8">
                   <% v %>
                  </form>
-         , do methodM POST
+         , do method POST
               (v,r') <- runForm form prefix $ happstackEnvironment
               r <- r'
               case r of
@@ -88,7 +88,7 @@ multiFormPart name action success failure form = guard name (formPart name (acti
     where
       guard :: (Happstack m) => String -> m a -> m a
       guard formName part =
-          (do methodOnly POST
+          (do method POST
               submittedName <- getDataFn (look "form")
               if (submittedName == (Right formName))
                then part

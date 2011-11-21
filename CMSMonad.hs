@@ -3,8 +3,12 @@ module CMSMonad
     ( CMS(..)
     , CMSState(..)
     , Content(..)
+    , Prefix(..)
     , markupToContent
     , setCurrentPage
+    , getPrefix
+    , getUnique
+    , setUnique
     , query
     , update
     , nestURL
@@ -24,6 +28,7 @@ import Page.Types                    (Markup(..))
 import Data.ByteString.Lazy          as LB (ByteString)
 import Data.ByteString.Lazy.UTF8     as LB (toString)
 import Data.Data
+import Data.SafeCopy                 (SafeCopy(..))
 import qualified Data.Text           as T
 import qualified Data.Text.Lazy      as TL
 import Data.Time.Clock               (UTCTime)
@@ -41,9 +46,14 @@ import Web.Routes.Happstack
 import Text.Blaze (Html)
 import Text.Blaze.Renderer.String (renderHtml)
 
+newtype Prefix = Prefix { prefixText :: T.Text }
+    deriving (Eq, Ord, Read, Show, Data, Typeable, SafeCopy)
+
 data CMSState 
-    = CMSState { acidState   :: Acid 
-               , currentPage :: PageId
+    = CMSState { acidState       :: Acid 
+               , currentPage     :: PageId
+               , componentPrefix :: Prefix
+               , uniqueId        :: Integer
                }
 
 newtype CMS url a = CMS { unCMS :: RouteT url (ServerPartT (StateT CMSState IO)) a }
@@ -70,6 +80,20 @@ update event =
 setCurrentPage :: PageId -> CMS url ()
 setCurrentPage pid =
     modify $ \s -> s { currentPage = pid }
+
+getPrefix :: CMS url Prefix
+getPrefix = componentPrefix <$> get
+
+setUnique :: Integer -> CMS url ()
+setUnique i =
+    modify $ \s -> s { uniqueId = i }
+
+getUnique :: CMS url Integer
+getUnique = 
+    do s <- get
+       let u = uniqueId s
+       put $ s { uniqueId = succ u }
+       return u
 
 -- * XMLGen / XMLGenerator instances for CMS
 

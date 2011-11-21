@@ -33,18 +33,19 @@ handlers ph cmsState =
 
 route :: PluginHandle -> SiteURL -> CMS SiteURL Response
 route ph url =
-    case url of
-      (ViewPage pid) -> 
-          do setCurrentPage pid
-             withSymbol ph "PageMapper.hs" "pageMapper" page
-      (Admin adminURL) ->
-          routeAdmin adminURL
-      (Profile profileDataURL) ->
-          nestURL Profile $ routeProfileData profileDataURL
-      (Auth apURL) ->
-          do Acid{..} <- acidState <$> get
-             u <- showURL $ Profile CreateNewProfileData
-             nestURL Auth $ handleAuthProfile acidAuth acidProfile template Nothing Nothing u apURL
+    do setUnique 0
+       case url of
+         (ViewPage pid) -> 
+             do setCurrentPage pid
+                withSymbol ph "PageMapper.hs" "pageMapper" page
+         (Admin adminURL) ->
+             routeAdmin adminURL
+         (Profile profileDataURL) ->
+             nestURL Profile $ routeProfileData profileDataURL
+         (Auth apURL) ->
+             do Acid{..} <- acidState <$> get
+                u <- showURL $ Profile CreateNewProfileData
+                nestURL Auth $ handleAuthProfile acidAuth acidProfile template Nothing Nothing u apURL
 
 cms :: PluginHandle -> CMSState -> Site SiteURL (ServerPart Response)
 cms ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'

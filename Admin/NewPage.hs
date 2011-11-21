@@ -6,6 +6,6 @@ import Page.Acid as Acid
 
 newPage :: CMS AdminURL Response
 newPage =
-    do methodOnly POST
+    do method POST
        page <- update Acid.NewPage
        seeOtherURL (EditPage (pageId page))
