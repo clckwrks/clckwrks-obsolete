@@ -3,7 +3,6 @@ module CMSMonad
     ( CMS(..)
     , CMSState(..)
     , Content(..)
-    , Prefix(..)
     , markupToContent
     , setCurrentPage
     , getPrefix
@@ -45,9 +44,7 @@ import Web.Routes.XMLGenT ()
 import Web.Routes.Happstack
 import Text.Blaze (Html)
 import Text.Blaze.Renderer.String (renderHtml)
-
-newtype Prefix = Prefix { prefixText :: T.Text }
-    deriving (Eq, Ord, Read, Show, Data, Typeable, SafeCopy)
+import Types
 
 data CMSState 
     = CMSState { acidState       :: Acid 

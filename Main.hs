@@ -6,6 +6,7 @@ import Admin.Template       (template)
 import Control.Monad.State  (get, evalStateT)
 import CMS
 import qualified Data.Text as Text
+import Data.IsString        (fromString)
 import Happstack.Auth
 import Happstack.Plugins.Plugins (PluginHandle, func, initPlugins)
 import ProfileData.Route    (routeProfileData)
@@ -16,8 +17,10 @@ main :: IO ()
 main = 
     do ph <- initPlugins
        withAcid Nothing $ \acid ->
-           do let cmsState = CMSState { acidState = acid 
-                                      , currentPage = PageId 0
+           do let cmsState = CMSState { acidState        = acid 
+                                      , currentPage     = PageId 0
+                                      , componentPrefix = Prefix (fromString "clckwrks")
+                                      , uniqueId        = 0
                                       }
               putStrLn "starting..."
               simpleHTTP nullConf (handlers ph cmsState)

@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, TemplateHaskell #-}
 module Menu.Types where
 
-import CMSMonad (CMS, Prefix(..), getPrefix, getUnique)
+-- import CMSMonad (CMS, Prefix(..), getPrefix, getUnique)
 import Control.Applicative ((<$>))
 import Control.Monad.Trans (MonadIO(liftIO))
 import Data.Aeson
@@ -12,6 +12,7 @@ import Data.Text
 import Data.Tree
 import Data.Monoid
 import Web.Routes
+import Types
 
 {-
 
@@ -77,15 +78,6 @@ data MenuName = MenuName
     deriving (Eq, Ord, Read, Show, Data, Typeable)
 $(deriveSafeCopy 1 'base ''MenuName)
 
-mkMenuName :: Text -> CMS url MenuName
-mkMenuName name =
-    do p <- getPrefix
-       u <- getUnique
-       return $ MenuName { menuPrefix = p
-                         , menuTag    = name
-                         , menuUnique = u
-                         }
-
 data MenuLink url
     = LinkText Text
     | LinkURL url
@@ -93,10 +85,12 @@ data MenuLink url
     deriving (Eq, Read, Show, Data, Typeable)
 
 data MenuItem url = MenuItem 
-    { menuName :: MenuName
-    , menuLink :: MenuLink url
+    { menuName  :: MenuName
+    , menuTitle :: Text
+    , menuLink  :: MenuLink url
     }
     deriving (Eq, Read, Show, Data, Typeable)
+
 
 data Menu url
     = Menu { menuItems :: Forest (MenuItem url)

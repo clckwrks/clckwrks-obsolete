@@ -2,6 +2,7 @@
 module ProfileData.URL where
 
 import Data.Data (Data, Typeable)
+import Data.SafeCopy (SafeCopy(..), base, deriveSafeCopy)
 import Web.Routes.TH
 
 data ProfileDataURL
@@ -9,3 +10,4 @@ data ProfileDataURL
       deriving (Eq, Ord, Read, Show, Data, Typeable)
 
 $(derivePathInfo ''ProfileDataURL)
+$(deriveSafeCopy 1 'base ''ProfileDataURL)
