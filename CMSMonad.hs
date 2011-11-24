@@ -20,8 +20,11 @@ import Control.Monad
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.Trans
+import Data.Aeson
 import Data.Acid                     (AcidState, EventState, EventResult, QueryEvent, UpdateEvent)
 import Data.Acid.Advanced            (query', update')
+import qualified Data.Map            as Map
+import qualified Data.Vector         as Vector
 import Page.Acid
 import Page.Types                    (Markup(..))
 import Data.ByteString.Lazy          as LB (ByteString)
@@ -32,19 +35,21 @@ import qualified Data.Text           as T
 import qualified Data.Text.Lazy      as TL
 import Data.Time.Clock               (UTCTime)
 import Data.Time.Format              (formatTime)
+import Language.Javascript.JMacro    
 import HSP hiding (Request, escape)
 import HSP.ServerPartT
 import qualified HSX.XMLGenerator as HSX
 import Happstack.Server
+import HSX.JMacro                    (IntegerSupply(..))
 import System.Locale                 (defaultTimeLocale)
-import URL                           (SiteURL(..))
-import Web.Routes         hiding (nestURL)
-import qualified Web.Routes as R
-import Web.Routes.XMLGenT ()
-import Web.Routes.Happstack
 import Text.Blaze (Html)
 import Text.Blaze.Renderer.String (renderHtml)
 import Types
+import URL                           (SiteURL(..))
+import Web.Routes         hiding (nestURL)
+import qualified Web.Routes as R
+import Web.Routes.Happstack
+import Web.Routes.XMLGenT ()
 
 data CMSState 
     = CMSState { acidState       :: Acid 
@@ -55,6 +60,19 @@ data CMSState
 
 newtype CMS url a = CMS { unCMS :: RouteT url (ServerPartT (StateT CMSState IO)) a }
     deriving (Functor, Applicative, Alternative, Monad, MonadIO, MonadPlus, Happstack, ServerMonad, HasRqData, FilterMonad Response, WebMonad Response, MonadState CMSState)
+
+instance IntegerSupply (CMS url) where
+    nextInteger = getUnique
+
+instance ToJExpr Value where
+    toJExpr (Object obj)  = ValExpr $ JHash   $ Map.fromList $ map (\(k,v) -> (T.unpack k, toJExpr v)) (Map.toList obj)
+    toJExpr (Array vs)    = ValExpr $ JList   $ map toJExpr (Vector.toList vs)
+    toJExpr (String s)    = ValExpr $ JStr    $ T.unpack s
+    toJExpr (Number n)    = ValExpr $ JDouble $ realToFrac n
+    toJExpr (Bool True)   = ValExpr $ JVar    $ StrI "true"
+    toJExpr (Bool False)  = ValExpr $ JVar    $ StrI "false"
+    toJExpr Null          = ValExpr $ JVar    $ StrI "null"
+
 
 nestURL :: (url1 -> url2) -> CMS url1 a -> CMS url2 a
 nestURL f (CMS r) = CMS $ R.nestURL f r

@@ -10,6 +10,7 @@ module CMS
     , module HSP 
     , module HSP.ServerPartT
     , module Happstack.Server
+    , module Language.Javascript.JMacro
     , module Menu.API
     , module Page.API
     , module ProfileData.API
@@ -30,6 +31,7 @@ import Happstack.Server
 import Happstack.Server.HSP.HTML
 import HSP hiding (Request, escape)
 import HSP.ServerPartT
+import Language.Javascript.JMacro (JExpr(..), JMacro(..), JStat(..), JType(..), JVal(..), Ident(..), toJExpr, jmacro, jmacroE)
 import Menu.API
 import Page.API
 import ProfileData.API

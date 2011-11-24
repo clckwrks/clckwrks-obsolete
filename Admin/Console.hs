@@ -12,6 +12,9 @@ consolePage =
     do pages <- query PagesSummary
        template "Administration" () $
          <div>
+          <ul>
+           <a href=EditMenu>Edit Menu</a>
+          </ul>
           <form action=NewPage method="POST" enctype="multipart/form-data">
            <button type="submit">Create New Page</button>
           </form>

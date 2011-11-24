@@ -8,7 +8,8 @@ import Data.Aeson
 import Data.Data
 import Data.IxSet
 import Data.SafeCopy
-import Data.Text
+import Data.String
+import Data.Text (Text)
 import Data.Tree
 import Data.Monoid
 import Web.Routes
@@ -104,3 +105,21 @@ $(deriveSafeCopy 1 'base ''Menu)
 instance Monoid (Menu url) where
     mempty = Menu { menuItems = [] }
     (Menu a) `mappend` (Menu b) = Menu $ a ++ b
+
+jstree :: Menu url -> Value
+jstree menu =
+    object [ fromString "json_data" .= menuToJSTree menu 
+           , fromString "plugins"   .= toJSON [ "themes", "json_data" ]
+           ]
+
+menuToJSTree :: Menu url -> Value
+menuToJSTree (Menu items) =
+    object  [ fromString "data" .= (toJSON $ map menuTreeToJSTree items) 
+            ]
+
+
+menuTreeToJSTree :: Tree (MenuItem url) -> Value
+menuTreeToJSTree (Node item children) =
+    object [ fromString "data" .= 
+             object [ fromString "title" .= menuTitle item ]
+           ]

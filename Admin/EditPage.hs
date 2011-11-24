@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes #-}
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Admin.EditPage where
 
@@ -19,7 +20,10 @@ editPage here pid =
          Nothing -> notFound $ toResponse $ "Page not found" ++ show (unPageId pid)
          (Just page) ->
              do action <- showURL here
-                template "edit page" () $ multiFormPart "ep" action updatePage Nothing (pageFormlet page)
+                template "edit page" () $ 
+                  <%> 
+                   <% multiFormPart "ep" action updatePage Nothing (pageFormlet page) %>
+                  </%>
     where
       updatePage :: Page -> CMS SiteURL Response
       updatePage page =

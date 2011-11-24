@@ -11,6 +11,7 @@ data AdminURL
     = Console
     | EditPage PageId
     | NewPage
+    | EditMenu
       deriving (Eq, Ord, Read, Show, Data, Typeable)
 
 $(derivePathInfo ''AdminURL)

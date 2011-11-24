@@ -6,7 +6,7 @@ import Admin.Template       (template)
 import Control.Monad.State  (get, evalStateT)
 import CMS
 import qualified Data.Text as Text
-import Data.IsString        (fromString)
+import Data.String          (fromString)
 import Happstack.Auth
 import Happstack.Plugins.Plugins (PluginHandle, func, initPlugins)
 import ProfileData.Route    (routeProfileData)
@@ -31,6 +31,9 @@ handlers ph cmsState =
        msum 
         [ dir "favicon.ico" $ notFound (toResponse ())
         , dir "static"      $ serveDirectory DisableBrowsing [] "static"
+         , dir "jquery"     $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery/"
+         , dir "jquery-ui"  $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery-ui/"
+         , dir "jstree"     $ serveDirectory DisableBrowsing [] "jstree/"
         , implSite (Text.pack "http://192.168.0.6:8000") (Text.pack "") (cms ph cmsState)
         ]
 

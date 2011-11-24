@@ -11,6 +11,7 @@ import Data.Data (Data, Typeable)
 import Data.IxSet (Indexable, IxSet, (@=), empty, fromList, getOne, ixSet, ixFun, insert, toList, updateIx)
 import Data.SafeCopy
 import Data.Text (Text)
+import Data.Tree (Tree(..))
 import qualified Data.Text as Text
 import Menu.Types
 
@@ -28,4 +29,11 @@ askMenu =
     do MenuState{..} <- ask
        return menu
 
-$(makeAcidic ''MenuState ['askMenu])
+addItem :: MenuItem url -> Update (MenuState url) (Menu url)
+addItem item =
+    do ms@MenuState{..} <- get
+       let menu' = Menu $ (menuItems menu) ++ [Node item []]
+       put $ ms { menu = menu' }
+       return menu'
+
+$(makeAcidic ''MenuState ['askMenu, 'addItem])

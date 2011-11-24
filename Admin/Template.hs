@@ -13,6 +13,7 @@ template title headers body =
     <html>
      <head>
       <link type="text/css" href="/static/style.css" rel="stylesheet" />
+      <script type="text/javascript" src="/jquery/jquery.js" ></script>
       <title><% title %></title>
       <% headers %>
      </head>
