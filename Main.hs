@@ -34,6 +34,7 @@ handlers ph cmsState =
          , dir "jquery"     $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery/"
          , dir "jquery-ui"  $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery-ui/"
          , dir "jstree"     $ serveDirectory DisableBrowsing [] "jstree/"
+         , dir "json2"      $ serveDirectory DisableBrowsing [] "json2/"
         , implSite (Text.pack "http://192.168.0.6:8000") (Text.pack "") (cms ph cmsState)
         ]
 
