@@ -23,6 +23,7 @@ import Control.Monad.Trans
 import Data.Aeson
 import Data.Acid                     (AcidState, EventState, EventResult, QueryEvent, UpdateEvent)
 import Data.Acid.Advanced            (query', update')
+import qualified Data.HashMap.Lazy   as HashMap
 import qualified Data.Map            as Map
 import qualified Data.Vector         as Vector
 import Page.Acid
@@ -65,7 +66,7 @@ instance IntegerSupply (CMS url) where
     nextInteger = getUnique
 
 instance ToJExpr Value where
-    toJExpr (Object obj)  = ValExpr $ JHash   $ Map.fromList $ map (\(k,v) -> (T.unpack k, toJExpr v)) (Map.toList obj)
+    toJExpr (Object obj)  = ValExpr $ JHash   $ Map.fromList $ map (\(k,v) -> (T.unpack k, toJExpr v)) (HashMap.toList obj)
     toJExpr (Array vs)    = ValExpr $ JList   $ map toJExpr (Vector.toList vs)
     toJExpr (String s)    = ValExpr $ JStr    $ T.unpack s
     toJExpr (Number n)    = ValExpr $ JDouble $ realToFrac n
