@@ -47,7 +47,7 @@ getPageContent =
 getPagesSummary :: CMS url [(PageId, Text)]
 getPagesSummary = query PagesSummary
 
-getPageMenu :: GenXML (CMS SiteURL)
+getPageMenu :: GenXML (CMS CMSURL)
 getPageMenu = 
     do ps <- query PagesSummary
        case ps of

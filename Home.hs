@@ -5,7 +5,7 @@ module Home where
 import CMS
 import Data.Time.Clock
 
-summaryBox :: PageId -> GenXML (CMS SiteURL)
+summaryBox :: PageId -> GenXML (CMS CMSURL)
 summaryBox pid =
     <div class="summary-box">
      <% getPageSummary pid %>
@@ -13,7 +13,7 @@ summaryBox pid =
     </div>
 
 
-page :: XMLGenT (CMS SiteURL) XML
+page :: XMLGenT (CMS CMSURL) XML
 
 %>
 

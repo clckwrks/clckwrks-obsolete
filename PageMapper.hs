@@ -4,7 +4,7 @@ import CMS
 import Page
 import qualified Home as Home
 
-pageMapper :: XMLGenT (CMS SiteURL) XML
+pageMapper :: XMLGenT (CMS CMSURL) XML
 pageMapper =
     do pid <- XMLGenT $ getPageId
        case pid of

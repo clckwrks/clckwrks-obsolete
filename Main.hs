@@ -38,7 +38,7 @@ handlers ph cmsState =
         , implSite (Text.pack "http://192.168.0.8:8000") (Text.pack "") (cms ph cmsState)
         ]
 
-route :: PluginHandle -> SiteURL -> CMS SiteURL Response
+route :: PluginHandle -> CMSURL -> CMS CMSURL Response
 route ph url =
     do setUnique 0
        case url of
@@ -54,7 +54,7 @@ route ph url =
                 u <- showURL $ Profile CreateNewProfileData
                 nestURL Auth $ handleAuthProfile acidAuth acidProfile template Nothing Nothing u apURL
 
-cms :: PluginHandle -> CMSState -> Site SiteURL (ServerPart Response)
+cms :: PluginHandle -> CMSState -> Site CMSURL (ServerPart Response)
 cms ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =

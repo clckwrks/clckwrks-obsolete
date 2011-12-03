@@ -19,7 +19,7 @@ mkMenuName name =
                          , menuUnique = u
                          }
 
-getMenu :: GenXML (CMS SiteURL)
+getMenu :: GenXML (CMS CMSURL)
 getMenu =
     do menu <- query AskMenu
        menuForestHTML $ menuItems menu

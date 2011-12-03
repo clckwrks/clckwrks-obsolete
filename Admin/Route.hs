@@ -8,7 +8,7 @@ import CMS
 import Menu.Acid
 import Menu.Edit
 
-routeAdmin :: AdminURL -> CMS SiteURL Response
+routeAdmin :: AdminURL -> CMS CMSURL Response
 routeAdmin url =
     case url of
       Console        -> nestURL Admin $ consolePage

@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable, TemplateHaskell #-}
 module URL 
-     ( SiteURL(..)
+     ( CMSURL(..)
      , AuthURL(..)
      , ProfileURL(..)
      , AuthProfileURL(..)
@@ -19,7 +19,7 @@ import Web.Routes
 import Web.Routes.TH
 
 
-data SiteURL
+data CMSURL
     = ViewPage PageId
     | Admin AdminURL
     | Profile ProfileDataURL
@@ -29,9 +29,9 @@ data SiteURL
 $(deriveSafeCopy 1 'base ''AuthURL)
 $(deriveSafeCopy 1 'base ''ProfileURL)
 $(deriveSafeCopy 1 'base ''AuthProfileURL)
-$(deriveSafeCopy 1 'base ''SiteURL)
+$(deriveSafeCopy 1 'base ''CMSURL)
 $(deriveSafeCopy 1 'base ''OpenIdURL)
 $(deriveSafeCopy 1 'base ''AuthMode)
 $(deriveSafeCopy 1 'base ''OpenIdProvider)
 
-$(derivePathInfo ''SiteURL)
+$(derivePathInfo ''CMSURL)

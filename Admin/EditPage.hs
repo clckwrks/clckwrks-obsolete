@@ -13,7 +13,7 @@ import Page.Acid
 import Text.Digestive
 import Text.Digestive.HSP.Html4 hiding (inputTextArea)
 
-editPage :: SiteURL -> PageId -> CMS SiteURL Response
+editPage :: CMSURL -> PageId -> CMS CMSURL Response
 editPage here pid =
     do mPage <- query $ PageById pid
        case mPage of
@@ -25,12 +25,12 @@ editPage here pid =
                    <% multiFormPart "ep" action updatePage Nothing (pageFormlet page) %>
                   </%>
     where
-      updatePage :: Page -> CMS SiteURL Response
+      updatePage :: Page -> CMS CMSURL Response
       updatePage page =
           do update (UpdatePage page)
              seeOtherURL (ViewPage (pageId page)) 
 
-pageFormlet :: Page -> FormDF (CMS SiteURL) Page
+pageFormlet :: Page -> FormDF (CMS CMSURL) Page
 pageFormlet page =
     (fieldset $
        ol $ (,,) <$> (li $ inputCheckBox hsColour <++ label "Highlight Haskell code with HsColour")

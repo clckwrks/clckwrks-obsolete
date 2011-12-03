@@ -46,7 +46,7 @@ import System.Locale                 (defaultTimeLocale)
 import Text.Blaze (Html)
 import Text.Blaze.Renderer.String (renderHtml)
 import Types
-import URL                           (SiteURL(..))
+import URL                           (CMSURL(..))
 import Web.Routes         hiding (nestURL)
 import qualified Web.Routes as R
 import Web.Routes.Happstack
@@ -182,7 +182,7 @@ instance (IsName n) => HSX.EmbedAsAttr (CMS url) (Attr n Int) where
 instance (IsName n) => HSX.EmbedAsAttr (CMS url) (Attr n Integer) where
     asAttr (n := i)  = asAttr $ MkAttr (toName n, pAttrVal (show i))
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS SiteURL) (Attr n SiteURL) where
+instance (IsName n) => HSX.EmbedAsAttr (CMS CMSURL) (Attr n CMSURL) where
     asAttr (n := u) = 
         do url <- showURL u
            asAttr $ MkAttr (toName n, pAttrVal (T.unpack url))

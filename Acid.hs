@@ -18,7 +18,7 @@ data Acid = Acid
     , acidProfile     :: AcidState ProfileState
     , acidProfileData :: AcidState ProfileDataState
     , acidPage        :: AcidState PageState
-    , acidMenu        :: AcidState (MenuState SiteURL)
+    , acidMenu        :: AcidState (MenuState CMSURL)
     }
 
 class GetAcidState st where
@@ -36,7 +36,7 @@ instance GetAcidState ProfileDataState where
 instance GetAcidState PageState where
     getAcidState = acidPage
 
-instance GetAcidState (MenuState SiteURL) where
+instance GetAcidState (MenuState CMSURL) where
     getAcidState = acidMenu
 
 

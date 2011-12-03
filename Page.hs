@@ -5,7 +5,7 @@ module Page where
 import CMS
 import Data.Time.Clock
 
-page :: XMLGenT (CMS SiteURL) XML
+page :: XMLGenT (CMS CMSURL) XML
 
 %>
 
