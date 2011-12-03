@@ -24,8 +24,11 @@ editMenu menu =
     do summaries <- query PagesSummary
        template "edit menu" (headers summaries) $
          <%>
-          <button id="create">Create</button>
-          <button id="serialize">Serialize</button>
+          <button id="add-page">Add Page</button>
+          <select id="page-list"></select><br />
+          <button id="add-sub-menu">Add Sub-Menu</button><br />
+          <button id="remove-item">Remove</button><br />
+          <button id="serialize">Serialize</button><br />
           <div id="menu">
           </div>
          </%>
@@ -38,6 +41,7 @@ editMenu menu =
                         $("#menu").jstree(`(jstree menu)`);
                         `(serialize)`;
                         `(addPageMenu summaries)`;
+                        `(addSubMenu)`;
                       });
                     |]
                   %>
@@ -47,18 +51,24 @@ addPageMenu :: [(PageId, Text)] -> JStat
 addPageMenu pageSummaries =
     [$jmacro|
       var menu = $.jstree._reference("#menu");
+      var select = $("#page-list");
+      var pages = `(data_)`;
 
-      $("#create").click(function () {
- //       var menu = $.jstree._reference("#menu");
-//        console.log(menu);
-//      menu.create("#menu", 0, `(root)`, false, true);
-        menu.create(null, 0, `(data_)`, false, true);
+      for (var i = 0; i < pages.length; i++) {
+       var option = $("<option>");
+       option.attr('value', i);
+       option.text(pages[i].data.title);
+       option.data( 'menu', pages[i]);
+       select.append(option);
+      }
+
+      $("#add-page").click(function () {
+        var i = select.val();
+        menu.create(null, 0, pages[i], false, true);
       });
     |]
     where
       root =
-          let (PageId pid, ttl) = head pageSummaries
-          in
           object [ fromString "data" .=
                      object [ fromString "title" .= "menu"
                             ]
@@ -66,10 +76,7 @@ addPageMenu pageSummaries =
                      object [ fromString "rel" .= "root" 
                             ]
                  ]
-
-      data_ =
-          let (PageId pid, ttl) = head pageSummaries
-          in
+      summaryData (PageId pid, ttl)  =
           object [ fromString "data" .=
                      object [ fromString "title" .= ttl
                             ]
@@ -78,6 +85,17 @@ addPageMenu pageSummaries =
                             ]
                  , fromString "metadata"  .= object [ fromString "pid" .= pid ]
                  ]
+      data_ = map summaryData pageSummaries
+
+addSubMenu =
+    [$jmacro|
+      var menu = $.jstree._reference("#menu");
+      $("#add-sub-menu").click(function () {
+        var item = { 'attr' : { 'rel' : 'menu' } }
+        menu.create(null, 0, item, false, false);
+      });
+    |]
+
 
 serialize :: JStat
 serialize =
@@ -103,8 +121,12 @@ jstree menu =
                                            ]
                                 ]
                       ]
-           , fromString "json_data" .= rootNode (menuToJSTree menu)
-           , fromString "plugins"   .= toJSON [ "themes", "ui", "crrm", "types", "json_data" ]
+           , fromString "dnd" .=
+               object [ fromString "drop_target"  .= False
+                      , fromString "drag_target"  .= False
+                      ]
+           , fromString "json_data" .= menuToJSTree menu
+           , fromString "plugins"   .= toJSON [ "themes", "ui", "crrm", "types", "json_data", "dnd" ]
            ]
 
 rootNode :: Value -> Value
@@ -132,18 +154,3 @@ menuTreeToJSTree (Node item children) =
            , fromString "children" .=
                map menuTreeToJSTree children
            ]
-
-create :: JStat
-create =
-    [$jmacro|
-      $("#create").click(function () {
-         $("#menu").jstree("create", null, 0, `(data_)`, false, true);
-       });
-    |]
-    where
-      data_ = 
-          object [ fromString "data" .= 
-                   object [ fromString "title" .= "foo"
-                          ]
---                 , fromString "metadata"  .= object [ fromString "foo" .= "bar" ]
-                 ]
