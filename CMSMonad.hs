@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleInstances, TypeSynonymInstances, FlexibleContexts, TypeFamilies, RecordWildCards, ScopedTypeVariables #-}
 module CMSMonad
     ( CMS(..)
-    , CMSState(..)
+    , ClckState(..)
     , Content(..)
     , markupToContent
     , setCurrentPage
@@ -52,15 +52,15 @@ import qualified Web.Routes as R
 import Web.Routes.Happstack
 import Web.Routes.XMLGenT ()
 
-data CMSState 
-    = CMSState { acidState       :: Acid 
+data ClckState 
+    = ClckState { acidState       :: Acid 
                , currentPage     :: PageId
                , componentPrefix :: Prefix
                , uniqueId        :: Integer
                }
 
-newtype CMS url a = CMS { unCMS :: RouteT url (ServerPartT (StateT CMSState IO)) a }
-    deriving (Functor, Applicative, Alternative, Monad, MonadIO, MonadPlus, Happstack, ServerMonad, HasRqData, FilterMonad Response, WebMonad Response, MonadState CMSState)
+newtype CMS url a = CMS { unCMS :: RouteT url (ServerPartT (StateT ClckState IO)) a }
+    deriving (Functor, Applicative, Alternative, Monad, MonadIO, MonadPlus, Happstack, ServerMonad, HasRqData, FilterMonad Response, WebMonad Response, MonadState ClckState)
 
 instance IntegerSupply (CMS url) where
     nextInteger = getUnique
@@ -82,17 +82,17 @@ instance MonadRoute (CMS url) where
     type URL (CMS url) = url
     askRouteFn = CMS $ askRouteFn
 
-query :: forall event m. (QueryEvent event, GetAcidState (EventState event), Functor m, MonadIO m, MonadState CMSState m) => event -> m (EventResult event)
+query :: forall event m. (QueryEvent event, GetAcidState (EventState event), Functor m, MonadIO m, MonadState ClckState m) => event -> m (EventResult event)
 query event =
     do as <- (getAcidState . acidState) <$> get
        query' (as :: AcidState (EventState event)) event
 
-update :: forall event m. (UpdateEvent event, GetAcidState (EventState event), Functor m, MonadIO m, MonadState CMSState m) => event -> m (EventResult event)
+update :: forall event m. (UpdateEvent event, GetAcidState (EventState event), Functor m, MonadIO m, MonadState ClckState m) => event -> m (EventResult event)
 update event =
     do as <- (getAcidState . acidState) <$> get
        update' (as :: AcidState (EventState event)) event
 
--- | update the 'currentPage' field of 'CMSState'
+-- | update the 'currentPage' field of 'ClckState'
 setCurrentPage :: PageId -> CMS url ()
 setCurrentPage pid =
     modify $ \s -> s { currentPage = pid }

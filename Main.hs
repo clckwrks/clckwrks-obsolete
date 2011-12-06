@@ -41,11 +41,11 @@ main =
   let c = defaultClckwrksConfig  { clckURL = Clck }
   in simpleClckwrks c
         
-withClckwrks ::  (PluginHandle -> CMSState -> IO b) -> IO b
+withClckwrks ::  (PluginHandle -> ClckState -> IO b) -> IO b
 withClckwrks action =
     do ph <- initPlugins
        withAcid Nothing $ \acid ->
-           do let clckState = CMSState { acidState       = acid 
+           do let clckState = ClckState { acidState       = acid 
                                        , currentPage     = PageId 0
                                        , componentPrefix = Prefix (fromString "clckwrks")
                                        , uniqueId        = 0
@@ -73,7 +73,7 @@ jsHandlers c =
        , dir "json2"       $ serveDirectory DisableBrowsing [] (clckJSON2Path c)
        ]
 {-
-handlers :: PluginHandle -> CMSState -> ServerPart Response
+handlers :: PluginHandle -> ClckState -> ServerPart Response
 handlers ph cmsState =
     do decodeBody (defaultBodyPolicy "/tmp/" (1*10^6) (1*10^6) (10*10^6))
        msum 
@@ -102,7 +102,7 @@ routeClck ph url =
                 u <- showURL $ Profile CreateNewProfileData
                 nestURL Auth $ handleAuthProfile acidAuth acidProfile template Nothing Nothing u apURL
 
-cmsSite :: PluginHandle -> CMSState -> Site ClckURL (ServerPart Response)
+cmsSite :: PluginHandle -> ClckState -> Site ClckURL (ServerPart Response)
 cmsSite ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =

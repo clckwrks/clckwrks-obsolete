@@ -27,7 +27,7 @@ import Text.HTML.TagSoup
 
 getPage :: CMS url Page
 getPage = 
-    do CMSState{..} <- get
+    do ClckState{..} <- get
        mPage <- query (PageById currentPage)
        case mPage of
          Nothing -> escape $ internalServerError $ toResponse ("getPage: invalid PageId " ++ show (unPageId currentPage))
