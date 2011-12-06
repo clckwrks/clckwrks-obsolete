@@ -13,36 +13,84 @@ import ProfileData.Route    (routeProfileData)
 import ProfileData.URL      (ProfileDataURL(..))
 import Web.Routes.Happstack (implSite)
 
+data ClckwrksConfig url = ClckwrksConfig
+    { clckHostname     :: String
+    , clckPort         :: Int
+    , clckURL          :: ClckURL -> url
+    , clckJQueryPath   :: FilePath
+    , clckJQueryUIPath :: FilePath
+    , clckJSTreePath   :: FilePath
+    , clckJSON2Path    :: FilePath
+    }
+    
+defaultClckwrksConfig :: ClckwrksConfig ClckURL
+defaultClckwrksConfig = ClckwrksConfig
+      { clckHostname     = "localhost"
+      , clckPort         = 8000 
+      , clckURL          = id
+      , clckJQueryPath   = "/usr/share/javascript/jquery/"
+      , clckJQueryUIPath = "/usr/share/javascript/jquery-ui/"
+      , clckJSTreePath   = "jstree/"
+      , clckJSON2Path    = "json2/"
+      }
+    
+data SiteURL = Clck ClckURL
+
 main :: IO ()
 main = 
+  let c = defaultClckwrksConfig  { clckURL = Clck }
+  in simpleClckwrks c
+        
+withClckwrks ::  (PluginHandle -> CMSState -> IO b) -> IO b
+withClckwrks action =
     do ph <- initPlugins
        withAcid Nothing $ \acid ->
-           do let cmsState = CMSState { acidState        = acid 
-                                      , currentPage     = PageId 0
-                                      , componentPrefix = Prefix (fromString "clckwrks")
-                                      , uniqueId        = 0
-                                      }
-              putStrLn "starting..."
-              simpleHTTP nullConf (handlers ph cmsState)
-
+           do let clckState = CMSState { acidState       = acid 
+                                       , currentPage     = PageId 0
+                                       , componentPrefix = Prefix (fromString "clckwrks")
+                                       , uniqueId        = 0
+                                       }
+              action ph clckState
+  
+simpleClckwrks :: ClckwrksConfig u -> IO ()
+simpleClckwrks cc =
+  withClckwrks $ \ph clckState ->
+    simpleHTTP (nullConf { port = clckPort cc }) (handlers ph clckState)
+  where
+    handlers ph clckState =
+       msum $ 
+         [ jsHandlers cc
+         , dir "favicon.ico" $ notFound (toResponse ())
+         , dir "static"      $ serveDirectory DisableBrowsing [] "static"
+         , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (cmsSite ph clckState)
+         ]
+              
+jsHandlers :: ClckwrksConfig u -> ServerPart Response
+jsHandlers c =
+  msum [ dir "jquery"      $ serveDirectory DisableBrowsing [] (clckJQueryPath c)
+       , dir "jquery-ui"   $ serveDirectory DisableBrowsing [] (clckJQueryUIPath c)
+       , dir "jstree"      $ serveDirectory DisableBrowsing [] (clckJSTreePath c)
+       , dir "json2"       $ serveDirectory DisableBrowsing [] (clckJSON2Path c)
+       ]
+{-
 handlers :: PluginHandle -> CMSState -> ServerPart Response
 handlers ph cmsState =
     do decodeBody (defaultBodyPolicy "/tmp/" (1*10^6) (1*10^6) (10*10^6))
        msum 
         [ dir "favicon.ico" $ notFound (toResponse ())
         , dir "static"      $ serveDirectory DisableBrowsing [] "static"
-         , dir "jquery"     $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery/"
-         , dir "jquery-ui"  $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery-ui/"
-         , dir "jstree"     $ serveDirectory DisableBrowsing [] "jstree/"
-         , dir "json2"      $ serveDirectory DisableBrowsing [] "json2/"
-        , implSite (Text.pack "http://192.168.0.8:8000") (Text.pack "") (cms ph cmsState)
+        , dir "jquery"      $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery/"
+        , dir "jquery-ui"   $ serveDirectory DisableBrowsing [] "/usr/share/javascript/jquery-ui/"
+        , dir "jstree"      $ serveDirectory DisableBrowsing [] "jstree/"
+        , dir "json2"       $ serveDirectory DisableBrowsing [] "json2/"
+        , implSite (Text.pack "http://192.168.0.8:8000") (Text.pack "") (cmsSite ph cmsState)
         ]
-
-route :: PluginHandle -> CMSURL -> CMS CMSURL Response
-route ph url =
+-}
+routeClck :: PluginHandle -> ClckURL -> CMS ClckURL Response
+routeClck ph url =
     do setUnique 0
        case url of
-         (ViewPage pid) -> 
+         (ViewPage pid) ->
              do setCurrentPage pid
                 withSymbol ph "PageMapper.hs" "pageMapper" page
          (Admin adminURL) ->
@@ -54,11 +102,11 @@ route ph url =
                 u <- showURL $ Profile CreateNewProfileData
                 nestURL Auth $ handleAuthProfile acidAuth acidProfile template Nothing Nothing u apURL
 
-cms :: PluginHandle -> CMSState -> Site CMSURL (ServerPart Response)
-cms ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
+cmsSite :: PluginHandle -> CMSState -> Site ClckURL (ServerPart Response)
+cmsSite ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =
-          mapServerPartT (\m -> evalStateT m cmsState) $ unRouteT (unCMS $ route ph u) f
+          mapServerPartT (\m -> evalStateT m cmsState) $ unRouteT (unCMS $ routeClck ph u) f
 
 withSymbol :: (MonadIO m) => PluginHandle -> FilePath -> String -> (a -> m b) -> m b
 withSymbol ph fp sym f =

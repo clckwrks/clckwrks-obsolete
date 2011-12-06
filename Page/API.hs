@@ -47,7 +47,7 @@ getPageContent =
 getPagesSummary :: CMS url [(PageId, Text)]
 getPagesSummary = query PagesSummary
 
-getPageMenu :: GenXML (CMS CMSURL)
+getPageMenu :: GenXML (CMS ClckURL)
 getPageMenu = 
     do ps <- query PagesSummary
        case ps of
@@ -80,6 +80,8 @@ extractExcerpt Page{..} =
                                               [] -> Text.pack "no summary available."
                                               (p:ps) -> renderTags $ takeThrough (not . isTagCloseName (Text.pack "p")) p
                             in return (TrustedHtml paragraph)
+                        (PlainText text) ->
+                               return (PlainText text)
                       
 takeThrough :: (a -> Bool) -> [a] -> [a]
 takeThrough _ [] = []

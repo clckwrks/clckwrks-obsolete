@@ -5,7 +5,7 @@ module Home where
 import CMS
 import Data.Time.Clock
 
-summaryBox :: PageId -> GenXML (CMS CMSURL)
+summaryBox :: PageId -> GenXML (CMS ClckURL)
 summaryBox pid =
     <div class="summary-box">
      <% getPageSummary pid %>
@@ -13,7 +13,7 @@ summaryBox pid =
     </div>
 
 
-page :: XMLGenT (CMS CMSURL) XML
+page :: XMLGenT (CMS ClckURL) XML
 
 %>
 
@@ -27,7 +27,8 @@ page :: XMLGenT (CMS CMSURL) XML
   <div id="clckwrks-menu">
     <span id="clck">Clck</span><span id="wrks">wrks</span><br />
     <span id="clckwrks-byline">for secure, reliable, & <br />integrated websites</span>
-    <% getMenu %>
+    <% getPageMenu %>
+--    <% getMenu %>
   </div>
   <div id="clckwrks-body">
    <h1><% getPageTitle   %></h1>
