@@ -54,10 +54,11 @@ import Web.Routes.XMLGenT ()
 
 data ClckState 
     = ClckState { acidState       :: Acid 
-               , currentPage     :: PageId
-               , componentPrefix :: Prefix
-               , uniqueId        :: Integer
-               }
+                , currentPage     :: PageId
+                , themePath       :: FilePath
+                , componentPrefix :: Prefix
+                , uniqueId        :: Integer
+                }
 
 newtype CMS url a = CMS { unCMS :: RouteT url (ServerPartT (StateT ClckState IO)) a }
     deriving (Functor, Applicative, Alternative, Monad, MonadIO, MonadPlus, Happstack, ServerMonad, HasRqData, FilterMonad Response, WebMonad Response, MonadState ClckState)
