@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 <%
-module Page where
+module Theme.Page where
 
 import Clckwrks
 

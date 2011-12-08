@@ -13,7 +13,8 @@ Build-type:          Simple
 Cabal-version:       >=1.2
 
 Library
-  Exposed-modules:     Home, Page
+  Exposed-modules:     Theme.Home,
+                       Theme.Page
 
   Build-depends:
         base < 4.4,

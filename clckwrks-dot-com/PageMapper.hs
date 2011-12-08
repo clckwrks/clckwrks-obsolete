@@ -1,12 +1,12 @@
 module PageMapper where
 
 import Clckwrks
-import Page
-import qualified Home as Home
+import qualified Theme.Page as Page
+import qualified Theme.Home as Home
 
 pageMapper :: XMLGenT (Clck ClckURL) XML
 pageMapper =
     do pid <- XMLGenT $ getPageId
        case pid of
          (PageId 1) -> Home.page
-         _          -> page
+         _          -> Page.page
