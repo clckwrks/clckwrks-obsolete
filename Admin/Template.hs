@@ -2,12 +2,12 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Admin.Template where
 
-import CMS
+import Clckwrks
 
 template :: 
-    ( EmbedAsChild (CMS url) headers
-    , EmbedAsChild (CMS url) body
-    ) => String -> headers -> body -> CMS url Response
+    ( EmbedAsChild (Clck url) headers
+    , EmbedAsChild (Clck url) body
+    ) => String -> headers -> body -> Clck url Response
 template title headers body =
    toResponse <$> (unXMLGenT $
     <html>

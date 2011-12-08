@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, MultiParamTypeClasses, FlexibleInstances, TypeSynonymInstances, FlexibleContexts, TypeFamilies, RecordWildCards, ScopedTypeVariables #-}
-module CMSMonad
-    ( CMS(..)
+module ClckwrksMonad
+    ( Clck(..)
     , ClckState(..)
     , Content(..)
     , markupToContent
@@ -60,10 +60,10 @@ data ClckState
                 , uniqueId        :: Integer
                 }
 
-newtype CMS url a = CMS { unCMS :: RouteT url (ServerPartT (StateT ClckState IO)) a }
+newtype Clck url a = Clck { unClck :: RouteT url (ServerPartT (StateT ClckState IO)) a }
     deriving (Functor, Applicative, Alternative, Monad, MonadIO, MonadPlus, Happstack, ServerMonad, HasRqData, FilterMonad Response, WebMonad Response, MonadState ClckState)
 
-instance IntegerSupply (CMS url) where
+instance IntegerSupply (Clck url) where
     nextInteger = getUnique
 
 instance ToJExpr Value where
@@ -76,12 +76,12 @@ instance ToJExpr Value where
     toJExpr Null          = ValExpr $ JVar    $ StrI "null"
 
 
-nestURL :: (url1 -> url2) -> CMS url1 a -> CMS url2 a
-nestURL f (CMS r) = CMS $ R.nestURL f r
+nestURL :: (url1 -> url2) -> Clck url1 a -> Clck url2 a
+nestURL f (Clck r) = Clck $ R.nestURL f r
 
-instance MonadRoute (CMS url) where
-    type URL (CMS url) = url
-    askRouteFn = CMS $ askRouteFn
+instance MonadRoute (Clck url) where
+    type URL (Clck url) = url
+    askRouteFn = Clck $ askRouteFn
 
 query :: forall event m. (QueryEvent event, GetAcidState (EventState event), Functor m, MonadIO m, MonadState ClckState m) => event -> m (EventResult event)
 query event =
@@ -94,39 +94,39 @@ update event =
        update' (as :: AcidState (EventState event)) event
 
 -- | update the 'currentPage' field of 'ClckState'
-setCurrentPage :: PageId -> CMS url ()
+setCurrentPage :: PageId -> Clck url ()
 setCurrentPage pid =
     modify $ \s -> s { currentPage = pid }
 
-getPrefix :: CMS url Prefix
+getPrefix :: Clck url Prefix
 getPrefix = componentPrefix <$> get
 
-setUnique :: Integer -> CMS url ()
+setUnique :: Integer -> Clck url ()
 setUnique i =
     modify $ \s -> s { uniqueId = i }
 
-getUnique :: CMS url Integer
+getUnique :: Clck url Integer
 getUnique = 
     do s <- get
        let u = uniqueId s
        put $ s { uniqueId = succ u }
        return u
 
--- * XMLGen / XMLGenerator instances for CMS
+-- * XMLGen / XMLGenerator instances for Clck
 
-instance HSX.XMLGen (CMS url) where
-    type HSX.XML (CMS url) = XML
-    newtype HSX.Child (CMS url) = CMSChild { unCMSChild :: XML }
-    newtype HSX.Attribute (CMS url) = FAttr { unFAttr :: Attribute }
+instance HSX.XMLGen (Clck url) where
+    type HSX.XML (Clck url) = XML
+    newtype HSX.Child (Clck url) = ClckChild { unClckChild :: XML }
+    newtype HSX.Attribute (Clck url) = FAttr { unFAttr :: Attribute }
     genElement n attrs children =
         do attribs <- map unFAttr <$> asAttr attrs
-           childer <- flattenCDATA . map (unCMSChild) <$> asChild children
+           childer <- flattenCDATA . map (unClckChild) <$> asChild children
            HSX.XMLGenT $ return (Element
                               (toName n)
                               attribs
                               childer
                              )
-    xmlToChild = CMSChild
+    xmlToChild = ClckChild
     pcdataToChild = HSX.xmlToChild . pcdata
 
 flattenCDATA :: [XML] -> [XML]
@@ -143,145 +143,145 @@ flattenCDATA cxml =
                            (CDATA e1 s1, CDATA e2 s2) | e1 == e2 -> flP (CDATA e1 (s1++s2) : xs) bs
                            _ -> flP (y:xs) (x:bs)
 
-instance IsAttrValue (CMS url) T.Text where
+instance IsAttrValue (Clck url) T.Text where
     toAttrValue = toAttrValue . T.unpack
 
-instance IsAttrValue (CMS url) TL.Text where
+instance IsAttrValue (Clck url) TL.Text where
     toAttrValue = toAttrValue . TL.unpack
 {-
-instance EmbedAsChild CMS (Block t) where
+instance EmbedAsChild Clck (Block t) where
   asChild b = asChild $
     <script type="text/javascript">
       <% show b %>
     </script>
 
-instance IsAttrValue CMS (HJScript (Exp t)) where
+instance IsAttrValue Clck (HJScript (Exp t)) where
   toAttrValue script = toAttrValue $ evaluateHJScript script
 
-instance IsAttrValue CMS (Block t) where
+instance IsAttrValue Clck (Block t) where
   toAttrValue block = return . attrVal $ "javascript:" ++ show block
 
-instance (IsName n) => HSX.EmbedAsAttr CMS (Attr n (HJScript (Exp a))) where
+instance (IsName n) => HSX.EmbedAsAttr Clck (Attr n (HJScript (Exp a))) where
     asAttr (n := script) = return . (:[]) . FAttr $ MkAttr (toName n, attrVal $ show $ evaluateHJScript script)
 -}
-instance HSX.EmbedAsAttr (CMS url) Attribute where
+instance HSX.EmbedAsAttr (Clck url) Attribute where
     asAttr = return . (:[]) . FAttr 
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS url) (Attr n String) where
+instance (IsName n) => HSX.EmbedAsAttr (Clck url) (Attr n String) where
     asAttr (n := str)  = asAttr $ MkAttr (toName n, pAttrVal str)
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS url) (Attr n Char) where
+instance (IsName n) => HSX.EmbedAsAttr (Clck url) (Attr n Char) where
     asAttr (n := c)  = asAttr (n := [c])
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS url) (Attr n Bool) where
+instance (IsName n) => HSX.EmbedAsAttr (Clck url) (Attr n Bool) where
     asAttr (n := True)  = asAttr $ MkAttr (toName n, pAttrVal "true")
     asAttr (n := False) = asAttr $ MkAttr (toName n, pAttrVal "false")
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS url) (Attr n Int) where
+instance (IsName n) => HSX.EmbedAsAttr (Clck url) (Attr n Int) where
     asAttr (n := i)  = asAttr $ MkAttr (toName n, pAttrVal (show i))
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS url) (Attr n Integer) where
+instance (IsName n) => HSX.EmbedAsAttr (Clck url) (Attr n Integer) where
     asAttr (n := i)  = asAttr $ MkAttr (toName n, pAttrVal (show i))
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS ClckURL) (Attr n ClckURL) where
+instance (IsName n) => HSX.EmbedAsAttr (Clck ClckURL) (Attr n ClckURL) where
     asAttr (n := u) = 
         do url <- showURL u
            asAttr $ MkAttr (toName n, pAttrVal (T.unpack url))
 
-instance (IsName n) => HSX.EmbedAsAttr (CMS AdminURL) (Attr n AdminURL) where
+instance (IsName n) => HSX.EmbedAsAttr (Clck AdminURL) (Attr n AdminURL) where
     asAttr (n := u) = 
         do url <- showURL u
            asAttr $ MkAttr (toName n, pAttrVal (T.unpack url))
 
 
 {-
-instance HSX.EmbedAsAttr CMS (Attr String AuthURL) where
+instance HSX.EmbedAsAttr Clck (Attr String AuthURL) where
     asAttr (n := u) = 
         do url <- showURL (W_Auth u)
            asAttr $ MkAttr (toName n, pAttrVal url)
 -}
 
-instance (IsName n) => (EmbedAsAttr (CMS url) (Attr n TL.Text)) where
+instance (IsName n) => (EmbedAsAttr (Clck url) (Attr n TL.Text)) where
     asAttr (n := a) = asAttr $ MkAttr (toName n, pAttrVal $ TL.unpack a)
 
-instance (IsName n) => (EmbedAsAttr (CMS url) (Attr n T.Text)) where
+instance (IsName n) => (EmbedAsAttr (Clck url) (Attr n T.Text)) where
     asAttr (n := a) = asAttr $ MkAttr (toName n, pAttrVal $ T.unpack a)
 
-instance EmbedAsChild (CMS url) Char where
-    asChild = XMLGenT . return . (:[]) . CMSChild . pcdata . (:[])
+instance EmbedAsChild (Clck url) Char where
+    asChild = XMLGenT . return . (:[]) . ClckChild . pcdata . (:[])
 
-instance EmbedAsChild (CMS url) String where
-    asChild = XMLGenT . return . (:[]) . CMSChild . pcdata
+instance EmbedAsChild (Clck url) String where
+    asChild = XMLGenT . return . (:[]) . ClckChild . pcdata
 
-instance EmbedAsChild (CMS url) Int where
-    asChild = XMLGenT . return . (:[]) . CMSChild . pcdata . show
+instance EmbedAsChild (Clck url) Int where
+    asChild = XMLGenT . return . (:[]) . ClckChild . pcdata . show
 
-instance EmbedAsChild (CMS url) Integer where
-    asChild = XMLGenT . return . (:[]) . CMSChild . pcdata . show
+instance EmbedAsChild (Clck url) Integer where
+    asChild = XMLGenT . return . (:[]) . ClckChild . pcdata . show
 
-instance EmbedAsChild (CMS url) Double where
-    asChild = XMLGenT . return . (:[]) . CMSChild . pcdata . show
+instance EmbedAsChild (Clck url) Double where
+    asChild = XMLGenT . return . (:[]) . ClckChild . pcdata . show
 
-instance EmbedAsChild (CMS url) Float where
-    asChild = XMLGenT . return . (:[]) . CMSChild . pcdata . show
+instance EmbedAsChild (Clck url) Float where
+    asChild = XMLGenT . return . (:[]) . ClckChild . pcdata . show
 
-instance EmbedAsChild (CMS url) TL.Text where
+instance EmbedAsChild (Clck url) TL.Text where
     asChild = asChild . TL.unpack
 
-instance EmbedAsChild (CMS url) T.Text where
+instance EmbedAsChild (Clck url) T.Text where
     asChild = asChild . T.unpack
 
-instance (EmbedAsChild (CMS url1) a, url1 ~ url2) => EmbedAsChild (CMS url1) (CMS url2 a) where
+instance (EmbedAsChild (Clck url1) a, url1 ~ url2) => EmbedAsChild (Clck url1) (Clck url2 a) where
     asChild c = 
         do a <- XMLGenT c
            asChild a
 
-instance (EmbedAsChild (CMS url) a) => EmbedAsChild (CMS url) (IO a) where
+instance (EmbedAsChild (Clck url) a) => EmbedAsChild (Clck url) (IO a) where
     asChild c = 
         do a <- XMLGenT (liftIO c)
            asChild a
 
 {-
-instance EmbedAsChild CMS TextHtml where
-    asChild = XMLGenT . return . (:[]) . CMSChild . cdata . T.unpack . unTextHtml
+instance EmbedAsChild Clck TextHtml where
+    asChild = XMLGenT . return . (:[]) . ClckChild . cdata . T.unpack . unTextHtml
 -}
-instance EmbedAsChild (CMS url) XML where
-    asChild = XMLGenT . return . (:[]) . CMSChild
+instance EmbedAsChild (Clck url) XML where
+    asChild = XMLGenT . return . (:[]) . ClckChild
 
-instance EmbedAsChild (CMS url) Html where
-    asChild = XMLGenT . return . (:[]) . CMSChild . cdata . renderHtml
+instance EmbedAsChild (Clck url) Html where
+    asChild = XMLGenT . return . (:[]) . ClckChild . cdata . renderHtml
 
-instance EmbedAsChild (CMS url) Markup where
+instance EmbedAsChild (Clck url) Markup where
     asChild mrkup = asChild =<< markupToContent mrkup
 
-instance EmbedAsChild (CMS url) () where
+instance EmbedAsChild (Clck url) () where
     asChild () = return []
 
-instance EmbedAsChild (CMS url) UTCTime where
+instance EmbedAsChild (Clck url) UTCTime where
     asChild = asChild . formatTime defaultTimeLocale "%a, %F @ %r"
 
-instance AppendChild (CMS url) XML where
+instance AppendChild (Clck url) XML where
  appAll xml children = do
         chs <- children
         case xml of
          CDATA _ _       -> return xml
-         Element n as cs -> return $ Element n as (cs ++ (map unCMSChild chs))
+         Element n as cs -> return $ Element n as (cs ++ (map unClckChild chs))
 
-instance SetAttr (CMS url) XML where
+instance SetAttr (Clck url) XML where
  setAll xml hats = do
         attrs <- hats
         case xml of
          CDATA _ _       -> return xml
          Element n as cs -> return $ Element n (foldr (:) as (map unFAttr attrs)) cs
 
-instance XMLGenerator (CMS url)
+instance XMLGenerator (Clck url)
 
 data Content 
     = TrustedHtml T.Text
     | PlainText   T.Text
       deriving (Eq, Ord, Read, Show, Data, Typeable)
 
-instance EmbedAsChild (CMS url) Content where
+instance EmbedAsChild (Clck url) Content where
     asChild (TrustedHtml html) = asChild $ cdata (T.unpack html)
     asChild (PlainText txt)    = asChild $ pcdata (T.unpack txt)
 

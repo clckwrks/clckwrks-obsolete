@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Menu.API where
 
-import CMSMonad
+import ClckwrksMonad
 import Data.Text (Text)
 import Data.Tree
 import HSP hiding (escape)
@@ -10,7 +10,7 @@ import Menu.Acid
 import Types
 import URL
 
-mkMenuName :: Text -> CMS url MenuName
+mkMenuName :: Text -> Clck url MenuName
 mkMenuName name =
     do p <- getPrefix
        u <- getUnique
@@ -19,19 +19,19 @@ mkMenuName name =
                          , menuUnique = u
                          }
 
-getMenu :: GenXML (CMS ClckURL)
+getMenu :: GenXML (Clck ClckURL)
 getMenu =
     do menu <- query AskMenu
        menuForestHTML $ menuItems menu
 
-menuForestHTML :: Forest (MenuItem url) -> GenXML (CMS url)
+menuForestHTML :: Forest (MenuItem url) -> GenXML (Clck url)
 menuForestHTML [] = return $ cdata ""
 menuForestHTML forest =
     <ol class="menu">
      <% mapM menuTreeHTML forest %>
     </ol>
 
-menuTreeHTML :: Tree (MenuItem url) -> GenXML (CMS url)
+menuTreeHTML :: Tree (MenuItem url) -> GenXML (Clck url)
 menuTreeHTML (Node menuItem subMenus) =
     <li>
      <a><% menuTitle menuItem %></a>

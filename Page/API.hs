@@ -16,7 +16,7 @@ import Acid
 import Control.Applicative
 import Control.Monad.State
 import Control.Monad.Trans (MonadIO)
-import CMSMonad
+import ClckwrksMonad
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Happstack.Server
@@ -25,7 +25,7 @@ import Page.Acid
 import URL
 import Text.HTML.TagSoup
 
-getPage :: CMS url Page
+getPage :: Clck url Page
 getPage = 
     do ClckState{..} <- get
        mPage <- query (PageById currentPage)
@@ -33,21 +33,21 @@ getPage =
          Nothing -> escape $ internalServerError $ toResponse ("getPage: invalid PageId " ++ show (unPageId currentPage))
          (Just p) -> return p
 
-getPageId :: CMS url PageId
+getPageId :: Clck url PageId
 getPageId = currentPage <$> get
 
-getPageTitle :: CMS url Text
+getPageTitle :: Clck url Text
 getPageTitle = pageTitle <$> getPage
 
-getPageContent :: CMS url Content
+getPageContent :: Clck url Content
 getPageContent = 
     do mrkup <- pageSrc <$> getPage
        markupToContent mrkup
 
-getPagesSummary :: CMS url [(PageId, Text)]
+getPagesSummary :: Clck url [(PageId, Text)]
 getPagesSummary = query PagesSummary
 
-getPageMenu :: GenXML (CMS ClckURL)
+getPageMenu :: GenXML (Clck ClckURL)
 getPageMenu = 
     do ps <- query PagesSummary
        case ps of
@@ -56,7 +56,7 @@ getPageMenu =
                 <% mapM (\(pid, ttl) -> <li><a href=(ViewPage pid) title=ttl><% ttl %></a></li>) ps %>
               </ul>
 
-getPageSummary :: PageId -> CMS url Content
+getPageSummary :: PageId -> Clck url Content
 getPageSummary pid =
     do mPage <- query (PageById pid)
        case mPage of

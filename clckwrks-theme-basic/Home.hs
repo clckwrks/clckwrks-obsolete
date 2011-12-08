@@ -2,10 +2,10 @@
 <%
 module Home where
 
-import CMS
+import Clckwrks
 import Data.Time.Clock
 
-summaryBox :: PageId -> GenXML (CMS ClckURL)
+summaryBox :: PageId -> GenXML (Clck ClckURL)
 summaryBox pid =
     <div class="summary-box">
      <% getPageSummary pid %>
@@ -13,7 +13,7 @@ summaryBox pid =
     </div>
 
 
-page :: XMLGenT (CMS ClckURL) XML
+page :: XMLGenT (Clck ClckURL) XML
 
 %>
 

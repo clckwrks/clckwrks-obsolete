@@ -2,10 +2,10 @@
 <%
 module Page where
 
-import CMS
+import Clckwrks
 import Data.Time.Clock
 
-page :: XMLGenT (CMS ClckURL) XML
+page :: XMLGenT (Clck ClckURL) XML
 
 %>
 

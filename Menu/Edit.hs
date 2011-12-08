@@ -3,7 +3,7 @@
 module Menu.Edit where
 
 import Admin.Template
-import CMSMonad
+import ClckwrksMonad
 import Data.Aeson
 import Data.String
 import Data.Tree
@@ -19,7 +19,7 @@ import Page.Acid
 import Types
 import URL
 
-editMenu :: Menu url -> CMS url Response
+editMenu :: Menu url -> Clck url Response
 editMenu menu =
     do summaries <- query PagesSummary
        template "edit menu" (headers summaries) $

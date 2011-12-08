@@ -3,11 +3,11 @@ module Admin.Console where
 
 import Admin.URL
 import Admin.Template
-import CMS
+import Clckwrks
 import Data.Text (Text)
 import Page.Acid (PagesSummary(..))
 
-consolePage :: CMS AdminURL Response
+consolePage :: Clck AdminURL Response
 consolePage =
     do pages <- query PagesSummary
        template "Administration" () $
@@ -21,7 +21,7 @@ consolePage =
           <% editList pages %>
          </div>
 
-editList ::  [(PageId, Text)] -> GenChildList (CMS AdminURL)
+editList ::  [(PageId, Text)] -> GenChildList (Clck AdminURL)
 editList [] = <%><p>There are currently no pages.</p></%>
 editList pgs =
     <%>
@@ -31,6 +31,6 @@ editList pgs =
      </ul>
     </%>
     where
-      editPageLI :: (PageId, Text) -> GenXML (CMS AdminURL)
+      editPageLI :: (PageId, Text) -> GenXML (Clck AdminURL)
       editPageLI (pid, ttl) =
           <li><a href=(EditPage pid)><% ttl %></a></li>

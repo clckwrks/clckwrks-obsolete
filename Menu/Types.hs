@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, TemplateHaskell #-}
 module Menu.Types where
 
--- import CMSMonad (CMS, Prefix(..), getPrefix, getUnique)
+-- import ClckwrksMonad (Clck, Prefix(..), getPrefix, getUnique)
 import Control.Applicative ((<$>))
 import Control.Monad.Trans (MonadIO(liftIO))
 import Data.Aeson

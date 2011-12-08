@@ -29,8 +29,8 @@ Library
                    Admin.NewPage 
                    Admin.EditPage
                    Clckwrks
-                   CMS
-                   CMSMonad
+                   ClckwrksMonad
+                   ClckwrksServer
                    FormPart
                    HsColour
                    Markdown

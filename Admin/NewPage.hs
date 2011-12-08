@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Admin.NewPage where
 
-import CMS
+import Clckwrks
 import Page.Acid as Acid
 
-newPage :: CMS AdminURL Response
+newPage :: Clck AdminURL Response
 newPage =
     do method POST
        page <- update Acid.NewPage

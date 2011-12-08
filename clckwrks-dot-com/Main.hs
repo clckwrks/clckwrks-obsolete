@@ -2,11 +2,11 @@
 module Main where
 
 import Clckwrks
-import CMS
+import ClckwrksServer
 
-data SiteURL = Clck ClckURL
+data SiteURL = C ClckURL
 
 main :: IO ()
 main = 
-  let c = defaultClckwrksConfig  { clckURL = Clck }
+  let c = defaultClckwrksConfig  { clckURL = C }
   in simpleClckwrks c

@@ -2,14 +2,14 @@
 module ProfileData.Route where
 
 import Control.Monad.State (get)
-import CMS
+import Clckwrks
 import Data.Set (singleton)
 import Happstack.Auth 
 import ProfileData.Acid
 import ProfileData.URL (ProfileDataURL(..))
 import ProfileData.Types
 
-routeProfileData :: ProfileDataURL -> CMS ProfileDataURL Response
+routeProfileData :: ProfileDataURL -> Clck ProfileDataURL Response
 routeProfileData url =
     case url of
       CreateNewProfileData ->

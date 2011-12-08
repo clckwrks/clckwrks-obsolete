@@ -5,7 +5,7 @@ module Admin.EditPage where
 import Admin.URL
 import Admin.Template
 import Control.Applicative ((<$>), (<*>), (<*))
-import CMS
+import Clckwrks
 import Data.Text (Text)
 import Data.Time.Clock (getCurrentTime)
 import FormPart (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
@@ -13,7 +13,7 @@ import Page.Acid
 import Text.Digestive
 import Text.Digestive.HSP.Html4 hiding (inputTextArea)
 
-editPage :: ClckURL -> PageId -> CMS ClckURL Response
+editPage :: ClckURL -> PageId -> Clck ClckURL Response
 editPage here pid =
     do mPage <- query $ PageById pid
        case mPage of
@@ -25,12 +25,12 @@ editPage here pid =
                    <% multiFormPart "ep" action updatePage Nothing (pageFormlet page) %>
                   </%>
     where
-      updatePage :: Page -> CMS ClckURL Response
+      updatePage :: Page -> Clck ClckURL Response
       updatePage page =
           do update (UpdatePage page)
              seeOtherURL (ViewPage (pageId page)) 
 
-pageFormlet :: Page -> FormDF (CMS ClckURL) Page
+pageFormlet :: Page -> FormDF (Clck ClckURL) Page
 pageFormlet page =
     (fieldset $
        ol $ (,,) <$> (li $ inputCheckBox hsColour <++ label "Highlight Haskell code with HsColour")

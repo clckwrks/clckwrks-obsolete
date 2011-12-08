@@ -4,11 +4,11 @@ import Admin.Console
 import Admin.URL
 import Admin.EditPage
 import Admin.NewPage
-import CMS
+import Clckwrks
 import Menu.Acid
 import Menu.Edit
 
-routeAdmin :: AdminURL -> CMS ClckURL Response
+routeAdmin :: AdminURL -> Clck ClckURL Response
 routeAdmin url =
     case url of
       Console        -> nestURL Admin $ consolePage
