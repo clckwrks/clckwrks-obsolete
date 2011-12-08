@@ -21,6 +21,7 @@ import Web.Routes.TH
 
 data ClckURL
     = ViewPage PageId
+    | ThemeData FilePath
     | Admin AdminURL
     | Profile ProfileDataURL
     | Auth AuthProfileURL

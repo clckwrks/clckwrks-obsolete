@@ -9,6 +9,8 @@ import CMS
 import qualified Data.Text as Text
 import Data.String          (fromString)
 import Happstack.Auth
+import Happstack.Server.FileServe.BuildingBlocks (guessContentTypeM, isSafePath, serveFile)
+import System.FilePath     ((</>), makeRelative, splitDirectories)
 import System.Plugins.Auto (PluginHandle, PluginConf(..), defaultPluginConf, initPlugins)
 import System.Plugins.Auto.Reloader (func)
 import ProfileData.Route    (routeProfileData)
@@ -35,7 +37,6 @@ defaultClckwrksConfig = ClckwrksConfig
       , clckJSTreePath   = "../jstree/"
       , clckJSON2Path    = "../json2/"
       }
-
         
 withClckwrks ::  (PluginHandle -> ClckState -> IO b) -> IO b
 withClckwrks action =
@@ -59,7 +60,7 @@ simpleClckwrks cc =
          [ jsHandlers cc
          , dir "favicon.ico" $ notFound (toResponse ())
          , dir "static"      $ serveDirectory DisableBrowsing [] "../static"
-         , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (cmsSite ph clckState)
+         , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite ph clckState)
          ]
               
 jsHandlers :: ClckwrksConfig u -> ServerPart Response
@@ -78,10 +79,16 @@ routeClck ph url =
              do setCurrentPage pid
                 fp <- themePath <$> get
                 let pc = (defaultPluginConf { pcGHCArgs = [ "-i" ++ fp] 
-                                            , pcWhenWatched = \fp -> print fp
-                                            , pcWhenChanged = \fp -> print fp
+--                                            , pcWhenWatched = \fp -> print fp
+--                                            , pcWhenChanged = \fp -> print fp
                                             })
                 withSymbol ph "PageMapper.hs" "pageMapper" pc page
+         (ThemeData fp')  ->
+             do fp <- themePath <$> get
+                let fp'' = makeRelative "/" fp'
+                if not (isSafePath (splitDirectories fp''))
+                   then notFound (toResponse ())
+                   else serveFile (guessContentTypeM mimeTypes) (fp </> "data" </> fp'')
          (Admin adminURL) ->
              routeAdmin adminURL
          (Profile profileDataURL) ->
@@ -91,8 +98,8 @@ routeClck ph url =
                 u <- showURL $ Profile CreateNewProfileData
                 nestURL Auth $ handleAuthProfile acidAuth acidProfile template Nothing Nothing u apURL
 
-cmsSite :: PluginHandle -> ClckState -> Site ClckURL (ServerPart Response)
-cmsSite ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
+clckSite :: PluginHandle -> ClckState -> Site ClckURL (ServerPart Response)
+clckSite ph cmsState = setDefault (ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =
           mapServerPartT (\m -> evalStateT m cmsState) $ unRouteT (unCMS $ routeClck ph u) f
