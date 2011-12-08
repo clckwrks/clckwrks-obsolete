@@ -3,7 +3,6 @@
 module Home where
 
 import Clckwrks
-import Data.Time.Clock
 
 summaryBox :: PageId -> GenXML (Clck ClckURL)
 summaryBox pid =
@@ -44,10 +43,7 @@ page :: XMLGenT (Clck ClckURL) XML
     <% summaryBox (PageId 3) %>
     <% summaryBox (PageId 4) %>
    </div>
-{-
-   <p><%  getCurrentTime %></p>
-   <p><% show <$> whoami %></p>
--}
+
    <p><a href=(Admin Console)>admin</a></p>
    <p><a href=(Auth $ AuthURL A_Login)>login</a></p>
 

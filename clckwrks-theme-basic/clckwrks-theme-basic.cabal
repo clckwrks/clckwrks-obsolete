@@ -1,0 +1,20 @@
+Name:                clckwrks-theme-basic
+Version:             0.1
+Synopsis:            A basic theme for clckwrks
+-- Description:         
+Homepage:            http://www.clckwrks.com/
+License:             BSD3
+License-file:        LICENSE
+Author:              Jeremy Shaw
+Maintainer:          jeremy@n-heptane.com
+-- Copyright:           
+Category:            Clckwrks
+Build-type:          Simple
+Cabal-version:       >=1.2
+
+Library
+  Exposed-modules:     Home, Page
+
+  Build-depends:
+        base < 4.4,
+        clckwrks

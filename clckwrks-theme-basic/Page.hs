@@ -3,7 +3,6 @@
 module Page where
 
 import Clckwrks
-import Data.Time.Clock
 
 page :: XMLGenT (Clck ClckURL) XML
 
