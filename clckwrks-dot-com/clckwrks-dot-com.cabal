@@ -51,17 +51,21 @@ Flag plugins
 
 Executable clckwrks-server
   Main-is: Main.hs
+  ghc-options: -threaded -O2
   Extensions: CPP
   Build-depends:
         base < 4.4,
-        clckwrks,
-        clckwrks-theme-basic
+        clckwrks
 
   if flag(plugins)
     Build-depends:
       mtl == 2.0.*,
-      plugins-auto
+      plugins-auto > 0.0.1
     cpp-options: -DPLUGINS
+  else
+    Build-depends:
+      clckwrks-theme-basic
+                                
   
 
 
