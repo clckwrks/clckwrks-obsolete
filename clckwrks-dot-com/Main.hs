@@ -22,6 +22,8 @@ clckwrksConfig = ClckwrksConfig
       , clckJQueryUIPath = "/usr/share/javascript/jquery-ui/"
       , clckJSTreePath   = "../jstree/"
       , clckJSON2Path    = "../json2/"
+      , clckThemeDir     = "../clckwrks-theme-basic/"
+      , clckStaticDir    = "../static"
 #ifdef PLUGINS
       , clckPageHandler  = undefined
 #else
