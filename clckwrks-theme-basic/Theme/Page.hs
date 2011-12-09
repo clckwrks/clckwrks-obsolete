@@ -11,8 +11,8 @@ page :: XMLGenT (Clck ClckURL) XML
 <html>
  <head>
   <title><% getPageTitle %></title>
-  <link rel="stylesheet" type="text/css" href="/ThemeData/style.css"    />
-  <link rel="stylesheet" type="text/css" href="/ThemeData/hscolour.css" />
+  <link rel="stylesheet" type="text/css" href=(ThemeData "style.css")    />
+  <link rel="stylesheet" type="text/css" href=(ThemeData "hscolour.css") />
  </head>
  <body>
   <div id="clckwrks-menu">
