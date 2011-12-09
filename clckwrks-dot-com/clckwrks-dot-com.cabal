@@ -45,16 +45,29 @@ Build-type:          Simple
 -- Constraint on the version of Cabal needed to build this package.
 Cabal-version:       >=1.2
 
+Flag plugins
+     Description: enable dynamic recompilation
+     Default: False
 
 Executable clckwrks-server
-  -- .hs or .lhs file containing the Main module.
   Main-is: Main.hs
-  
-  -- Packages needed in order to build this package.
+  Extensions: CPP
   Build-depends:
         base < 4.4,
-        clckwrks
+        clckwrks,
+        clckwrks-theme-basic
+
+  if flag(plugins)
+    Build-depends:
+      mtl == 2.0.*,
+      plugins-auto
+    cpp-options: -DPLUGINS
   
+
+
+
+
+        
   -- Modules not exported by this package.
   -- Other-modules:       
   
