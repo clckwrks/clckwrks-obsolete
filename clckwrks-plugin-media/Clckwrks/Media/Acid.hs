@@ -4,7 +4,7 @@ module Clckwrks.Media.Acid where
 import Control.Monad.Reader   (ask)
 import Control.Monad.State    (get, put)
 import Data.Acid              (Query, Update, makeAcidic)
-import Data.IxSet             (IxSet, (@=), getOne, updateIx)
+import Data.IxSet             (IxSet, (@=), getOne, empty, updateIx)
 import Data.SafeCopy          (base, deriveSafeCopy)
 import Clckwrks.Media.Types   (Media(..), MediaId(..))
 
@@ -13,6 +13,12 @@ data MediaState = MediaState
     , media       :: IxSet Media
     }
 $(deriveSafeCopy 0 'base ''MediaState)
+
+initialMediaState :: MediaState
+initialMediaState = MediaState
+    { nextMediaId = MediaId 0
+    , media       = empty
+    }
 
 -- | get the next unused 'MediaId'
 genMediaId :: Update MediaState MediaId
