@@ -14,6 +14,8 @@ Cabal-version:       >=1.2
 Library
   Exposed-modules:
     Clckwrks.Media.Acid
+    Clckwrks.Media.Monad
+    Clckwrks.Media.Route
     Clckwrks.Media.Types
     Clckwrks.Media.Upload
     Clckwrks.Media.URL
@@ -25,9 +27,11 @@ Library
     digestive-functors == 0.2.*,
     digestive-functors-hsp == 0.4.*,
     directory == 1.1.*,
+    filepath == 1.2.*,
     happstack-server == 6.4.*,
     hsp == 0.6.*,
-    ixset == 1.0.*,           
+    ixset == 1.0.*,
+    magic == 1.0.*,
     mtl == 2.0.*,
     safecopy == 0.6.*,
     text == 0.11.*,
