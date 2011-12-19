@@ -5,6 +5,6 @@ import Clckwrks.Media.Types (MediaId(..))
 import Web.Routes.TH (derivePathInfo)
 
 data MediaURL
-    = Media MediaId
+    = GetMedia MediaId
     | Upload
 $(derivePathInfo ''MediaURL)

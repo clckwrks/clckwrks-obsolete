@@ -3,6 +3,7 @@ module Main where
 
 import Clckwrks
 import ClckwrksServer
+import Clcwrks.Media
 
 #ifdef PLUGINS
 import Control.Monad.State (get)
