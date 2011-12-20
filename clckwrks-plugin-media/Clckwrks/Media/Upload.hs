@@ -1,18 +1,18 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Clckwrks.Media.Upload where
 
-import Admin.Template       (template)
 import Control.Applicative  ((<$>))
 import Control.Monad.Reader (ask)
 import Control.Monad.Trans  (liftIO)
 import Clckwrks             (update)
+import Clckwrks.Admin.Template (template)
+import Clckwrks.FormPart (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
 import Clckwrks.Media.Acid  (GenMediaId(..))
 import Clckwrks.Media.Monad (MediaConfig(..), MediaT)
 import Clckwrks.Media.Types (MediaId(..))
 import Clckwrks.Media.URL   (MediaURL(..))
 import Happstack.Server     (Response, ok, toResponse)
 import HSP
-import FormPart (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
 import Magic (magicFile)
 import Text.Digestive ((++>))
 import Text.Digestive.HSP.Html4 (inputFile, label)

@@ -2,8 +2,8 @@
 module Main where
 
 import Clckwrks
-import ClckwrksServer
-import Clcwrks.Media
+import Clckwrks.Server
+import Clckwrks.Media
 
 #ifdef PLUGINS
 import Control.Monad.State (get)
@@ -11,6 +11,9 @@ import System.Plugins.Auto (PluginHandle, PluginConf(..), defaultPluginConf, ini
 #else
 import PageMapper
 #endif
+
+import qualified Data.Text as Text
+import Web.Routes.Happstack
 
 clckwrksConfig :: ClckwrksConfig ClckURL
 clckwrksConfig = ClckwrksConfig
@@ -29,13 +32,29 @@ clckwrksConfig = ClckwrksConfig
       , clckPageHandler  = staticPageHandler
 #endif
       }
+
+clckwrks :: ClckwrksConfig u -> IO ()
+clckwrks cc =
+  withClckwrks cc $ \clckState ->
+   withMediaConfig Nothing "_uploads" $ \media ->
+    simpleHTTP (nullConf { port = clckPort cc }) (route cc clckState media)
+
+route :: ClckwrksConfig url -> ClckState -> MediaConfig -> ServerPartT IO Response
+route cc clckState media =
+    do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
+       msum $ 
+            [ jsHandlers cc
+            , dir "favicon.ico" $ notFound (toResponse ())
+            , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
+            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite (clckPageHandler cc) clckState)
+            ]
       
 #ifdef PLUGINS
 main :: IO ()
 main = 
   do ph <- initPlugins 
      putStrLn "Dynamic Server Started."
-     simpleClckwrks (clckwrksConfig { clckPageHandler = dynamicPageHandler ph })
+     clckwrks (clckwrksConfig { clckPageHandler = dynamicPageHandler ph })
 
 dynamicPageHandler :: PluginHandle -> Clck ClckURL Response
 dynamicPageHandler ph =
@@ -50,7 +69,7 @@ dynamicPageHandler ph =
 main :: IO ()
 main = 
   do putStrLn "Static Server Started."
-     simpleClckwrks clckwrksConfig
+     clckwrks clckwrksConfig
 
 staticPageHandler :: Clck ClckURL Response
 staticPageHandler = toResponse <$> unXMLGenT pageMapper

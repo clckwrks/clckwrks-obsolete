@@ -1,14 +1,14 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeSynonymInstances #-}
 module Clckwrks.Media.Monad where
 
-import Acid
-import Control.Applicative ((<$>))
-import Control.Exception (bracket)
-import Control.Monad.Reader (ReaderT(..), MonadReader(..))
 import Clckwrks (ClckT(..))
+import Clckwrks.Acid
 import Clckwrks.Media.Acid
 import Clckwrks.Media.Types
 import Clckwrks.Media.URL
+import Control.Applicative ((<$>))
+import Control.Exception (bracket)
+import Control.Monad.Reader (ReaderT(..), MonadReader(..))
 import Data.Acid (AcidState)
 import Data.Acid.Local (createCheckpointAndClose, openLocalStateFrom)
 import Data.Maybe (fromMaybe)

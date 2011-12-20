@@ -55,7 +55,10 @@ Executable clckwrks-server
   Extensions: CPP
   Build-depends:
         base < 4.4,
-        clckwrks
+        clckwrks,
+        clckwrks-plugin-media,
+        text,
+        web-routes-happstack
 
   if flag(plugins)
     Build-depends:
