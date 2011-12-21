@@ -1,6 +1,7 @@
 module Clckwrks.Media.Route where
 
-import Clckwrks.Media.Monad  (MediaT)
+import Clckwrks              (Clck)
+import Clckwrks.Media.Monad  (MediaT(..), MediaConfig(..))
 import Clckwrks.Media.URL    (MediaURL(..))
 import Clckwrks.Media.Upload (uploadMedia)
 import Happstack.Server      (Response)
@@ -10,3 +11,4 @@ routeMedia :: MediaURL -> MediaT IO Response
 routeMedia url =
     case url of
       Upload -> uploadMedia url
+    

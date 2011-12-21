@@ -1,9 +1,11 @@
 {-# LANGUAGE CPP, RecordWildCards #-}
 module Main where
 
+import Control.Monad.State (evalStateT)
 import Clckwrks
 import Clckwrks.Server
 import Clckwrks.Media
+import URL
 
 #ifdef PLUGINS
 import Control.Monad.State (get)
@@ -46,9 +48,22 @@ route cc clckState media =
             [ jsHandlers cc
             , dir "favicon.ico" $ notFound (toResponse ())
             , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
-            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite (clckPageHandler cc) clckState)
+--            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite (clckPageHandler cc) clckState)
+            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (site (clckPageHandler cc) clckState media)
             ]
+
+routeSite :: Clck ClckURL Response -> MediaConfig -> SiteURL -> Clck SiteURL Response
+routeSite pageHandler media url =
+    case url of
+      (C clckURL)  -> nestURL C $ routeClck pageHandler clckURL
+      (M mediaURL) -> nestURL M $ runMediaT media $ routeMedia mediaURL
       
+site :: Clck ClckURL Response -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
+site ph clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
+    where
+      route' f u =
+          mapServerPartT (\m -> evalStateT m clckState) $ unRouteT (unClck $ routeSite ph media u) f
+
 #ifdef PLUGINS
 main :: IO ()
 main = 

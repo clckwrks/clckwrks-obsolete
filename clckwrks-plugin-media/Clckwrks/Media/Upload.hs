@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Clckwrks.Media.Upload where
 
-import Control.Applicative  ((<$>))
+import Control.Applicative  ((<$>), (<*))
 import Control.Monad.Reader (ask)
 import Control.Monad.Trans  (liftIO)
 import Clckwrks             (update)
@@ -15,7 +15,7 @@ import Happstack.Server     (Response, ok, toResponse)
 import HSP
 import Magic (magicFile)
 import Text.Digestive ((++>))
-import Text.Digestive.HSP.Html4 (inputFile, label)
+import Text.Digestive.HSP.Html4 (inputFile, label, submit)
 import System.Directory (copyFile)
 import System.FilePath  ((</>), addExtension, takeExtension)
 import Web.Routes (showURL)
@@ -34,6 +34,7 @@ uploadMedia here =
              mid@(MediaId i) <- update GenMediaId
              magic <- mediaMagic <$> ask
              contentType <- liftIO $ magicFile magic tempPath
+--              liftIO $ putStrLn contentType -- "image/jpeg; charset=binary"
              liftIO $ copyFile tempPath ((md </> show i) `addExtension` (takeExtension origName))   -- renameFile would be faster, but may not work if it has to cross physical devices
              
 --             let media = Media 
@@ -41,4 +42,4 @@ uploadMedia here =
 
 uploadForm :: FormDF (MediaT IO) (Maybe (String, FilePath))
 uploadForm =
-    label "upload file: " ++> inputFile
+    label "upload file: " ++> inputFile <* submit "Upload"

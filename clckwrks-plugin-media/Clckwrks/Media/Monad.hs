@@ -1,10 +1,9 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeSynonymInstances #-}
 module Clckwrks.Media.Monad where
 
-import Clckwrks (ClckT(..))
+import Clckwrks (ClckT(..), ClckState, mapClckT)
 import Clckwrks.Acid
 import Clckwrks.Media.Acid
-import Clckwrks.Media.Types
 import Clckwrks.Media.URL
 import Control.Applicative ((<$>))
 import Control.Exception (bracket)
@@ -12,6 +11,8 @@ import Control.Monad.Reader (ReaderT(..), MonadReader(..))
 import Data.Acid (AcidState)
 import Data.Acid.Local (createCheckpointAndClose, openLocalStateFrom)
 import Data.Maybe (fromMaybe)
+import Happstack.Server
+import Happstack.Server.Internal.Monads (FilterFun)
 import Magic (Magic, MagicFlag(..), magicLoadDefault, magicOpen)
 import System.FilePath ((</>))
 
@@ -22,6 +23,13 @@ data MediaConfig = MediaConfig
     }
 
 type MediaT m = ClckT MediaURL (ReaderT MediaConfig m)
+
+runMediaT :: MediaConfig -> MediaT m a -> ClckT MediaURL m a
+runMediaT mc m = mapClckT f m
+    where
+      f :: ReaderT MediaConfig m (Maybe (Either Response a, FilterFun Response), ClckState) 
+        -> m (Maybe (Either Response a, FilterFun Response), ClckState)
+      f r = runReaderT r mc
 
 instance (Monad m) => MonadReader MediaConfig (MediaT m) where
     ask = ClckT $ ask
