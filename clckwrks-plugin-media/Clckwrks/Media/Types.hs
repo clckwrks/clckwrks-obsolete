@@ -16,12 +16,15 @@ data MediaKind
       deriving (Eq, Ord, Read, Show, Data, Typeable)
 $(deriveSafeCopy 0 'base ''MediaKind)
 
+mediaContentType :: MediaKind -> String
+mediaContentType JPEG = "image/jpeg; charset=binary"
+
 data Media
     = Media { mediaId     :: MediaId
             , uploadName  :: FilePath
             , mediaPath   :: FilePath
             , mediaKind   :: MediaKind
-            , fileSize    :: Integer
+--            , fileSize    :: Integer
             }
       deriving (Eq, Ord, Read, Show, Data, Typeable)
 
