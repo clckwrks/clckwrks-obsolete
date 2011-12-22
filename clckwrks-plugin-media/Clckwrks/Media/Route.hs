@@ -3,8 +3,8 @@ module Clckwrks.Media.Route where
 import Clckwrks                (Clck)
 import Clckwrks.Media.Monad    (MediaT(..), MediaConfig(..))
 import Clckwrks.Media.URL      (MediaURL(..))
-import Clckwrks.Media.GetMedia (getMedia)
-import Clckwrks.Media.Upload   (uploadMedia)
+import Clckwrks.Media.Page.GetMedia (getMedia)
+import Clckwrks.Media.Page.Upload   (uploadMedia)
 import Happstack.Server        (Response)
 import Magic
 

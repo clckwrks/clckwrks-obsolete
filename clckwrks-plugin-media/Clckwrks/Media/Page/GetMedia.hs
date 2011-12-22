@@ -1,4 +1,4 @@
-module Clckwrks.Media.GetMedia where
+module Clckwrks.Media.Page.GetMedia where
 
 import Clckwrks             (query)
 import Clckwrks.Media.Acid  (GetMediaById(..))

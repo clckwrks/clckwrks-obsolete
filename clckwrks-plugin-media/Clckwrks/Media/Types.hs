@@ -27,8 +27,14 @@ data Media
 --            , fileSize    :: Integer
             }
       deriving (Eq, Ord, Read, Show, Data, Typeable)
-
 $(deriveSafeCopy 0 'base ''Media)
+
+data PreviewSize
+    = Small
+    | Medium
+    | Large
+      deriving (Eq, Ord, Read, Show, Data, Typeable)
+$(deriveSafeCopy 0 'base ''PreviewSize)
 
 instance Indexable Media where
     empty = ixSet [ ixFun ((:[]) . mediaId)
