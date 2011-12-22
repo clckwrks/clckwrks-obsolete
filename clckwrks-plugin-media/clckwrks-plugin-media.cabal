@@ -16,15 +16,17 @@ Library
     Clckwrks.Media
     Clckwrks.Media.Acid
     Clckwrks.Media.Monad
+    Clckwrks.Media.Page.Upload
+    Clckwrks.Media.Page.GetMedia
     Clckwrks.Media.Route
     Clckwrks.Media.Types
-    Clckwrks.Media.Upload
     Clckwrks.Media.URL
 
   Build-depends:
     base < 4.5,
     acid-state == 0.6.*,
     clckwrks == 0.1.*,
+    containers == 0.4.*,
     digestive-functors == 0.2.*,
     digestive-functors-hsp == 0.4.*,
     directory == 1.1.*,
