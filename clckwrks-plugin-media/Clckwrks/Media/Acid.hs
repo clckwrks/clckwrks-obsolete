@@ -6,42 +6,42 @@ import Control.Monad.State    (get, put)
 import Data.Acid              (Query, Update, makeAcidic)
 import Data.IxSet             (IxSet, (@=), getOne, empty, updateIx)
 import Data.SafeCopy          (base, deriveSafeCopy)
-import Clckwrks.Media.Types   (Media(..), MediaId(..))
+import Clckwrks.Media.Types   (Medium(..), MediumId(..))
 
 data MediaState = MediaState 
-    { nextMediaId :: MediaId
-    , media       :: IxSet Media
+    { nextMediumId :: MediumId
+    , media        :: IxSet Medium
     }
 $(deriveSafeCopy 0 'base ''MediaState)
 
 initialMediaState :: MediaState
 initialMediaState = MediaState
-    { nextMediaId = MediaId 0
-    , media       = empty
+    { nextMediumId = MediumId 0
+    , media        = empty
     }
 
 -- | get the next unused 'MediaId'
-genMediaId :: Update MediaState MediaId
-genMediaId =
+genMediumId :: Update MediaState MediumId
+genMediumId =
     do ms@MediaState{..} <- get
-       put $ ms { nextMediaId = MediaId $ succ $ unMediaId $ nextMediaId }
-       return nextMediaId
+       put $ ms { nextMediumId = MediumId $ succ $ unMediumId $ nextMediumId }
+       return nextMediumId
 
--- | get 'Media' by 'MediaId'
-getMediaById :: MediaId -> Query MediaState (Maybe Media)
-getMediaById mid =
+-- | get 'Media' by 'MediumId'
+getMediumById :: MediumId -> Query MediaState (Maybe Medium)
+getMediumById mid =
     do MediaState{..} <- ask
        return $ getOne (media @= mid)
 
--- | store 'Media' in the state. Will overwrite an existing entry with the same 'MediaId'
-putMedia :: Media -> Update MediaState ()
-putMedia m =
+-- | store 'Media' in the state. Will overwrite an existing entry with the same 'MediumId'
+putMedium :: Medium -> Update MediaState ()
+putMedium m =
     do ms@MediaState{..} <- get
-       put $ ms { media = updateIx (mediaId m) m media }
+       put $ ms { media = updateIx (mediumId m) m media }
 
 $(makeAcidic ''MediaState 
-   [ 'genMediaId
-   , 'getMediaById
-   , 'putMedia
+   [ 'genMediumId
+   , 'getMediumById
+   , 'putMedium
    ]
  )

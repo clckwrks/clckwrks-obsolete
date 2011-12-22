@@ -7,9 +7,9 @@ import Control.Monad.Trans  (liftIO)
 import Clckwrks             (update, seeOtherURL)
 import Clckwrks.Admin.Template (template)
 import Clckwrks.FormPart (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
-import Clckwrks.Media.Acid  (GenMediaId(..), PutMedia(..))
+import Clckwrks.Media.Acid  (GenMediumId(..), PutMedium(..))
 import Clckwrks.Media.Monad (MediaConfig(..), MediaT)
-import Clckwrks.Media.Types (Media(..), MediaId(..), MediaKind(..))
+import Clckwrks.Media.Types (Medium(..), MediumId(..), MediumKind(..))
 import Clckwrks.Media.URL   (MediaURL(..))
 import           Data.Map   (Map)
 import qualified Data.Map   as Map
@@ -22,7 +22,7 @@ import System.Directory (copyFile)
 import System.FilePath  ((</>), addExtension, takeExtension)
 import Web.Routes (showURL)
 
-extensionMap :: Map String (String, MediaKind)
+extensionMap :: Map String (String, MediumKind)
 extensionMap =
     Map.fromList 
            [ ("image/jpeg", ("jpg", JPEG))
@@ -31,19 +31,19 @@ extensionMap =
 acceptedTypes :: [String]
 acceptedTypes = Map.keys extensionMap 
 
-contentTypeExtension :: String -> Maybe (String, MediaKind)
+contentTypeExtension :: String -> Maybe (String, MediumKind)
 contentTypeExtension ct = Map.lookup (takeWhile (/= ';') ct) extensionMap
 
-uploadMedia :: MediaURL -> MediaT IO Response
-uploadMedia here =
+uploadMedium :: MediaURL -> MediaT IO Response
+uploadMedium here =
     do action <- showURL here
-       template "upload media" () $
+       template "Upload Medium" () $
         <%>
-         <% multiFormPart "ep" action saveMedia Nothing uploadForm %>
+         <% multiFormPart "ep" action saveMedium Nothing uploadForm %>
         </%>
     where
-      saveMedia :: Maybe (String, FilePath) -> MediaT IO Response
-      saveMedia (Just (origName, tempPath)) =
+      saveMedium :: Maybe (String, FilePath) -> MediaT IO Response
+      saveMedium (Just (origName, tempPath)) =
           do md <- mediaDirectory <$> ask
              magic <- mediaMagic <$> ask
              contentType <- liftIO $ magicFile magic tempPath
@@ -58,16 +58,16 @@ uploadMedia here =
                 (Just (ext, kind)) ->
                     do -- renameFile would be faster, but may not work if it has to cross physical devices
                        -- in theory, the filename could be the md5sum of the file making it easy to check for corruption
-                       mid@(MediaId i) <- update GenMediaId
-                       let destPath = (md </> show i) `addExtension` ext
-                       liftIO $ copyFile tempPath destPath
-                       let media = Media { mediaId    = mid
-                                         , uploadName = origName
-                                         , mediaPath  = destPath
-                                         , mediaKind  = kind
-                                         }
-                       update (PutMedia media)
-                       seeOtherURL (GetMedia mid)
+                       mid@(MediumId i) <- update GenMediumId
+                       let destPath = show i `addExtension` ext
+                       liftIO $ copyFile tempPath (md </> destPath)
+                       let medium = Medium { mediumId   = mid
+                                           , uploadName = origName
+                                           , mediumPath = destPath
+                                           , mediumKind = kind
+                                           }
+                       update (PutMedium medium)
+                       seeOtherURL (GetMedium mid)
 
 uploadForm :: FormDF (MediaT IO) (Maybe (String, FilePath))
 uploadForm =

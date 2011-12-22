@@ -1,10 +1,11 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Clckwrks.Media.URL where
 
-import Clckwrks.Media.Types (MediaId(..))
+import Clckwrks.Media.Types (MediumId(..))
 import Web.Routes.TH (derivePathInfo)
 
 data MediaURL
-    = GetMedia MediaId
+    = GetMedium MediumId
     | Upload
+    | Preview MediumId
 $(derivePathInfo ''MediaURL)

@@ -5,37 +5,36 @@ import Data.Data (Data, Typeable)
 import Data.IxSet (Indexable(..), ixSet, ixFun)
 import Data.SafeCopy (SafeCopy, base, deriveSafeCopy)
 import Data.Text     (Text)
-import Web.Routes.TH (derivePathInfo)
+import Web.Routes    (PathInfo(..))
 
-newtype MediaId = MediaId { unMediaId :: Integer } 
-    deriving (Eq, Ord, Read, Show, Data, Typeable, SafeCopy)
-$(derivePathInfo ''MediaId)
+newtype MediumId = MediumId { unMediumId :: Integer } 
+    deriving (Eq, Ord, Read, Show, Data, Typeable, SafeCopy, PathInfo)
 
-data MediaKind
+data MediumKind
     = JPEG
       deriving (Eq, Ord, Read, Show, Data, Typeable)
-$(deriveSafeCopy 0 'base ''MediaKind)
+$(deriveSafeCopy 0 'base ''MediumKind)
 
-mediaContentType :: MediaKind -> String
-mediaContentType JPEG = "image/jpeg; charset=binary"
+mediumContentType :: MediumKind -> String
+mediumContentType JPEG = "image/jpeg; charset=binary"
 
-data Media
-    = Media { mediaId     :: MediaId
-            , uploadName  :: FilePath
-            , mediaPath   :: FilePath
-            , mediaKind   :: MediaKind
---            , fileSize    :: Integer
-            }
+data Medium
+    = Medium { mediumId     :: MediumId
+             , uploadName   :: FilePath
+             , mediumPath   :: FilePath
+             , mediumKind   :: MediumKind
+             -- , fileSize    :: Integer
+             }
       deriving (Eq, Ord, Read, Show, Data, Typeable)
-$(deriveSafeCopy 0 'base ''Media)
+$(deriveSafeCopy 0 'base ''Medium)
 
 data PreviewSize
-    = Small
-    | Medium
-    | Large
+    = Tall
+    | Grande
+    | Venti
       deriving (Eq, Ord, Read, Show, Data, Typeable)
 $(deriveSafeCopy 0 'base ''PreviewSize)
 
-instance Indexable Media where
-    empty = ixSet [ ixFun ((:[]) . mediaId)
+instance Indexable Medium where
+    empty = ixSet [ ixFun ((:[]) . mediumId)
                   ]

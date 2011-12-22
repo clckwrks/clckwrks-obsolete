@@ -16,8 +16,10 @@ Library
     Clckwrks.Media
     Clckwrks.Media.Acid
     Clckwrks.Media.Monad
+    Clckwrks.Media.Preview
     Clckwrks.Media.Page.Upload
-    Clckwrks.Media.Page.GetMedia
+    Clckwrks.Media.Page.GetMedium
+    Clckwrks.Media.Page.Preview
     Clckwrks.Media.Route
     Clckwrks.Media.Types
     Clckwrks.Media.URL
@@ -31,6 +33,7 @@ Library
     digestive-functors-hsp == 0.4.*,
     directory == 1.1.*,
     filepath == 1.2.*,
+    gd == 3000.*,
     happstack-server == 6.4.*,
     hsp == 0.6.*,
     ixset == 1.0.*,
