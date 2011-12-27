@@ -5,6 +5,11 @@ import Control.Monad.State (evalStateT)
 import Clckwrks
 import Clckwrks.Server
 import Clckwrks.Media
+import Clckwrks.Media.PreProcess (mediaCmd)
+import qualified Data.ByteString.Char8 as C
+import Data.List (intercalate)
+import qualified Data.Map as Map
+import Data.Monoid (mappend)
 import URL
 
 #ifdef PLUGINS
@@ -35,11 +40,70 @@ clckwrksConfig = ClckwrksConfig
 #endif
       }
 
-clckwrks :: ClckwrksConfig u -> IO ()
-clckwrks cc =
+clckwrks' :: ToMessage a =>
+             Text.Text
+          -> ClckwrksConfig url
+          -> (ClckState -> MediaConfig -> RouteT SiteURL (ServerPartT IO) a)
+          -> IO ()
+clckwrks' approot cc handler =
   withClckwrks cc $ \clckState ->
-   withMediaConfig Nothing "_uploads" $ \media ->
-    simpleHTTP (nullConf { port = clckPort cc }) (route cc clckState media)
+   withMediaConfig Nothing "_uploads" clckState $ \clckState' mediaConfig ->
+       let s = site (clckPageHandler cc) clckState' mediaConfig
+       in unRouteT (r clckState mediaConfig) (showUrlFn s)
+    where
+      showUrlFn s url qs =
+        let (pieces, qs') = formatPathSegments s url
+        in approot `mappend` encodePathInfo pieces (qs ++ qs')
+      r :: ClckState -> MediaConfig -> RouteT SiteURL IO ()
+      r clckState mediaConfig = 
+          do rf <- askRouteFn
+             let clckState' = clckState { preProcessorCmds = Map.insert (Text.pack "media") (mediaCmd (\u p -> rf (M u) p)) (preProcessorCmds clckState) }
+             clckwrks_ cc (handler clckState' mediaConfig)
+
+clckwrks_ :: (ToMessage a) => ClckwrksConfig u -> RouteT SiteURL (ServerPartT IO) a -> RouteT SiteURL IO ()
+clckwrks_ cc (RouteT handler) = RouteT $ \showURLFn ->
+    simpleHTTP (nullConf { port = clckPort cc }) (handler showURLFn)
+
+
+clckwrks cc = clckwrks' Text.empty cc (route' Text.empty cc)
+
+route' :: Text.Text -> ClckwrksConfig url -> ClckState -> MediaConfig -> RouteT SiteURL (ServerPartT IO) Response
+route' approot cc clckState mediaConfig =
+    (lift $ do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
+               msum $  [ jsHandlers cc
+                      , dir "favicon.ico" $ notFound (toResponse ())
+                      , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
+--            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite (clckPageHandler cc) clckState)
+--            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (site (clckPageHandler cc) clckState media)
+                      ])
+     `mplus` r
+    where
+      r :: RouteT SiteURL (ServerPartT IO) Response
+      r = dirs (Text.unpack approot) $
+            do rq <- askRq
+               let pathInfo = intercalate "/" (map escapeSlash (rqPaths rq))
+                   s = site (clckPageHandler cc) clckState mediaConfig
+               case parsePathSegments s $ decodePathInfo (C.pack pathInfo) of
+                 (Left parseError) -> notFound $ toResponse parseError
+                 (Right url) ->
+                     mapRouteT (mapServerPartT (\m -> evalStateT m clckState)) $ unClck $ routeSite (clckPageHandler cc) mediaConfig url
+
+{-
+                   f        = runSite (domain `Text.append` approot) siteSpec (C.pack pathInfo)
+               case f of
+                 (Left parseError) -> return (Left parseError)
+                 (Right sp)   -> Right <$> (localRq (const $ rq { rqPaths = [] }) sp)
+-}
+      escapeSlash :: String -> String
+      escapeSlash [] = []
+      escapeSlash ('/':cs) = "%2F" ++ escapeSlash cs
+      escapeSlash (c:cs)   = c : escapeSlash cs
+    
+clckwrksOld :: ClckwrksConfig u -> IO ()
+clckwrksOld cc =
+  withClckwrks cc $ \clckState ->
+   withMediaConfig Nothing "_uploads" clckState $ \clckState' media ->
+    simpleHTTP (nullConf { port = clckPort cc }) (route cc clckState' media)
 
 route :: ClckwrksConfig url -> ClckState -> MediaConfig -> ServerPartT IO Response
 route cc clckState media =
@@ -54,9 +118,10 @@ route cc clckState media =
 
 routeSite :: Clck ClckURL Response -> MediaConfig -> SiteURL -> Clck SiteURL Response
 routeSite pageHandler media url =
-    case url of
-      (C clckURL)  -> nestURL C $ routeClck pageHandler clckURL
-      (M mediaURL) -> nestURL M $ runMediaT media $ routeMedia mediaURL
+    do 
+       case url of
+        (C clckURL)  -> nestURL C $ routeClck pageHandler clckURL
+        (M mediaURL) -> nestURL M $ runMediaT media $ routeMedia mediaURL
       
 site :: Clck ClckURL Response -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
 site ph clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
