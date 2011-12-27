@@ -8,7 +8,7 @@ import Clckwrks             (update, seeOtherURL)
 import Clckwrks.Admin.Template (template)
 import Clckwrks.FormPart (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
 import Clckwrks.Media.Acid  (GenMediumId(..), PutMedium(..))
-import Clckwrks.Media.Monad (MediaConfig(..), MediaT)
+import Clckwrks.Media.Monad (MediaConfig(..), MediaM)
 import Clckwrks.Media.Types (Medium(..), MediumId(..), MediumKind(..))
 import Clckwrks.Media.URL   (MediaURL(..))
 import           Data.Map   (Map)
@@ -34,7 +34,7 @@ acceptedTypes = Map.keys extensionMap
 contentTypeExtension :: String -> Maybe (String, MediumKind)
 contentTypeExtension ct = Map.lookup (takeWhile (/= ';') ct) extensionMap
 
-uploadMedium :: MediaURL -> MediaT IO Response
+uploadMedium :: MediaURL -> MediaM Response
 uploadMedium here =
     do action <- showURL here
        template "Upload Medium" () $
@@ -42,7 +42,7 @@ uploadMedium here =
          <% multiFormPart "ep" action saveMedium Nothing uploadForm %>
         </%>
     where
-      saveMedium :: Maybe (String, FilePath) -> MediaT IO Response
+      saveMedium :: Maybe (String, FilePath) -> MediaM Response
       saveMedium (Just (origName, tempPath)) =
           do md <- mediaDirectory <$> ask
              magic <- mediaMagic <$> ask
@@ -69,6 +69,6 @@ uploadMedium here =
                        update (PutMedium medium)
                        seeOtherURL (GetMedium mid)
 
-uploadForm :: FormDF (MediaT IO) (Maybe (String, FilePath))
+uploadForm :: FormDF MediaM (Maybe (String, FilePath))
 uploadForm =
     label "upload file: " ++> inputFile <* submit "Upload"

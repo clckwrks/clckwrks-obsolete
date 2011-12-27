@@ -86,14 +86,7 @@ route' approot cc clckState mediaConfig =
                case parsePathSegments s $ decodePathInfo (C.pack pathInfo) of
                  (Left parseError) -> notFound $ toResponse parseError
                  (Right url) ->
-                     mapRouteT (mapServerPartT (\m -> evalStateT m clckState)) $ unClck $ routeSite (clckPageHandler cc) mediaConfig url
-
-{-
-                   f        = runSite (domain `Text.append` approot) siteSpec (C.pack pathInfo)
-               case f of
-                 (Left parseError) -> return (Left parseError)
-                 (Right sp)   -> Right <$> (localRq (const $ rq { rqPaths = [] }) sp)
--}
+                     mapRouteT (\m -> evalStateT m clckState) $ unClckT $ routeSite (clckPageHandler cc) mediaConfig url
       escapeSlash :: String -> String
       escapeSlash [] = []
       escapeSlash ('/':cs) = "%2F" ++ escapeSlash cs
@@ -127,7 +120,7 @@ site :: Clck ClckURL Response -> ClckState -> MediaConfig -> Site SiteURL (Serve
 site ph clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =
-          mapServerPartT (\m -> evalStateT m clckState) $ unRouteT (unClck $ routeSite ph media u) f
+          evalStateT (unRouteT (unClckT $ routeSite ph media u) f) clckState
 
 #ifdef PLUGINS
 main :: IO ()

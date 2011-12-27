@@ -9,7 +9,7 @@ import Clckwrks.Media.Monad
 import Clckwrks.Media.Types
 import Happstack.Server
 
-previewMedium :: MediumId -> MediaT IO Response
+previewMedium :: MediumId -> MediaM Response
 previewMedium mid =
     do size <- lookSize
        mFp <- previewMediumFilePath mid size
@@ -17,7 +17,7 @@ previewMedium mid =
          Nothing -> notFound $ toResponse $ "Invalid MediumId " ++ show (unMediumId mid)
          (Just fp) -> serveFile (guessContentTypeM mimeTypes) fp
 
-lookSize :: MediaT IO PreviewSize
+lookSize :: MediaM PreviewSize
 lookSize =
     do txt <- look "size"
        case txt of
@@ -26,7 +26,7 @@ lookSize =
          "venti"  -> return Venti
          _        -> mzero
 
-previewMediumFilePath :: MediumId -> PreviewSize -> MediaT IO (Maybe FilePath)
+previewMediumFilePath :: MediumId -> PreviewSize -> MediaM (Maybe FilePath)
 previewMediumFilePath mediumId size =
     do filterChan <- mediaIOThread <$> ask
        res <- query (GetMediumById mediumId)

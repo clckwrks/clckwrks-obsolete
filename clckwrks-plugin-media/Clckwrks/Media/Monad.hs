@@ -30,12 +30,11 @@ data MediaConfig = MediaConfig
     }
 
 type MediaT m = ClckT MediaURL (ReaderT MediaConfig m)
+type MediaM = ClckT MediaURL (ReaderT MediaConfig (ServerPartT IO))
 
 runMediaT :: MediaConfig -> MediaT m a -> ClckT MediaURL m a
 runMediaT mc m = mapClckT f m
     where
-      f :: ReaderT MediaConfig m (Maybe (Either Response a, FilterFun Response), ClckState)
-        -> m (Maybe (Either Response a, FilterFun Response), ClckState)
       f r = runReaderT r mc
 
 instance (Monad m) => MonadReader MediaConfig (MediaT m) where
