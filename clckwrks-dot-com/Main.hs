@@ -103,50 +103,6 @@ runSitePlus sitePlus =
          (Left _)  -> mzero
          (Right a) -> return a
 
-{-
-clckwrks' :: ToMessage a =>
-             Text.Text
-          -> ClckwrksConfig url
-          -> (ClckState -> MediaConfig -> RouteT SiteURL (ServerPartT IO) a)
-          -> IO ()
-clckwrks' approot cc handler =
-  withClckwrks cc $ \clckState ->
-   withMediaConfig Nothing "_uploads" clckState $ \clckState' mediaConfig ->
-       let s = site (clckPageHandler cc) clckState' mediaConfig
-       in unRouteT (r clckState mediaConfig) (showUrlFn s)
-    where
-      showUrlFn s url qs =
-        let (pieces, qs') = formatPathSegments s url
-        in approot `mappend` encodePathInfo pieces (qs ++ qs')
-      r :: ClckState -> MediaConfig -> RouteT SiteURL IO ()
-      r clckState mediaConfig = 
-          do rf <- askRouteFn
-             let clckState' = clckState { preProcessorCmds = Map.insert (Text.pack "media") (mediaCmd (\u p -> rf (M u) p)) (preProcessorCmds clckState) }
-             clckwrks_ cc (handler clckState' mediaConfig)
--}
-{-
-clckwrksServer :: (ToMessage a) => Conf -> ClckT SiteURL (ServerPartT IO) a -> IO ()
-clckwrksServer =
-    runClckT
--}
-mkSite3 :: ClckwrksConfig url -> ClckState -> MediaConfig -> Site SiteURL (ServerPartT IO Response)
-mkSite3 cc clckState mediaConfig = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
-    where
-      route' :: (SiteURL -> [(Text.Text, Maybe Text.Text)] -> Text.Text) -> SiteURL -> (ServerPartT IO Response)
-      route' f u =
-          evalStateT (unRouteT (unClckT (route2 cc mediaConfig u)) f) clckState
-{-
-          routeSite ph media u
--}
-
-mkSite4 :: ClckwrksConfig url -> ClckState -> MediaConfig -> Site SiteURL (ClckT SiteURL IO Response)
-mkSite4 cc clckState mediaConfig = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
-    where
-      route' :: (SiteURL -> [(Text.Text, Maybe Text.Text)] -> Text.Text) -> SiteURL -> (ClckT SiteURL IO Response)
-      route' f u = undefined
---           evalStateT (unRouteT (unClckT (route2 cc mediaConfig u)) f) clckState
-
-
 clckwrksServer' :: (ToMessage a) => Conf -> ClckT SiteURL (ServerPartT IO) a -> ClckT SiteURL IO ()
 clckwrksServer' conf handler = 
     do cs <- get
@@ -167,28 +123,6 @@ route2 cc mediaConfig url =
 runTheSite :: Site SiteURL (ClckT SiteURL (ServerPartT IO) Response) -> IO ()
 runTheSite site = undefined
 
-{-
-addMediaPlugin :: Site SiteURL (ClckT SiteURL (ServerPartT IO) Response) -> ClckT SiteURL (ServerPartT IO) ()
-addMediaPlugin site u = 
-    do rf <- askRouteFn
-       modify $ \clckState -> clckState { preProcessorCmds = Map.insert (Text.pack "media") (mediaCmd (\u p -> rf (M u) p)) (preProcessorCmds clckState) }
-       liftIO $ simpleHTTP nullConf $ 
-       implSite
--}
-{-
-clckwrks cc =
-  withClckwrks cc $ \clckState ->
-   withMediaConfig Nothing "_uploads" $ \mediaConfig ->
-    do let conf = nullConf { port = clckPort cc }
-           site = mkSite2 cc mediaConfig
-       runTheSite site
--}
-{-
-    in simpleHTTP conf $ implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (mkSite3 cc clckState' mediaConfig)
--}
-{-
-    in implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (mkSite3 cc conf clckState' mediaConfig)
--}
 route' :: Text.Text -> ClckwrksConfig url -> ClckState -> MediaConfig -> RouteT SiteURL (ServerPartT IO) Response
 route' approot cc clckState mediaConfig =
     (lift $ do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
@@ -213,18 +147,7 @@ route' approot cc clckState mediaConfig =
       escapeSlash [] = []
       escapeSlash ('/':cs) = "%2F" ++ escapeSlash cs
       escapeSlash (c:cs)   = c : escapeSlash cs
-{-
-runClckwrks :: Conf -> Text.Text -> ClckT SiteURL IO () -> ClckState -> Site SiteURL (ClckT SiteURL (ServerPartT IO) Response) -> IO ()
-runClckwrks conf approot init clckState site  =
-    do -- runClckT showFn clckState init
-       simpleHTTP conf $ runClckT showFn clckState (handleSite site)
-    where
-    showFn url qs =
-        let (pieces, qs') = formatPathSegments site url
-        in approot `mappend` (encodePathInfo pieces (qs ++ qs'))
 
-  -}  
-    
 clckwrks :: ClckwrksConfig SiteURL -> IO ()
 clckwrks cc =
     withClckwrks cc $ \clckState ->
