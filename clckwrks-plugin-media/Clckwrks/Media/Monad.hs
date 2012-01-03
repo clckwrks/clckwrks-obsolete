@@ -46,18 +46,17 @@ instance (Functor m, Monad m) => GetAcidState (MediaT m) MediaState where
         mediaState <$> ask
 
 -- seems silly that we have to pass ClckState manually here. Should be able to use get/set/modify by now?
-withMediaConfig :: Maybe FilePath -> FilePath -> ClckState -> (ClckState -> MediaConfig -> IO a) -> IO a
-withMediaConfig mBasePath mediaDir clckState f =
+withMediaConfig :: Maybe FilePath -> FilePath -> (MediaConfig -> IO a) -> IO a
+withMediaConfig mBasePath mediaDir f =
     do let basePath = fromMaybe "_state" mBasePath
            cacheDir  = mediaDir </> "_cache"
-           clckState' = clckState -- { preProcessorCmds = Map.insert mediaCmd (preProcessorCmds clckState) }
        createDirectoryIfMissing True cacheDir
        bracket (openLocalStateFrom (basePath </> "media") initialMediaState) (createCheckpointAndClose) $ \media ->
          bracket (startIOThread (applyTransforms mediaDir cacheDir)) killIOThread $ \ioThread ->
            do magic <- magicOpen [MagicMime, MagicError]
               magicLoadDefault magic
-              f clckState' (MediaConfig { mediaDirectory = mediaDir
-                                        , mediaState     = media
-                                        , mediaMagic     = magic
-                                        , mediaIOThread  = ioThread
-                                        })
+              f (MediaConfig { mediaDirectory = mediaDir
+                             , mediaState     = media
+                             , mediaMagic     = magic
+                             , mediaIOThread  = ioThread
+                             })
