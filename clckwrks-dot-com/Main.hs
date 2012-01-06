@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE CPP, RankNTypes, RecordWildCards, OverloadedStrings #-}
 module Main where
 
 import Control.Monad.State (evalStateT, get, modify)
@@ -13,6 +13,7 @@ import Data.Monoid (mappend)
 import Data.Text  (Text)
 import Data.Text.Lazy.Builder (Builder)
 import qualified Data.Text as Text
+import System.Environment (getArgs)
 import URL
 import Web.Routes.Happstack
 
@@ -149,17 +150,25 @@ route' approot cc clckState mediaConfig =
       escapeSlash (c:cs)   = c : escapeSlash cs
 
 clckwrks :: ClckwrksConfig SiteURL -> IO ()
-clckwrks cc =
-    withClckwrks cc $ \clckState ->
-        withMediaConfig Nothing "_uploads" $ \mediaConf ->
-            let -- site     = mkSite (clckPageHandler cc) clckState mediaConf
-                site     = mkSite2 cc mediaConf
-                sitePlus = mkSitePlus (Text.pack "localhost") (clckPort cc) Text.empty site
-                mediaCmd' :: forall url m. (Monad m) => (Text -> ClckT url m Builder)
-                mediaCmd' = mediaCmd (\u p -> (siteShowURL sitePlus) (M u) p)
-                clckState' = clckState { preProcessorCmds = Map.insert (Text.pack "media") mediaCmd' (preProcessorCmds clckState) }
-                sitePlus'  = fmap (runClckT (siteShowURL sitePlus) clckState') sitePlus
-            in simpleHTTP (nullConf { port = clckPort cc }) (route cc sitePlus')
+clckwrks cc' =
+    do args <- getArgs
+       let cc = case args of
+                  [] -> cc'
+                  (h:_) -> cc' { clckHostname = h }
+       withClckwrks cc $ \clckState ->
+           withMediaConfig Nothing "_uploads" $ \mediaConf ->
+               let -- site     = mkSite (clckPageHandler cc) clckState mediaConf
+                   site     = mkSite2 cc mediaConf
+                   sitePlus = mkSitePlus (Text.pack $ clckHostname cc) (clckPort cc) Text.empty site
+               in 
+                 do ((), clckState') <- runClckT (siteShowURL sitePlus) clckState $ 
+                                        do showFn <- askRouteFn
+                                           let mediaCmd' :: forall url m. (Monad m) => (Text -> ClckT url m Builder)
+                                               mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
+                                           addPreProcessor "media" mediaCmd'
+                                           nestURL M $ addMediaAdminMenu
+                    let sitePlus'  = fmap (evalClckT (siteShowURL sitePlus) clckState') sitePlus
+                    simpleHTTP (nullConf { port = clckPort cc }) (route cc sitePlus')
 
 route :: Happstack m => ClckwrksConfig url -> SitePlus url (m Response) -> m Response
 route cc sitePlus =

@@ -1,7 +1,7 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, TypeSynonymInstances, OverloadedStrings #-}
 module Clckwrks.Media.Monad where
 
-import Clckwrks            (ClckT(..), ClckState(..), mapClckT)
+import Clckwrks            (ClckT(..), ClckState(..), mapClckT, addAdminMenu)
 import Clckwrks.Acid
 import Clckwrks.IOThread   (IOThread(..), startIOThread, killIOThread)
 import Clckwrks.Media.Acid
@@ -21,6 +21,7 @@ import Happstack.Server.Internal.Monads (FilterFun)
 import Magic                (Magic, MagicFlag(..), magicLoadDefault, magicOpen)
 import System.Directory     (createDirectoryIfMissing)
 import System.FilePath      ((</>))
+import Web.Routes           (showURL)
 
 data MediaConfig = MediaConfig
     { mediaDirectory :: FilePath -- ^ directory in which to store uploaded media files
@@ -60,3 +61,9 @@ withMediaConfig mBasePath mediaDir f =
                              , mediaMagic     = magic
                              , mediaIOThread  = ioThread
                              })
+
+addMediaAdminMenu :: ClckT MediaURL IO ()
+addMediaAdminMenu = 
+    do uploadURL <- showURL Upload
+       addAdminMenu "Media Gallery" [("upload", uploadURL)]
+
