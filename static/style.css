@@ -1,3 +1,9 @@
+body
+{
+    margin: 0;
+    padding: 0;
+}
+
 form fieldset
 {
     border: none;
@@ -6,4 +12,49 @@ form fieldset
 form ol
 {
     list-style-type: none;
+}
+
+/* admin console */
+
+#admin-sidebar
+{
+    width: 200px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0;
+}
+
+#admin-body
+{
+    position: absolute;
+    top: 0;
+    left: 200px;
+    border-left: 1px solid black;
+}
+
+ul#admin-menu 
+{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+}
+
+#admin-menu ul
+{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+.admin-menu-category-title
+{
+    width: 100%;
+    display: block;
+    font-weight: bold;
+    color: white;
+    background: gray;
+    font-size: 1.1em;
 }
