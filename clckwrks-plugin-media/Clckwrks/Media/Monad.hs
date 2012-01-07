@@ -65,5 +65,5 @@ withMediaConfig mBasePath mediaDir f =
 addMediaAdminMenu :: ClckT MediaURL IO ()
 addMediaAdminMenu = 
     do uploadURL <- showURL Upload
-       addAdminMenu "Media Gallery" [("upload", uploadURL)]
+       addAdminMenu ("Media Gallery", [("upload", uploadURL)])
 

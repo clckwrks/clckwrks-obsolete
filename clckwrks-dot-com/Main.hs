@@ -3,6 +3,7 @@ module Main where
 
 import Control.Monad.State (evalStateT, get, modify)
 import Clckwrks
+import Clckwrks.Admin.Template (defaultAdminMenu)
 import Clckwrks.Server
 import Clckwrks.Media
 import Clckwrks.Media.PreProcess (mediaCmd)
@@ -167,6 +168,8 @@ clckwrks cc' =
                                                mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
                                            addPreProcessor "media" mediaCmd'
                                            nestURL M $ addMediaAdminMenu
+                                           dm <- nestURL C $ defaultAdminMenu
+                                           mapM_ addAdminMenu dm
                     let sitePlus'  = fmap (evalClckT (siteShowURL sitePlus) clckState') sitePlus
                     simpleHTTP (nullConf { port = clckPort cc }) (route cc sitePlus')
 

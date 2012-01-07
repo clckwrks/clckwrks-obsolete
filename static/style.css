@@ -23,14 +23,15 @@ form ol
     top: 0;
     left: 0;
     padding: 0;
+    border-right: 1px solid black;
+    height: 100%;
 }
 
 #admin-body
 {
     position: absolute;
     top: 0;
-    left: 200px;
-    border-left: 1px solid black;
+    left: 210px;
 }
 
 ul#admin-menu 
