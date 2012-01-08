@@ -11,7 +11,7 @@ import Happstack.Server
 
 previewMedium :: MediumId -> MediaM Response
 previewMedium mid =
-    do size <- lookSize
+    do size <- lookSize <|> pure Tall
        mFp <- previewMediumFilePath mid size
        case mFp of 
          Nothing -> notFound $ toResponse $ "Invalid MediumId " ++ show (unMediumId mid)

@@ -8,4 +8,5 @@ data MediaURL
     = GetMedium MediumId
     | Upload
     | Preview MediumId
+    | AllMedia
 $(derivePathInfo ''MediaURL)

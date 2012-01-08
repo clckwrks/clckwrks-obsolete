@@ -4,7 +4,7 @@ module Clckwrks.Media.Acid where
 import Control.Monad.Reader   (ask)
 import Control.Monad.State    (get, put)
 import Data.Acid              (Query, Update, makeAcidic)
-import Data.IxSet             (IxSet, (@=), getOne, empty, updateIx)
+import Data.IxSet             (IxSet, (@=), getOne, empty, toList, updateIx)
 import Data.SafeCopy          (base, deriveSafeCopy)
 import Clckwrks.Media.Types   (Medium(..), MediumId(..))
 
@@ -39,9 +39,15 @@ putMedium m =
     do ms@MediaState{..} <- get
        put $ ms { media = updateIx (mediumId m) m media }
 
+allMediumIds :: Query MediaState [MediumId]
+allMediumIds =
+    do MediaState{..} <- ask
+       return $ map mediumId (toList media)
+
 $(makeAcidic ''MediaState 
    [ 'genMediumId
    , 'getMediumById
    , 'putMedium
+   , 'allMediumIds
    ]
  )

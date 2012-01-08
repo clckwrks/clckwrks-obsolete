@@ -9,19 +9,21 @@ body
     margin: 0;
 }
 
-#clck
+#clck a
 {
     font-family: 'Lobster Two', cursive;
     color: #ffffff;
     font-size: 36pt;
     font-weight: 700;
+    text-decoration: none;
 }
-#wrks
+#wrks a
 {
     font-family: 'Lobster Two', cursive;
     color: #C1272D;
     font-size: 36pt;
     font-weight: 700;
+    text-decoration: none;
 }
 
 #clckwrks-byline

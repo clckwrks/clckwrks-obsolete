@@ -24,7 +24,7 @@ page :: XMLGenT (Clck ClckURL) XML
  </head>
  <body>
   <div id="clckwrks-menu">
-    <span id="clck">Clck</span><span id="wrks">wrks</span><br />
+    <span id="clck"><a href="/">Clck</a></span><span id="wrks"><a href="/">wrks</a></span><br />
     <span id="clckwrks-byline">for secure, reliable, & <br />integrated websites</span>
 --    <% getPageMenu %>
     <% getMenu %>

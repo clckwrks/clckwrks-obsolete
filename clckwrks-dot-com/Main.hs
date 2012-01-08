@@ -35,6 +35,7 @@ clckwrksConfig = ClckwrksConfig
       , clckJSTreePath   = "../jstree/"
       , clckJSON2Path    = "../json2/"
       , clckThemeDir     = "../clckwrks-theme-basic/"
+      , clckPluginDir    = [("media", "../clckwrks-plugin-media/")]
       , clckStaticDir    = "../static"
 #ifdef PLUGINS
       , clckPageHandler  = undefined
@@ -162,7 +163,7 @@ clckwrks cc' =
                    site     = mkSite2 cc mediaConf
                    sitePlus = mkSitePlus (Text.pack $ clckHostname cc) (clckPort cc) Text.empty site
                in 
-                 do ((), clckState') <- runClckT (siteShowURL sitePlus) clckState $ 
+                 do clckState' <- execClckT (siteShowURL sitePlus) clckState $ 
                                         do showFn <- askRouteFn
                                            let mediaCmd' :: forall url m. (Monad m) => (Text -> ClckT url m Builder)
                                                mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
@@ -210,11 +211,15 @@ In theory, we would like to do some stuff in the ClckT monad before start listen
 Though it seems the information we need comes from Site not implSite.
 -}
 routeSite :: Clck ClckURL Response -> MediaConfig -> SiteURL -> Clck SiteURL Response
-routeSite pageHandler media url =
+routeSite pageHandler mediaConfig url =
     do 
        case url of
         (C clckURL)  -> nestURL C $ routeClck pageHandler clckURL
-        (M mediaURL) -> nestURL M $ runMediaT media $ routeMedia mediaURL
+        (M mediaURL) -> 
+            do showFn <- askRouteFn
+               -- FIXME: it is a bit silly that we wait this  long to set the mediaClckURL
+               -- would be better to do it before we forkIO on simpleHTTP
+               nestURL M $ runMediaT (mediaConfig { mediaClckURL = (showFn . C) })  $ routeMedia mediaURL
       
 mkSite :: Clck ClckURL Response -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
 mkSite ph clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'

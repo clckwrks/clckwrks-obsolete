@@ -49,13 +49,31 @@ ul#admin-menu
     margin: 0;
 }
 
+.admin-menu-link
+{
+    border-bottom: 1px dotted #ddd;
+    padding-left: 1em;
+}
+
+#admin-menu a
+{
+    text-decoration: none;
+    color: black;
+}
+
+#admin-menu-links li:hover
+{
+    background: #ddd;
+}
+
 
 .admin-menu-category-title
 {
-    width: 100%;
+
     display: block;
     font-weight: bold;
     color: white;
     background: gray;
     font-size: 1.1em;
+    padding-left: 1em;
 }
