@@ -152,6 +152,17 @@ Theme.Page</p>
 
 <p>Hopefully the themes are simple enough that end users can modify an existing theme with out really having to learn any Haskell.</p>
 
+<h3>clckwrks-plugin-media</h3>
+
+<p>One of the most valuable aspects of Clckwrks is the ability to extend it through the use of plugins. The <code>clckwrks-plugin-media</code> adds a media gallery. You can upload images, including them in post, and (eventually) create galleries and slideshows.</p>
+
+<p>plugins can also hook into the markup engine and add new markup commands. For example, in a post you could write:</p>
+
+<pre><code>Check out this great photo I took: {media|id=1}
+</code></pre>
+
+<p>And when the page is rendered, the image with id 1 will automatically be included in the message.</p>
+
 <h3>clckwrks-dot-com</h3>
 
 <p>This is where we tie it all together. There are only two files so far.</p>
@@ -184,6 +195,10 @@ PageMapper.hs
 </code></pre>
 
 <p>And then in your routing function you would call <code>routeClck</code> for the <code>ClckURL</code> case.</p>
+
+<h3>clckwrks-cli</h3>
+
+<p>The <code>clckwrks-cli</code> app provides a command-line interface which communications with a running clckwrks app to perform various administrative features. Right now the only feature it has is the ability to make UserId 1 an Administrator. </p>
 
 <h2>TODO</h2>
 
