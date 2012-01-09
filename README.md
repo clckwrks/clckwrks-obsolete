@@ -143,6 +143,16 @@ Looking at the Theme.Home file, we see a slightly more advanced template that us
 
 Hopefully the themes are simple enough that end users can modify an existing theme with out really having to learn any Haskell.
 
+### clckwrks-plugin-media
+
+One of the most valuable aspects of Clckwrks is the ability to extend it through the use of plugins. The `clckwrks-plugin-media` adds a media gallery. You can upload images, including them in post, and (eventually) create galleries and slideshows.
+
+plugins can also hook into the markup engine and add new markup commands. For example, in a post you could write:
+
+    Check out this great photo I took: {media|id=1}
+
+And when the page is rendered, the image with id 1 will automatically be included in the message.
+
 ### clckwrks-dot-com
 
 This is where we tie it all together. There are only two files so far.
@@ -173,6 +183,10 @@ An example is forth-coming. The essence is that you would create a new URL type 
                 | Foo
 
 And then in your routing function you would call `routeClck` for the `ClckURL` case.
+
+### clckwrks-cli
+
+The `clckwrks-cli` app provides a command-line interface which communications with a running clckwrks app to perform various administrative features. Right now the only feature it has is the ability to make UserId 1 an Administrator. 
 
 ## TODO
 
