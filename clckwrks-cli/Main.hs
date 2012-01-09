@@ -8,6 +8,9 @@ import Data.Acid.Remote (openRemoteState)
 import Network (PortID(UnixSocket))
 import System.Environment
 
+-- right now this just connects to the server and makes UserId 1 an administrator
+--
+-- eventually there should be an actually useful command-line interface
 main :: IO ()
 main =
     do [socket] <- getArgs

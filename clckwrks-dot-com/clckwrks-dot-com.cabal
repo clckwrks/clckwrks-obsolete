@@ -54,11 +54,15 @@ Executable clckwrks-server
   ghc-options: -threaded -O2
   Extensions: CPP
   Build-depends:
-        base < 4.4,
+        base < 5,
+        bytestring == 0.9.*,
         clckwrks,
         clckwrks-plugin-media,
+        containers == 0.4.*,
+        mtl == 2.0.*,
         text,
-        web-routes-happstack
+        web-routes-happstack,
+        web-routes-th == 0.21.*
 
   if flag(plugins)
     Build-depends:

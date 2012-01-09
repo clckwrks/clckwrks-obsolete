@@ -16,23 +16,27 @@ Library
     Clckwrks.Media
     Clckwrks.Media.Acid
     Clckwrks.Media.Monad
-    Clckwrks.Media.Preview
-    Clckwrks.Media.Page.Upload
+    Clckwrks.Media.Page.AllMedia
     Clckwrks.Media.Page.GetMedium
     Clckwrks.Media.Page.Preview
+    Clckwrks.Media.Page.Upload
+    Clckwrks.Media.PreProcess
+    Clckwrks.Media.Preview
     Clckwrks.Media.Route
     Clckwrks.Media.Types
     Clckwrks.Media.URL
 
   Build-depends:
-    base < 4.5,
+    base < 5,
     acid-state == 0.6.*,
+    attoparsec == 0.10.*,
+    blaze-html == 0.4.*,
     clckwrks == 0.1.*,
     containers == 0.4.*,
     digestive-functors == 0.2.*,
     digestive-functors-hsp == 0.4.*,
     directory == 1.1.*,
-    filepath == 1.2.*,
+    filepath >= 1.2 && < 1.4,
     gd == 3000.*,
     happstack-server == 6.4.*,
     hsp == 0.6.*,

@@ -17,5 +17,5 @@ Library
                        Theme.Page
 
   Build-depends:
-        base < 4.4,
+        base < 5,
         clckwrks

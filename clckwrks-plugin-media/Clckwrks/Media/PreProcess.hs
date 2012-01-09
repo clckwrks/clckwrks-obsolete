@@ -15,6 +15,8 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Renderer.Text (renderHtml)
 import Web.Routes (showURL)
 
+
+
 -- we need to be able to access the acid database here and also generate URLs here.
 -- So, we need to be in a cooler monad.
 mediaCmd_ :: (MediaURL -> [(Text, Maybe Text)] -> Text) -> ClckState -> Text -> IO Builder
