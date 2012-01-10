@@ -17,6 +17,7 @@ import qualified Data.Text as Text
 import System.Environment (getArgs)
 import URL
 import Web.Routes.Happstack
+import qualified Theme.Blog as Blog
 
 #ifdef PLUGINS
 import Control.Monad.State (get)
@@ -42,6 +43,7 @@ clckwrksConfig = ClckwrksConfig
 #else
       , clckPageHandler  = staticPageHandler
 #endif
+      , clckBlogHandler  = staticBlogHandler
       }
 
 data SitePlus url a = SitePlus 
@@ -118,7 +120,7 @@ route2 cc mediaConfig url =
        msum $  [ jsHandlers cc
                , dir "favicon.ico" $ notFound (toResponse ())
                , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
-               , routeSite (clckPageHandler cc) mediaConfig url
+               , routeSite cc mediaConfig url
 --               , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (mkSite2 (clckPageHandler cc) mediaConfig) 
                -- this is no good because we need the path higher up
                ]
@@ -141,11 +143,11 @@ route' approot cc clckState mediaConfig =
       r = dirs (Text.unpack approot) $
             do rq <- askRq
                let pathInfo = intercalate "/" (map escapeSlash (rqPaths rq))
-                   s = mkSite (clckPageHandler cc) clckState mediaConfig
+                   s = mkSite cc clckState mediaConfig
                case parsePathSegments s $ decodePathInfo (C.pack pathInfo) of
                  (Left parseError) -> notFound $ toResponse parseError
                  (Right url) ->
-                     mapRouteT (\m -> evalStateT m clckState) $ unClckT $ routeSite (clckPageHandler cc) mediaConfig url
+                     mapRouteT (\m -> evalStateT m clckState) $ unClckT $ routeSite cc mediaConfig url
       escapeSlash :: String -> String
       escapeSlash [] = []
       escapeSlash ('/':cs) = "%2F" ++ escapeSlash cs
@@ -210,22 +212,22 @@ In theory, we would like to do some stuff in the ClckT monad before start listen
 
 Though it seems the information we need comes from Site not implSite.
 -}
-routeSite :: Clck ClckURL Response -> MediaConfig -> SiteURL -> Clck SiteURL Response
-routeSite pageHandler mediaConfig url =
+routeSite :: ClckwrksConfig u -> MediaConfig -> SiteURL -> Clck SiteURL Response
+routeSite cc mediaConfig url =
     do 
        case url of
-        (C clckURL)  -> nestURL C $ routeClck pageHandler clckURL
+        (C clckURL)  -> nestURL C $ routeClck cc clckURL
         (M mediaURL) -> 
             do showFn <- askRouteFn
                -- FIXME: it is a bit silly that we wait this  long to set the mediaClckURL
                -- would be better to do it before we forkIO on simpleHTTP
                nestURL M $ runMediaT (mediaConfig { mediaClckURL = (showFn . C) })  $ routeMedia mediaURL
       
-mkSite :: Clck ClckURL Response -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
-mkSite ph clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
+mkSite :: ClckwrksConfig u -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
+mkSite cc clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =
-          evalStateT (unRouteT (unClckT $ routeSite ph media u) f) clckState
+          evalStateT (unRouteT (unClckT $ routeSite cc media u) f) clckState
 
 mkSite2 :: ClckwrksConfig u -> MediaConfig -> Site SiteURL (ClckT SiteURL (ServerPartT IO) Response)
 mkSite2 cc media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
@@ -260,3 +262,7 @@ main =
 staticPageHandler :: Clck ClckURL Response
 staticPageHandler = toResponse <$> unXMLGenT pageMapper
 #endif
+
+staticBlogHandler :: Clck ClckURL Response
+staticBlogHandler = toResponse <$> unXMLGenT Blog.page
+

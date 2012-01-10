@@ -117,3 +117,21 @@ ul.page-menu
     overflow: auto;
     width: 100%;
 }
+
+ol#blog-posts
+{
+    list-style-type: none;
+}
+
+
+#blog-posts h1
+{
+    font-family: 'Lobster Two', cursive;
+    font-weight: 700;
+}
+
+.pub-date
+{
+    font-style: italic;
+    color: #aaa;
+}
