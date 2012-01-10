@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Clckwrks.Media.PreProcess where
-
+import Control.Monad.Trans
 import Control.Applicative
 import Clckwrks (ClckT, ClckState)
 import Clckwrks.Media.URL
@@ -15,27 +15,34 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Renderer.Text (renderHtml)
 import Web.Routes (showURL)
 
+parseAttr :: Text -> Parser ()
+parseAttr name =
+    do skipMany space
+       stringCI name
+       skipMany space
+       char '='
+       skipMany space 
 
+width :: Parser H.Attribute
+width =
+    A.width . H.toValue <$> (parseAttr "width" *> (decimal :: Parser Integer))
 
--- we need to be able to access the acid database here and also generate URLs here.
--- So, we need to be in a cooler monad.
-mediaCmd_ :: (MediaURL -> [(Text, Maybe Text)] -> Text) -> ClckState -> Text -> IO Builder
-mediaCmd_ showURLFn _clckState txt =
-    do let mi = parseOnly (string "id=" >> signed decimal) txt
-       case mi of
-         (Left e) -> undefined
-         (Right i) ->
-             do let u = toValue $ showURLFn (GetMedium (MediumId i)) []
-                return $ B.fromLazyText $ renderHtml $ H.img ! A.src u
-       
+height :: Parser H.Attribute
+height =
+    A.height . H.toValue <$> (parseAttr "height" *> (decimal :: Parser Integer))
+
+parseCmd :: Parser (MediumId, [H.Attribute])
+parseCmd =
+    (,) <$> (parseAttr "id" *> (MediumId <$> decimal))
+        <*> (many $ choice [ width, height ])
 
 mediaCmd :: (Monad m) => (MediaURL -> [(Text, Maybe Text)] -> Text) -> Text -> ClckT url m Builder
 mediaCmd showURLFn txt =
-    do let mi = parseOnly (string "id=" >> signed decimal) txt
+    do let mi = parseOnly parseCmd txt
        case mi of
          (Left e) ->
                return $ B.fromString e -- FIXME: format the error more nicely or something?
-         (Right i) ->
-             do let u = toValue $ showURLFn (GetMedium (MediumId i)) []
-                return $ B.fromLazyText $ renderHtml $ H.img ! A.src u
+         (Right (mid, attrs)) ->
+             do let u = toValue $ showURLFn (GetMedium mid) []
+                return $ B.fromLazyText $ renderHtml $ foldr (\attr tag -> tag ! attr) H.img (A.src u : attrs)
        
