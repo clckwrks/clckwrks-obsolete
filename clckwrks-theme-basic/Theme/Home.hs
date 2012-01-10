@@ -44,9 +44,6 @@ page :: XMLGenT (Clck ClckURL) XML
     <% summaryBox (PageId 4) %>
    </div>
 
-   <p><a href=(Admin Console)>admin</a></p>
-   <p><a href=(Auth $ AuthURL A_Login)>login</a></p>
-
   </div>
  </body>
 </html>

@@ -117,17 +117,18 @@ clckwrksServer' conf handler =
 route2 :: ClckwrksConfig url -> MediaConfig -> SiteURL -> ClckT SiteURL (ServerPartT IO) Response
 route2 cc mediaConfig url =
     do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
-       msum $  [ jsHandlers cc
+       msum $  [ {- jsHandlers cc
                , dir "favicon.ico" $ notFound (toResponse ())
                , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
-               , routeSite cc mediaConfig url
+               , dir "login" $ seeOtherURL (C $ Auth $ AuthURL A_Login)
+               , dir "admin" $ seeOtherURL (C $ Admin Console) 
+-}
+                routeSite cc mediaConfig url
 --               , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (mkSite2 (clckPageHandler cc) mediaConfig) 
                -- this is no good because we need the path higher up
                ]
 
-runTheSite :: Site SiteURL (ClckT SiteURL (ServerPartT IO) Response) -> IO ()
-runTheSite site = undefined
-
+{-
 route' :: Text.Text -> ClckwrksConfig url -> ClckState -> MediaConfig -> RouteT SiteURL (ServerPartT IO) Response
 route' approot cc clckState mediaConfig =
     (lift $ do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
@@ -152,7 +153,7 @@ route' approot cc clckState mediaConfig =
       escapeSlash [] = []
       escapeSlash ('/':cs) = "%2F" ++ escapeSlash cs
       escapeSlash (c:cs)   = c : escapeSlash cs
-
+-}
 clckwrks :: ClckwrksConfig SiteURL -> IO ()
 clckwrks cc' =
     do args <- getArgs
@@ -176,13 +177,15 @@ clckwrks cc' =
                     let sitePlus'  = fmap (evalClckT (siteShowURL sitePlus) clckState') sitePlus
                     simpleHTTP (nullConf { port = clckPort cc }) (route cc sitePlus')
 
-route :: Happstack m => ClckwrksConfig url -> SitePlus url (m Response) -> m Response
+route :: Happstack m => ClckwrksConfig SiteURL -> SitePlus SiteURL (m Response) -> m Response
 route cc sitePlus =
     do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
        msum $ 
             [ jsHandlers cc
             , dir "favicon.ico" $ notFound (toResponse ())
             , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
+            , dir "login"       $ seeOther ((siteShowURL sitePlus) (C $ Auth $ AuthURL A_Login) []) (toResponse ())
+            , dir "admin"       $ seeOther ((siteShowURL sitePlus) (C $ Admin Console) []) (toResponse ())
             , runSitePlus sitePlus
 --            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite (clckPageHandler cc) clckState)
 --            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") site
