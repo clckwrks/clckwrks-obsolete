@@ -46,6 +46,8 @@ clckwrksConfig = ClckwrksConfig
       , clckBlogHandler  = staticBlogHandler
       }
 
+-- * SitePlus
+
 data SitePlus url a = SitePlus 
     { siteSite    :: Site url a
     , siteDomain  :: Text
@@ -108,52 +110,16 @@ runSitePlus sitePlus =
          (Left _)  -> mzero
          (Right a) -> return a
 
-clckwrksServer' :: (ToMessage a) => Conf -> ClckT SiteURL (ServerPartT IO) a -> ClckT SiteURL IO ()
-clckwrksServer' conf handler = 
-    do cs <- get
-       routeFn <- askRouteFn
-       liftIO $ simpleHTTP conf (evalStateT (unRouteT (unClckT handler) routeFn) cs)
+initPlugins :: ClckT SiteURL IO ()
+initPlugins =
+    do showFn <- askRouteFn
+       let mediaCmd' :: forall url m. (Monad m) => (Text -> ClckT url m Builder)
+           mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
+       addPreProcessor "media" mediaCmd'
+       nestURL M $ addMediaAdminMenu
+       dm <- nestURL C $ defaultAdminMenu
+       mapM_ addAdminMenu dm
 
-route2 :: ClckwrksConfig url -> MediaConfig -> SiteURL -> ClckT SiteURL (ServerPartT IO) Response
-route2 cc mediaConfig url =
-    do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
-       msum $  [ {- jsHandlers cc
-               , dir "favicon.ico" $ notFound (toResponse ())
-               , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
-               , dir "login" $ seeOtherURL (C $ Auth $ AuthURL A_Login)
-               , dir "admin" $ seeOtherURL (C $ Admin Console) 
--}
-                routeSite cc mediaConfig url
---               , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (mkSite2 (clckPageHandler cc) mediaConfig) 
-               -- this is no good because we need the path higher up
-               ]
-
-{-
-route' :: Text.Text -> ClckwrksConfig url -> ClckState -> MediaConfig -> RouteT SiteURL (ServerPartT IO) Response
-route' approot cc clckState mediaConfig =
-    (lift $ do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
-               msum $  [ jsHandlers cc
-                       , dir "favicon.ico" $ notFound (toResponse ())
-                      , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
---            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite (clckPageHandler cc) clckState)
---            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (site (clckPageHandler cc) clckState media)
-                      ])
-     `mplus` r
-    where
-      r :: RouteT SiteURL (ServerPartT IO) Response
-      r = dirs (Text.unpack approot) $
-            do rq <- askRq
-               let pathInfo = intercalate "/" (map escapeSlash (rqPaths rq))
-                   s = mkSite cc clckState mediaConfig
-               case parsePathSegments s $ decodePathInfo (C.pack pathInfo) of
-                 (Left parseError) -> notFound $ toResponse parseError
-                 (Right url) ->
-                     mapRouteT (\m -> evalStateT m clckState) $ unClckT $ routeSite cc mediaConfig url
-      escapeSlash :: String -> String
-      escapeSlash [] = []
-      escapeSlash ('/':cs) = "%2F" ++ escapeSlash cs
-      escapeSlash (c:cs)   = c : escapeSlash cs
--}
 clckwrks :: ClckwrksConfig SiteURL -> IO ()
 clckwrks cc' =
     do args <- getArgs
@@ -166,15 +132,8 @@ clckwrks cc' =
                    site     = mkSite2 cc mediaConf
                    sitePlus = mkSitePlus (Text.pack $ clckHostname cc) (clckPort cc) Text.empty site
                in 
-                 do clckState' <- execClckT (siteShowURL sitePlus) clckState $ 
-                                        do showFn <- askRouteFn
-                                           let mediaCmd' :: forall url m. (Monad m) => (Text -> ClckT url m Builder)
-                                               mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
-                                           addPreProcessor "media" mediaCmd'
-                                           nestURL M $ addMediaAdminMenu
-                                           dm <- nestURL C $ defaultAdminMenu
-                                           mapM_ addAdminMenu dm
-                    let sitePlus'  = fmap (evalClckT (siteShowURL sitePlus) clckState') sitePlus
+                 do clckState'    <- execClckT (siteShowURL sitePlus) clckState $ initPlugins
+                    let sitePlus' = fmap (evalClckT (siteShowURL sitePlus) clckState') sitePlus
                     simpleHTTP (nullConf { port = clckPort cc }) (route cc sitePlus')
 
 route :: Happstack m => ClckwrksConfig SiteURL -> SitePlus SiteURL (m Response) -> m Response
@@ -187,8 +146,6 @@ route cc sitePlus =
             , dir "login"       $ seeOther ((siteShowURL sitePlus) (C $ Auth $ AuthURL A_Login) []) (toResponse ())
             , dir "admin"       $ seeOther ((siteShowURL sitePlus) (C $ Admin Console) []) (toResponse ())
             , runSitePlus sitePlus
---            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") (clckSite (clckPageHandler cc) clckState)
---            , implSite (Text.pack $ "http://" ++ clckHostname cc ++ ":" ++ show (clckPort cc)) (Text.pack "") site
             ]
 
 {-
@@ -217,27 +174,27 @@ Though it seems the information we need comes from Site not implSite.
 -}
 routeSite :: ClckwrksConfig u -> MediaConfig -> SiteURL -> Clck SiteURL Response
 routeSite cc mediaConfig url =
-    do 
-       case url of
+    do case url of
         (C clckURL)  -> nestURL C $ routeClck cc clckURL
         (M mediaURL) -> 
             do showFn <- askRouteFn
                -- FIXME: it is a bit silly that we wait this  long to set the mediaClckURL
                -- would be better to do it before we forkIO on simpleHTTP
                nestURL M $ runMediaT (mediaConfig { mediaClckURL = (showFn . C) })  $ routeMedia mediaURL
-      
+{-      
 mkSite :: ClckwrksConfig u -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
 mkSite cc clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' f u =
           evalStateT (unRouteT (unClckT $ routeSite cc media u) f) clckState
-
+-}
+-- FIXME: something seems weird here.. we do not use the 'f' in route'
 mkSite2 :: ClckwrksConfig u -> MediaConfig -> Site SiteURL (ClckT SiteURL (ServerPartT IO) Response)
-mkSite2 cc media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
+mkSite2 cc mediaConfig = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' :: (SiteURL -> [(Text.Text, Maybe Text.Text)] -> Text.Text) -> SiteURL -> ClckT SiteURL (ServerPartT IO) Response
-      route' f u =
-          route2 cc media u
+      route' f url =
+          routeSite cc mediaConfig url
 
 
 #ifdef PLUGINS
