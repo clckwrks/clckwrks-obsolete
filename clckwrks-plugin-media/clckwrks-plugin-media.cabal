@@ -38,14 +38,14 @@ Library
     directory == 1.1.*,
     filepath >= 1.2 && < 1.4,
     gd == 3000.*,
-    happstack-server == 6.4.*,
+    happstack-server == 6.6.*,
     hsp == 0.6.*,
     ixset == 1.0.*,
     magic == 1.0.*,
     mtl == 2.0.*,
     safecopy == 0.6.*,
     text == 0.11.*,
-    web-routes == 0.26.*,
+    web-routes == 0.27.*,
     web-routes-th == 0.21.*
 
   -- Build-tools:

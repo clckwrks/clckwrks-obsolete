@@ -92,8 +92,7 @@ runSitePlus_ :: (Happstack m) => SitePlus url (m a) -> m (Either String a)
 runSitePlus_ sitePlus =
     dirs (Text.unpack (siteAppRoot sitePlus)) $
          do rq <- askRq
-            let pathInfo = C.pack $ intercalate "/" (map escapeSlash (rqPaths rq))
-                r        = runSite (sitePrefix sitePlus) (siteSite sitePlus) pathInfo
+            let r        = runSite (sitePrefix sitePlus) (siteSite sitePlus) (map Text.pack $ rqPaths rq)
             case r of
               (Left parseError) -> return (Left parseError)
               (Right sp)   -> Right <$> (localRq (const $ rq { rqPaths = [] }) sp)
