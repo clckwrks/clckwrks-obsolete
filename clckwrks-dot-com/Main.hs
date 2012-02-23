@@ -37,7 +37,7 @@ clckwrksConfig = ClckwrksConfig
       , clckJSON2Path    = "../json2/"
       , clckThemeDir     = "../clckwrks-theme-basic/"
       , clckPluginDir    = [("media", "../clckwrks-plugin-media/")]
-      , clckStaticDir    = "../static"
+      , clckStaticDir    = "../clckwrks/static"
 #ifdef PLUGINS
       , clckPageHandler  = undefined
 #else
