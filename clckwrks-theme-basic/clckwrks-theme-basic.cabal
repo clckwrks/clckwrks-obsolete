@@ -11,11 +11,17 @@ Maintainer:          jeremy@n-heptane.com
 Category:            Clckwrks
 Build-type:          Simple
 Cabal-version:       >=1.2
+Data-Files:
+        data/bluebox.png
+        data/hscolour.css
+        data/sidebar-background-01.png
+        data/style.css
 
 Library
   Exposed-modules:     Theme.Blog,
                        Theme.Home,
                        Theme.Page
+                       Paths_clckwrks_theme_basic
 
   Build-depends:
         base < 5,

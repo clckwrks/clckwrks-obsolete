@@ -10,6 +10,8 @@ Maintainer:          jeremy@n-heptane.com
 Category:            Clckwrks
 Build-type:          Simple
 Cabal-version:       >=1.2
+Data-Files:
+    data/style.css
 
 Library
   Exposed-modules:
@@ -25,6 +27,7 @@ Library
     Clckwrks.Media.Route
     Clckwrks.Media.Types
     Clckwrks.Media.URL
+    Paths_clckwrks_plugin_media
 
   Build-depends:
     base < 5,
