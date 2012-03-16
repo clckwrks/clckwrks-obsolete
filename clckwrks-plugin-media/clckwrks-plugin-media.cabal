@@ -14,6 +14,8 @@ Data-Files:
     data/style.css
 
 Library
+  Build-tools:
+    trhsx
   Exposed-modules:
     Clckwrks.Media
     Clckwrks.Media.Acid
@@ -51,5 +53,3 @@ Library
     web-routes == 0.27.*,
     web-routes-th == 0.21.*
 
-  -- Build-tools:
-  --   trhsx
