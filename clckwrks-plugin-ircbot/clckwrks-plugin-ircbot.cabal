@@ -1,0 +1,56 @@
+Name:                clckwrks-plugin-ircbot
+Version:             0.1
+Synopsis:            ircbot plugin for clckwrks
+Homepage:            http://clckwrks.com/
+License:             BSD3
+License-file:        LICENSE
+Author:              Jeremy Shaw
+Maintainer:          jeremy@n-heptane.com
+-- Copyright:
+Category:            Clckwrks
+Build-type:          Simple
+Cabal-version:       >=1.2
+Data-Files:
+    data/style.css
+
+Library
+  Build-tools:
+    trhsx
+  Exposed-modules:
+    Clckwrks.IrcBot
+    Clckwrks.IrcBot.Acid
+    Clckwrks.IrcBot.Monad
+    Clckwrks.IrcBot.Page.IrcLog
+    Clckwrks.IrcBot.Page.IrcLogs
+    Clckwrks.IrcBot.Page.Template
+    Clckwrks.IrcBot.PreProcess
+    Clckwrks.IrcBot.Route
+    Clckwrks.IrcBot.Types
+    Clckwrks.IrcBot.URL
+    Paths_clckwrks_plugin_ircbot
+
+  Build-depends:
+    base                   < 5,
+    acid-state             == 0.6.*,
+    attoparsec             == 0.10.*,
+    blaze-html             == 0.4.*,
+    clckwrks               == 0.4.*,
+    containers             == 0.4.*,
+--    digestive-functors     == 0.2.*,
+--    digestive-functors-hsp == 0.4.*,
+    directory              == 1.1.*,
+    filepath               >= 1.2 && < 1.4,
+--    gd                     == 3000.*,
+    happstack-server       == 7.0.*,
+    happstack-hsp          == 7.0.*,
+    hsp                    == 0.6.*,
+    ircbot                 == 0.3.*,
+    ixset                  == 1.0.*,
+--    magic                  == 1.0.*,
+    mtl                    == 2.0.*,
+    network                == 2.3.*,
+    safecopy               == 0.6.*,
+    text                   == 0.11.*,
+    web-routes             == 0.27.*,
+    web-routes-th          == 0.21.*
+

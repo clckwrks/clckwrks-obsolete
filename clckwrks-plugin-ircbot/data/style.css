@@ -1,0 +1,10 @@
+ul#media-gallery
+{
+    list-style-type: none;
+}
+
+#media-gallery li
+{
+    display: inline;
+    padding-right: 1em;
+}
