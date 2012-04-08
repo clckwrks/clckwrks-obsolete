@@ -1,5 +1,5 @@
 Name:                clckwrks-plugin-media
-Version:             0.1.2
+Version:             0.1.3
 Synopsis:            media plugin for clckwrks
 Homepage:            http://clckwrks.com/
 License:             BSD3
@@ -36,7 +36,7 @@ Library
     acid-state == 0.6.*,
     attoparsec == 0.10.*,
     blaze-html == 0.4.*,
-    clckwrks >= 0.1 && < 0.4,
+    clckwrks   == 0.4.*,
     containers == 0.4.*,
     digestive-functors == 0.2.*,
     digestive-functors-hsp == 0.4.*,
