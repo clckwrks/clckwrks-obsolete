@@ -1,5 +1,5 @@
 Name:                clckwrks-plugin-ircbot
-Version:             0.1
+Version:             0.1.1
 Synopsis:            ircbot plugin for clckwrks
 Homepage:            http://clckwrks.com/
 License:             BSD3
@@ -46,7 +46,7 @@ Library
     happstack-server       == 7.0.*,
     happstack-hsp          == 7.0.*,
     hsp                    == 0.6.*,
-    ircbot                 == 0.4.*,
+    ircbot                 == 0.5.*,
     ixset                  == 1.0.*,
 --    magic                  == 1.0.*,
     mtl                    == 2.0.*,
