@@ -22,6 +22,8 @@ Library
     Clckwrks.IrcBot.Monad
     Clckwrks.IrcBot.Page.IrcLog
     Clckwrks.IrcBot.Page.IrcLogs
+    Clckwrks.IrcBot.Page.Reconnect
+    Clckwrks.IrcBot.Page.Settings
     Clckwrks.IrcBot.Page.Template
     Clckwrks.IrcBot.PreProcess
     Clckwrks.IrcBot.Route
@@ -36,15 +38,15 @@ Library
     blaze-html             == 0.4.*,
     clckwrks               == 0.4.*,
     containers             == 0.4.*,
---    digestive-functors     == 0.2.*,
---    digestive-functors-hsp == 0.4.*,
+    digestive-functors     == 0.2.*,
+    digestive-functors-hsp == 0.4.*,
     directory              == 1.1.*,
     filepath               >= 1.2 && < 1.4,
 --    gd                     == 3000.*,
     happstack-server       == 7.0.*,
     happstack-hsp          == 7.0.*,
     hsp                    == 0.6.*,
-    ircbot                 == 0.3.*,
+    ircbot                 == 0.4.*,
     ixset                  == 1.0.*,
 --    magic                  == 1.0.*,
     mtl                    == 2.0.*,

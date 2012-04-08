@@ -45,6 +45,7 @@ data IrcBotConfig = IrcBotConfig
                          -> headers
                          -> body
                          -> XMLGenT (Clck IrcBotURL) XML
+    , ircReconnect       :: IO ()
     }
 
 type IrcBotT m = ClckT IrcBotURL (ReaderT IrcBotConfig m)
@@ -99,33 +100,14 @@ withIrcBotConfig mBasePath initIrcConfig pageTemplate' ircBotLogDir f =
                                         , channels      = ircChannels
                                         }
               ircParts <- initParts (channels botConf)
-              tids <- simpleBot botConf ircParts
+              (tids, reconnect) <- simpleBot botConf ircParts
               (f (IrcBotConfig { ircBotLogDirectory = ircBotLogDir
                                , ircBotState        = ircBot
                                , ircBotClckURL      = undefined
                                , ircBotPageTemplate = pageTemplate'
+                               , ircReconnect       = reconnect
                                })) `finally` (mapM_ killThread tids)
 
-{-
-initIrcBotConfig :: Maybe FilePath -> FilePath -> IO (IO IrcBotConfig, IrcBotConfig -> IO ())
-initIrcBotConfig mBasePath mediaDir =
-    return (create, destroy)
-    where
-    do let basePath = fromMaybe "_state" mBasePath
-           cacheDir  = mediaDir </> "_cache"
-       createDirectoryIfMissing True cacheDir
-       bracket (openLocalStateFrom (basePath </> "media") initialIrcBotState) (createCheckpointAndClose) $ \media ->
-         bracket (startIOThread (applyTransforms mediaDir cacheDir)) killIOThread $ \ioThread ->
-           do magic <- magicOpen [MagicMime, MagicError]
-              magicLoadDefault magic
-              f (IrcBotConfig { mediaDirectory = mediaDir
-                             , mediaState     = media
-                             , mediaMagic     = magic
-                             , mediaIOThread  = ioThread
-                             , mediaClckURL   = undefined
-                             })
-
--}
 
 initParts :: (BotMonad m) =>
              Set String  -- ^ set of channels to join
@@ -140,12 +122,9 @@ initParts chans =
               ]
 
 addIrcBotAdminMenu :: ClckT IrcBotURL IO ()
-addIrcBotAdminMenu = return ()
-{-
-    do uploadURL   <- showURL (IrcBotAdmin Upload)
-       allIrcBotURL <- showURL (IrcBotAdmin AllIrcBot)
-       addAdminMenu ("IrcBot Gallery", [("Upload",    uploadURL)
-                                      ,("All IrcBot", allIrcBotURL)
-                                      ])
-
--}
+addIrcBotAdminMenu =
+    do reconnectURL <- showURL (IrcBotAdmin IrcBotReconnect)
+       settingsURL  <- showURL (IrcBotAdmin IrcBotSettings)
+       addAdminMenu ("IrcBot", [ ("Reconnect", reconnectURL)
+                               , ("Settings", settingsURL)
+                               ])

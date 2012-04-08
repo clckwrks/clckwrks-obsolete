@@ -4,7 +4,8 @@ module Clckwrks.IrcBot.URL where
 import Web.Routes.TH         (derivePathInfo)
 
 data IrcBotAdminURL
-    = IrcBotAdminHome
+    = IrcBotReconnect
+    | IrcBotSettings
 $(derivePathInfo ''IrcBotAdminURL)
 
 data IrcBotURL
