@@ -98,6 +98,7 @@ withIrcBotConfig mBasePath initIrcConfig pageTemplate' ircBotLogDir f =
                                         , commandPrefix = ircCommandPrefix
                                         , user          = ircUser
                                         , channels      = ircChannels
+                                        , limits        = Just (5, 2000000)
                                         }
               ircParts <- initParts (channels botConf)
               (tids, reconnect) <- simpleBot botConf ircParts
