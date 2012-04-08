@@ -38,6 +38,7 @@ clckwrksConfig = ClckwrksConfig
       , clckThemeDir     = "../clckwrks-theme-basic/"
       , clckPluginDir    = [("media", "../clckwrks-plugin-media/")]
       , clckStaticDir    = "../clckwrks/static"
+      , clckTopDir       = Nothing
 #ifdef PLUGINS
       , clckPageHandler  = undefined
 #else
@@ -48,7 +49,7 @@ clckwrksConfig = ClckwrksConfig
 
 -- * SitePlus
 
-data SitePlus url a = SitePlus 
+data SitePlus url a = SitePlus
     { siteSite    :: Site url a
     , siteDomain  :: Text
     , sitePort    :: Int
@@ -67,7 +68,7 @@ mkSitePlus :: Text
            -> Site url a
            -> SitePlus url a
 mkSitePlus domain port approot site =
-    SitePlus { siteSite          = site 
+    SitePlus { siteSite          = site
              , siteDomain        = domain
              , sitePort          = port
              , siteAppRoot       = approot
@@ -79,7 +80,7 @@ mkSitePlus domain port approot site =
       showFn url qs =
         let (pieces, qs') = formatPathSegments site url
         in approot `mappend` (encodePathInfo pieces (qs ++ qs'))
-      prefix = Text.concat $ [ Text.pack "http://" 
+      prefix = Text.concat $ [ Text.pack "http://"
                              , domain
                              ] ++
                              (if port == 80
@@ -130,7 +131,7 @@ clckwrks cc' =
                let -- site     = mkSite (clckPageHandler cc) clckState mediaConf
                    site     = mkSite2 cc mediaConf
                    sitePlus = mkSitePlus (Text.pack $ clckHostname cc) (clckPort cc) Text.empty site
-               in 
+               in
                  do clckState'    <- execClckT (siteShowURL sitePlus) clckState $ initPlugins
                     let sitePlus' = fmap (evalClckT (siteShowURL sitePlus) clckState') sitePlus
                     simpleHTTP (nullConf { port = clckPort cc }) (route cc sitePlus')
@@ -138,7 +139,7 @@ clckwrks cc' =
 route :: Happstack m => ClckwrksConfig SiteURL -> SitePlus SiteURL (m Response) -> m Response
 route cc sitePlus =
     do decodeBody (defaultBodyPolicy "/tmp/" (10 * 10^6)  (1 * 10^6)  (1 * 10^6))
-       msum $ 
+       msum $
             [ jsHandlers cc
             , dir "favicon.ico" $ notFound (toResponse ())
             , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
@@ -161,7 +162,7 @@ So, the reason it is hard to get the monad into the callback is because we shoul
 
 Well, that is not actually a problem. The monad is really an environment in which a computation can run. And we can create that environment multiple ways.
 
-The issue with the MediaT monad is that it includes the MediaURL. And so to work with that, we need to specify how to turn a MediaURL into a SiteURL. 
+The issue with the MediaT monad is that it includes the MediaURL. And so to work with that, we need to specify how to turn a MediaURL into a SiteURL.
 
 That is something we normally do in routeSite via 'nestURL M'. But that means we have to repeat ourselves.
 
@@ -175,12 +176,12 @@ routeSite :: ClckwrksConfig u -> MediaConfig -> SiteURL -> Clck SiteURL Response
 routeSite cc mediaConfig url =
     do case url of
         (C clckURL)  -> nestURL C $ routeClck cc clckURL
-        (M mediaURL) -> 
+        (M mediaURL) ->
             do showFn <- askRouteFn
                -- FIXME: it is a bit silly that we wait this  long to set the mediaClckURL
                -- would be better to do it before we forkIO on simpleHTTP
                nestURL M $ runMediaT (mediaConfig { mediaClckURL = (showFn . C) })  $ routeMedia mediaURL
-{-      
+{-
 mkSite :: ClckwrksConfig u -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
 mkSite cc clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
     where
@@ -198,8 +199,8 @@ mkSite2 cc mediaConfig = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
 
 #ifdef PLUGINS
 main :: IO ()
-main = 
-  do ph <- initPlugins 
+main =
+  do ph <- initPlugins
      putStrLn "Dynamic Server Started."
      clckwrks (clckwrksConfig { clckPageHandler = dynamicPageHandler ph })
 
@@ -214,7 +215,7 @@ dynamicPageHandler ph =
       internalServerError $ toResponse $ unlines errs
 #else
 main :: IO ()
-main = 
+main =
   do putStrLn "Static Server Started."
      clckwrks clckwrksConfig
 
