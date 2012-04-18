@@ -9,6 +9,7 @@ import Clckwrks.IrcBot.Page.IrcLogs    (ircLogs)
 import Clckwrks.IrcBot.Page.Reconnect  (ircReconnectPage)
 import Clckwrks.IrcBot.Page.Settings   (ircBotSettings)
 import Clckwrks.IrcBot.URL             (IrcBotURL(..), IrcBotAdminURL(..))
+import qualified Data.Set              as Set
 import Happstack.Server                (Response, toResponse, notFound)
 
 checkAuth :: IrcBotURL -> IrcBotM IrcBotURL
@@ -16,7 +17,7 @@ checkAuth url =
     case url of
       IrcBotAdmin {} ->
           do showFn <- ircBotClckURL <$> ask
-             requiresRole_ showFn Administrator url
+             requiresRole_ showFn (Set.singleton Administrator) url
       _ -> return url
 
 
