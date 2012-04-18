@@ -25,5 +25,5 @@ Library
                        Paths_clckwrks_theme_basic
 
   Build-depends:
-        base < 5,
-        clckwrks
+        base       < 5,
+        clckwrks  == 0.5.*
