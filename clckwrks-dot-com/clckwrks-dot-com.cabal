@@ -1,5 +1,5 @@
 Name:                clckwrks-dot-com
-Version:             0.1.1
+Version:             0.1.2
 Synopsis:            clckwrks.com 
 -- Description:         
 Homepage:            http://clckwrks.com/
@@ -23,7 +23,7 @@ Executable clckwrks-server
   Build-depends:
         base < 5,
         bytestring == 0.9.*,
-        clckwrks   == 0.4.*,
+        clckwrks   == 0.5.*,
         clckwrks-plugin-media,
         containers == 0.4.*,
         mtl == 2.0.*,

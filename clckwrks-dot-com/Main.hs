@@ -4,6 +4,7 @@ module Main where
 import Control.Monad.State (evalStateT, get, modify)
 import Clckwrks
 import Clckwrks.Admin.Template (defaultAdminMenu)
+import Clckwrks.Page.Atom (fixFeedConfigUUID)
 import Clckwrks.Server
 import Clckwrks.Media
 import Clckwrks.Media.PreProcess (mediaCmd)
@@ -79,7 +80,7 @@ mkSitePlus domain port approot site =
     where
       showFn url qs =
         let (pieces, qs') = formatPathSegments site url
-        in approot `mappend` (encodePathInfo pieces (qs ++ qs'))
+        in prefix `mappend` (encodePathInfo pieces (qs ++ qs'))
       prefix = Text.concat $ [ Text.pack "http://"
                              , domain
                              ] ++
@@ -112,7 +113,8 @@ runSitePlus sitePlus =
 
 initPlugins :: ClckT SiteURL IO ()
 initPlugins =
-    do showFn <- askRouteFn
+    do fixFeedConfigUUID
+       showFn <- askRouteFn
        let mediaCmd' :: forall url m. (Monad m) => (Text -> ClckT url m Builder)
            mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
        addPreProcessor "media" mediaCmd'
