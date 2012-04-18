@@ -9,17 +9,18 @@ import Clckwrks.Media.Page.AllMedia  (allMedia)
 import Clckwrks.Media.Page.GetMedium (getMedium)
 import Clckwrks.Media.Page.Preview   (previewMedium)
 import Clckwrks.Media.Page.Upload    (uploadMedium)
+import qualified Data.Set            as Set
 import Happstack.Server              (Response)
 import Magic
 
 checkAuth :: MediaURL -> MediaM MediaURL
 checkAuth url =
     case url of
-      MediaAdmin {} -> 
+      MediaAdmin {} ->
           do showFn <- mediaClckURL <$> ask
-             requiresRole_ showFn Administrator url
+             requiresRole_ showFn (Set.singleton Administrator) url
       _ -> return url
-      
+
 
 routeMedia :: MediaURL -> MediaM Response
 routeMedia unsecureURL =
@@ -29,4 +30,3 @@ routeMedia unsecureURL =
          (MediaAdmin AllMedia) -> allMedia
          (GetMedium mid) -> getMedium mid
          (Preview mid)   -> previewMedium mid
-    
