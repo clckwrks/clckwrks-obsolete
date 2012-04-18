@@ -1,24 +1,23 @@
 Name:                clckwrks-cli
-Version:             0.1
+Version:             0.1.1
 Synopsis:            a command-line interface for adminstrating some aspects of clckwrks
--- Description:         
+-- Description:
 Homepage:            http://www.clckwrks.com/
 License:             BSD3
 License-file:        LICENSE
 Author:              Jeremy Shaw
 Maintainer:          jeremy@n-heptane.com
--- Copyright:           
+Copyright:           2012 SeeReason Partners LLC
 Category:            Clckwrks
 Build-type:          Simple
 Cabal-version:       >=1.2
 
-
 Executable clckwrks-cli
-  Main-is:             
+  Main-is:
      Main.hs
-  
-  Build-depends:       
+
+  Build-depends:
      acid-state == 0.6.*,
-     base       < 5,
-     clckwrks,
+     base        < 5,
+     clckwrks   == 0.5.0,
      network    == 2.3.*
