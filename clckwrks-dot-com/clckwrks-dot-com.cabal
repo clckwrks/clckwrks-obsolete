@@ -26,7 +26,7 @@ Executable clckwrks-server
         clckwrks   == 0.5.*,
         clckwrks-plugin-media,
         containers == 0.4.*,
-        mtl == 2.0.*,
+        mtl        >= 2.0 && < 2.3,
         text,
         web-routes == 0.27.*,
         web-routes-happstack,
@@ -34,7 +34,6 @@ Executable clckwrks-server
 
   if flag(plugins)
     Build-depends:
-      mtl == 2.0.*,
       plugins-auto > 0.0.1
     cpp-options: -DPLUGINS
   else

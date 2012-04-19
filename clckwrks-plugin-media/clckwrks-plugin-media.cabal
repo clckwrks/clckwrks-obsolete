@@ -47,7 +47,7 @@ Library
     hsp                    == 0.6.*,
     ixset                  == 1.0.*,
     magic                  == 1.0.*,
-    mtl                    == 2.0.*,
+    mtl                    >= 2.0 && < 2.3,
     safecopy               == 0.6.*,
     text                   == 0.11.*,
     web-routes             == 0.27.*,
