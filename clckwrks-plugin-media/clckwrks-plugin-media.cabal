@@ -1,5 +1,5 @@
 Name:                clckwrks-plugin-media
-Version:             0.1.5
+Version:             0.1.6
 Synopsis:            media plugin for clckwrks
 Homepage:            http://clckwrks.com/
 License:             BSD3
@@ -39,12 +39,12 @@ Library
     clckwrks               == 0.5.*,
     containers             == 0.4.*,
     digestive-functors     == 0.2.*,
-    digestive-functors-hsp == 0.4.*,
+    digestive-functors-hsp == 0.5.*,
     directory              == 1.1.*,
     filepath               >= 1.2 && < 1.4,
     gd                     == 3000.*,
     happstack-server       == 7.0.*,
-    hsp                    == 0.6.*,
+    hsp                    == 0.7.*,
     ixset                  == 1.0.*,
     magic                  == 1.0.*,
     mtl                    >= 2.0 && < 2.3,
