@@ -23,7 +23,7 @@ Executable clckwrks-server
   Build-depends:
         base < 5,
         bytestring == 0.9.*,
-        clckwrks   == 0.5.*,
+        clckwrks   == 0.6.*,
         clckwrks-plugin-media,
         containers == 0.4.*,
         mtl        >= 2.0 && < 2.3,
