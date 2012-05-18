@@ -9,10 +9,10 @@ import Data.Attoparsec.Text
 import           Data.Text (Text)
 import           Data.Text.Lazy.Builder (Builder)
 import qualified Data.Text.Lazy.Builder as B
-import           Text.Blaze ((!), toValue)
+import           Text.Blaze.Html ((!), toValue)
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
-import Text.Blaze.Renderer.Text (renderHtml)
+import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Web.Routes (showURL)
 
 parseAttr :: Text -> Parser ()
@@ -21,7 +21,7 @@ parseAttr name =
        stringCI name
        skipMany space
        char '='
-       skipMany space 
+       skipMany space
 
 width :: Parser H.Attribute
 width =
@@ -45,4 +45,3 @@ mediaCmd showURLFn txt =
          (Right (mid, attrs)) ->
              do let u = toValue $ showURLFn (GetMedium mid) []
                 return $ B.fromLazyText $ renderHtml $ foldr (\attr tag -> tag ! attr) H.img (A.src u : attrs)
-       
