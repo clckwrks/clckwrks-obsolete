@@ -5,11 +5,10 @@ module Clckwrks.IrcBot.Page.Settings where
 import Control.Applicative      ((<$>), (<*>), (<*))
 import Control.Monad.Reader     (ask)
 import Control.Monad.Trans      (liftIO)
-import Clckwrks                 (query, update, seeOtherURL)
+import Clckwrks                 (ClckFormT, query, update, seeOtherURL)
 import Clckwrks.Admin.Template  (template)
-import Clckwrks.FormPart        (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
 import Clckwrks.IrcBot.Acid     (GetIrcConfig(..), SetIrcConfig(..))
-import Clckwrks.IrcBot.Monad    (IrcBotM(..), IrcBotConfig(..))
+import Clckwrks.IrcBot.Monad    (IrcBotM(..), IrcBotConfig(..), IrcBotForm, IrcFormError(..))
 import Clckwrks.IrcBot.Types    (IrcConfig(..))
 import Clckwrks.IrcBot.URL      (IrcBotURL)
 import Data.Char                (isSpace)
@@ -23,8 +22,9 @@ import Happstack.Server         (Response, ok, setResponseCode, toResponse)
 import HSP
 import Network.IRC.Bot          (User(..))
 import Numeric                  (readDec)
-import Text.Digestive           (Transformer, (++>), mapView, transform, transformEither)
-import Text.Digestive.HSP.Html4 (inputString, label, submit)
+import Text.Reform              ((++>), mapView, transformEither)
+import Text.Reform.Happstack    (reform)
+import Text.Reform.HSP.String   (inputText, label, inputSubmit, form)
 import Web.Routes               (showURL)
 
 ircBotSettings :: IrcBotURL -> IrcBotM Response
@@ -33,7 +33,7 @@ ircBotSettings here =
        oldConfig <- query GetIrcConfig
        template "IrcBot Settings" () $
                 <%>
-                 <% multiFormPart "ibs" action updateSettings Nothing (ircBotSettingsForm oldConfig) %>
+                 <% reform (form action) "ibs" updateSettings Nothing (ircBotSettingsForm oldConfig) %>
                 </%>
     where
       updateSettings :: IrcConfig -> IrcBotM Response
@@ -42,39 +42,39 @@ ircBotSettings here =
              template "IrcConfig updated" () $
                       <p>IrcConfig updated</p>
 
-ircBotSettingsForm :: IrcConfig -> FormDF IrcBotM IrcConfig
+ircBotSettingsForm :: IrcConfig -> IrcBotForm IrcConfig
 ircBotSettingsForm IrcConfig{..} =
-     ul ((IrcConfig <$> host <*> port <*> nick <*> cp <*> user <*> channels) <* submit "update")
+     ul ((IrcConfig <$> host <*> port <*> nick <*> cp <*> user <*> channels) <* inputSubmit "update")
     where
-      host     = li $ label "irc server" ++> inputString (Just ircHost)
-      port     = li $ label "irc port"   ++> inputString (Just $ show ircPort) `transform` toWord16
-      nick     = li $ label "nickname"   ++> inputString (Just ircNick)
-      cp       = li $ label "cmd prefix" ++> inputString (Just ircCommandPrefix)
-      usrnm    = li $ label "username"   ++> inputString (Just $ username ircUser)
-      hstnm    = li $ label "hostname"   ++> inputString (Just $ hostname ircUser)
-      srvrnm   = li $ label "servername" ++> inputString (Just $ servername ircUser)
-      rlnm     = li $ label "realname"   ++> inputString (Just $ realname ircUser)
+      host     = li $ label "irc server" ++> inputText (ircHost)
+      port     = li $ label "irc port"   ++> inputText (show ircPort) `transformEither` toWord16
+      nick     = li $ label "nickname"   ++> inputText (ircNick)
+      cp       = li $ label "cmd prefix" ++> inputText (ircCommandPrefix)
+      usrnm    = li $ label "username"   ++> inputText (username ircUser)
+      hstnm    = li $ label "hostname"   ++> inputText (hostname ircUser)
+      srvrnm   = li $ label "servername" ++> inputText (servername ircUser)
+      rlnm     = li $ label "realname"   ++> inputText (realname ircUser)
       user     = User <$> usrnm <*> hstnm <*> srvrnm <*> rlnm
-      channels = li $ label "channels (comma separated)"   ++> inputString (Just $ fromSet ircChannels) `transform` toSet
+      channels = li $ label "channels (comma separated)"   ++> inputText (fromSet ircChannels) `transformEither` toSet
 
       -- markup
-      li :: FormDF IrcBotM a -> FormDF IrcBotM a
+      li :: IrcBotForm a -> IrcBotForm a
       li = mapView (\xml -> [<li><% xml %></li>])
-      ul :: FormDF IrcBotM a -> FormDF IrcBotM a
+      ul :: IrcBotForm a -> IrcBotForm a
       ul = mapView (\xml -> [<ul><% xml %></ul>])
 
       -- transformers
-      toWord16 :: Transformer IrcBotM String String Word16
-      toWord16 = transformEither $ \str ->
+      toWord16 :: String -> Either IrcFormError Word16
+      toWord16 str =
           case readDec str of
             [(n,[])] -> Right n
-            _        -> (Left $ "Could not parse as Word16: " ++ str)
+            _        -> (Left (CouldNotParsePort str))
 
       fromSet :: Set String -> String
       fromSet s = intercalate "," (Set.toList s)
 
-      toSet :: Transformer IrcBotM String String (Set String)
-      toSet = transformEither $ \str ->
+      toSet :: String -> Either IrcFormError (Set String)
+      toSet str =
               Right (Set.fromList $ words' str)
 
       words'                   :: String -> [String]

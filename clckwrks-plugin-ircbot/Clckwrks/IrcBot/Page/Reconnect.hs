@@ -6,15 +6,15 @@ import Control.Monad.Reader     (ask)
 import Control.Monad.Trans      (liftIO)
 import Clckwrks                 (update, seeOtherURL)
 import Clckwrks.Admin.Template  (template)
-import Clckwrks.FormPart        (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
-import Clckwrks.IrcBot.Monad    (IrcBotM(..), IrcBotConfig(..))
+import Clckwrks.IrcBot.Monad    (IrcBotM(..), IrcBotForm, IrcBotConfig(..))
 import Clckwrks.IrcBot.URL      (IrcBotURL)
 import           Data.Map       (Map)
 import qualified Data.Map       as Map
 import Happstack.Server         (Response, ok, setResponseCode, toResponse)
 import HSP
-import Text.Digestive           ((++>))
-import Text.Digestive.HSP.Html4 (inputFile, label, submit)
+import Text.Reform              ((++>))
+import Text.Reform.Happstack    (reform)
+import Text.Reform.HSP.String   (inputSubmit, form)
 import Web.Routes               (showURL)
 
 ircReconnectPage :: IrcBotURL -> IrcBotM Response
@@ -22,10 +22,10 @@ ircReconnectPage here =
     do action <- showURL here
        template "Force Reconnect" () $
                 <%>
-                 <% multiFormPart "ir" action forceReconnect Nothing forceReconnectForm %>
+                 <% reform (form action) "ir" forceReconnect Nothing forceReconnectForm %>
                 </%>
     where
-      forceReconnect :: String -> IrcBotM Response
+      forceReconnect :: Maybe String -> IrcBotM Response
       forceReconnect _ =
           do fr <- ircReconnect <$> ask
              liftIO $ putStrLn "attempting reconnect"
@@ -33,6 +33,6 @@ ircReconnectPage here =
              template "forced reconnect" () $
                       <p>forced bot to reconnect</p>
 
-forceReconnectForm :: FormDF IrcBotM String
+forceReconnectForm :: IrcBotForm (Maybe String)
 forceReconnectForm =
-    submit "Force Reconnect"
+    inputSubmit "Force Reconnect"

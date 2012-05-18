@@ -1,7 +1,7 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, TypeSynonymInstances, OverloadedStrings, RecordWildCards, RankNTypes, FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, TypeSynonymInstances, OverloadedStrings, RecordWildCards, RankNTypes, FlexibleContexts, TypeFamilies #-}
 module Clckwrks.IrcBot.Monad where
 
-import Clckwrks                     (Clck(..), ClckT(..), ClckState(..), ClckURL(..), mapClckT, addAdminMenu)
+import Clckwrks                     (Clck(..), ClckT(..), ClckFormT, ClckState(..), ClckURL(..), mapClckT, addAdminMenu)
 import Clckwrks.Acid
 import Clckwrks.IrcBot.Acid
 import Clckwrks.IrcBot.PreProcess   (ircBotCmd)
@@ -17,7 +17,7 @@ import qualified Data.Map            as Map
 import Data.Maybe                    (fromMaybe)
 import Data.Set                      (Set, insert)
 import qualified Data.Text           as T
-import Happstack.Server              (ServerPartT)
+import Happstack.Server              (ServerPartT, Input)
 import Happstack.Server.Internal.Monads (FilterFun)
 import HSP                           (Attr((:=)), Attribute(MkAttr), EmbedAsChild(..), EmbedAsAttr(..), IsName(toName), XMLGenT(..), pAttrVal, XML)
 import Network                       (PortID(PortNumber))
@@ -32,6 +32,7 @@ import Network.IRC.Bot.Part.Channels (initChannelsPart)
 import Network.IRC.Bot.PosixLogger   (posixLogger)
 import System.Directory              (createDirectoryIfMissing)
 import System.FilePath               ((</>))
+import Text.Reform                   (CommonFormError, FormError(..))
 import Web.Routes                    (showURL)
 
 data IrcBotConfig = IrcBotConfig
@@ -50,6 +51,20 @@ data IrcBotConfig = IrcBotConfig
 
 type IrcBotT m = ClckT IrcBotURL (ReaderT IrcBotConfig m)
 type IrcBotM   = ClckT IrcBotURL (ReaderT IrcBotConfig (ServerPartT IO))
+
+data IrcFormError
+    = IrcCFE (CommonFormError [Input])
+    | CouldNotParsePort String
+      deriving (Show)
+
+instance FormError IrcFormError where
+    type ErrorInputType IrcFormError = [Input]
+    commonFormError = IrcCFE
+
+type IrcBotForm = ClckFormT IrcFormError IrcBotM
+
+instance (Functor m, Monad m) => EmbedAsChild (IrcBotT m) IrcFormError where
+    asChild e = asChild (show e)
 
 instance (IsName n) => EmbedAsAttr IrcBotM (Attr n IrcBotURL) where
         asAttr (n := u) =

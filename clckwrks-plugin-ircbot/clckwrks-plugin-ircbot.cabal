@@ -1,5 +1,5 @@
 Name:                clckwrks-plugin-ircbot
-Version:             0.1.3
+Version:             0.2.0
 Synopsis:            ircbot plugin for clckwrks
 Homepage:            http://clckwrks.com/
 License:             BSD3
@@ -36,10 +36,8 @@ Library
     acid-state             == 0.6.*,
     attoparsec             == 0.10.*,
     blaze-html             == 0.4.*,
-    clckwrks               == 0.5.*,
+    clckwrks               == 0.6.*,
     containers             == 0.4.*,
-    digestive-functors     == 0.2.*,
-    digestive-functors-hsp == 0.5.*,
     directory              == 1.1.*,
     filepath               >= 1.2 && < 1.4,
 --    gd                     == 3000.*,
@@ -51,6 +49,9 @@ Library
 --    magic                  == 1.0.*,
     mtl                    >= 2.0 && < 2.3,
     network                == 2.3.*,
+    reform                 == 0.1.*,
+    reform-happstack       == 0.1.*,
+    reform-hsp             >= 0.1.1 && < 0.2,
     safecopy               == 0.6.*,
     text                   == 0.11.*,
     web-routes             == 0.27.*,
