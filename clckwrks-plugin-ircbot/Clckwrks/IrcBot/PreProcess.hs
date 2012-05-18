@@ -9,10 +9,10 @@ import Data.Attoparsec.Text
 import           Data.Text (Text)
 import           Data.Text.Lazy.Builder (Builder)
 import qualified Data.Text.Lazy.Builder as B
-import           Text.Blaze ((!), toValue)
+import           Text.Blaze.Html ((!), toValue)
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
-import Text.Blaze.Renderer.Text (renderHtml)
+import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Web.Routes (showURL)
 
 parseAttr :: Text -> Parser ()
