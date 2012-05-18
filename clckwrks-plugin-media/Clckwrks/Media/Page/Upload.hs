@@ -1,35 +1,37 @@
+{-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Clckwrks.Media.Page.Upload where
 
 import Control.Applicative  ((<$>), (<*))
-import Control.Monad.Reader (ask)
+import Control.Monad.Reader (ReaderT, ask)
 import Control.Monad.Trans  (liftIO)
-import Clckwrks             (update, seeOtherURL)
+import Clckwrks             (ClckT, ClckFormT, update, seeOtherURL)
 import Clckwrks.Admin.Template (template)
-import Clckwrks.FormPart (FormDF, fieldset, ol, li, inputTextArea, multiFormPart)
 import Clckwrks.Media.Acid  (GenMediumId(..), PutMedium(..))
-import Clckwrks.Media.Monad (MediaConfig(..), MediaM)
+import Clckwrks.Media.Monad (MediaConfig(..), MediaM, MediaForm)
 import Clckwrks.Media.Types (Medium(..), MediumId(..), MediumKind(..))
 import Clckwrks.Media.URL   (MediaURL(..))
 import           Data.Map   (Map)
 import qualified Data.Map   as Map
-import Happstack.Server     (Response, ok, setResponseCode, toResponse)
+import Data.Text            (pack)
+import Happstack.Server     (ContentType, Input, Response, ServerPartT, ok, setResponseCode, toResponse)
 import HSP
-import Magic (magicFile)
-import Text.Digestive ((++>))
-import Text.Digestive.HSP.Html4 (inputFile, label, submit)
+import Magic                (magicFile)
+import Text.Reform          ((++>), FormError(..))
+import Text.Reform.Happstack (reform)
+import Text.Reform.HSP.Text (inputFile, label, inputSubmit, textarea, fieldset, ol, li, form)
 import System.Directory (copyFile)
 import System.FilePath  ((</>), addExtension, takeExtension)
 import Web.Routes (showURL)
 
 extensionMap :: Map String (String, MediumKind)
 extensionMap =
-    Map.fromList 
+    Map.fromList
            [ ("image/jpeg", ("jpg", JPEG))
            ]
 
 acceptedTypes :: [String]
-acceptedTypes = Map.keys extensionMap 
+acceptedTypes = Map.keys extensionMap
 
 contentTypeExtension :: String -> Maybe (String, MediumKind)
 contentTypeExtension ct = Map.lookup (takeWhile (/= ';') ct) extensionMap
@@ -39,12 +41,13 @@ uploadMedium here =
     do action <- showURL here
        template "Upload Medium" () $
         <%>
-         <% multiFormPart "ep" action saveMedium Nothing uploadForm %>
+         <% reform (form action) "ep" saveMedium Nothing uploadForm %>
         </%>
+
     where
-      saveMedium :: Maybe (String, FilePath) -> MediaM Response
-      saveMedium (Just (origName, tempPath)) =
-          do md <- mediaDirectory <$> ask
+      saveMedium :: (String, FilePath, ContentType) -> MediaM Response
+      saveMedium (origName, tempPath, contentType) =
+          do md    <- mediaDirectory <$> ask
              magic <- mediaMagic <$> ask
              contentType <- liftIO $ magicFile magic tempPath
              case contentTypeExtension contentType of
@@ -69,6 +72,6 @@ uploadMedium here =
                        update (PutMedium medium)
                        seeOtherURL (GetMedium mid)
 
-uploadForm :: FormDF MediaM (Maybe (String, FilePath))
+uploadForm :: MediaForm (FilePath, FilePath, ContentType)
 uploadForm =
-    label "upload file: " ++> inputFile <* submit "Upload"
+    label "upload file: " ++> inputFile <* inputSubmit (pack "Upload")

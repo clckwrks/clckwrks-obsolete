@@ -1,11 +1,11 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, TypeSynonymInstances, OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, TypeFamilies, TypeSynonymInstances, OverloadedStrings #-}
 module Clckwrks.Media.Monad where
 
-import Clckwrks            (ClckT(..), ClckState(..), ClckURL(..), mapClckT, addAdminMenu)
+import Clckwrks            (ClckT(..), ClckFormT, ClckState(..), ClckURL(..), mapClckT, addAdminMenu)
 import Clckwrks.Acid
 import Clckwrks.IOThread   (IOThread(..), startIOThread, killIOThread)
 import Clckwrks.Media.Acid
-import Clckwrks.Media.Preview 
+import Clckwrks.Media.Preview
 import Clckwrks.Media.PreProcess (mediaCmd)
 import Clckwrks.Media.Types
 import Clckwrks.Media.URL
@@ -19,10 +19,11 @@ import Data.Maybe          (fromMaybe)
 import qualified Data.Text as T
 import Happstack.Server
 import Happstack.Server.Internal.Monads (FilterFun)
-import HSP                  (Attr((:=)), Attribute(MkAttr), EmbedAsAttr(..), IsName(toName), pAttrVal)
+import HSP                  (Attr((:=)), Attribute(MkAttr), EmbedAsAttr(..), EmbedAsChild(..), IsName(toName), pAttrVal)
 import Magic                (Magic, MagicFlag(..), magicLoadDefault, magicOpen)
 import System.Directory     (createDirectoryIfMissing)
 import System.FilePath      ((</>))
+import Text.Reform          (CommonFormError, FormError(..))
 import Web.Routes           (showURL)
 
 data MediaConfig = MediaConfig
@@ -36,13 +37,26 @@ data MediaConfig = MediaConfig
 type MediaT m = ClckT MediaURL (ReaderT MediaConfig m)
 type MediaM = ClckT MediaURL (ReaderT MediaConfig (ServerPartT IO))
 
+data MediaFormError
+    = MediaCFE (CommonFormError [Input])
+      deriving Show
+
+instance FormError MediaFormError where
+    type ErrorInputType MediaFormError = [Input]
+    commonFormError = MediaCFE
+
+instance (Functor m, Monad m) => EmbedAsChild (MediaT m) MediaFormError where
+    asChild e = asChild (show e)
+
+type MediaForm = ClckFormT MediaFormError MediaM
+
 instance (IsName n) => EmbedAsAttr MediaM (Attr n MediaURL) where
-        asAttr (n := u) = 
+        asAttr (n := u) =
             do url <- showURL u
                asAttr $ MkAttr (toName n, pAttrVal (T.unpack url))
 
 instance (IsName n) => EmbedAsAttr MediaM (Attr n ClckURL) where
-        asAttr (n := url) = 
+        asAttr (n := url) =
             do showFn <- mediaClckURL <$> ask
                asAttr $ MkAttr (toName n, pAttrVal (T.unpack $ showFn url []))
 
@@ -96,7 +110,7 @@ initMediaConfig mBasePath mediaDir =
 
 -}
 addMediaAdminMenu :: ClckT MediaURL IO ()
-addMediaAdminMenu = 
+addMediaAdminMenu =
     do uploadURL   <- showURL (MediaAdmin Upload)
        allMediaURL <- showURL (MediaAdmin AllMedia)
        addAdminMenu ("Media Gallery", [("Upload",    uploadURL)
