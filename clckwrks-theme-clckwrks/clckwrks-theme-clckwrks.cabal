@@ -14,7 +14,7 @@ Cabal-version:       >=1.2
 Data-Files:
         data/style.css
         data/hscolour.css
-        data/clckwrks-gold.png
+        data/clckwrks-logo.png
         data/7-icon.png
         data/8-icon.png
         data/philosophy-icon.png
