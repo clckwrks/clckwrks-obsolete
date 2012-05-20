@@ -38,4 +38,4 @@ Executable clckwrks-server
     cpp-options: -DPLUGINS
   else
     Build-depends:
-      clckwrks-theme-basic
+      clckwrks-theme-clckwrks
