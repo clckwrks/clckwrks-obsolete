@@ -68,3 +68,51 @@ Architecture: any
 Section: misc
 Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}
 Description: clckwrks.com
+
+Package: clckwrks-dot-com-production
+Architecture: all
+Section: misc
+Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}, clckwrks-dot-com-server
+Description: Server clckwrks.com
+ Server clckwrks.com
+ .
+  Author: David Fox <dsf@seereason.com>, Clifford Beshers <beshers@seereason.com>
+  Upstream-Maintainer: Clifford Beshers <beshers@seereason.com>
+
+Package: clckwrks-dot-com-staging
+Architecture: all
+Section: misc
+Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}
+Description: Server clckwrks.com
+ Server clckwrks.com
+ .
+  Author: David Fox <dsf@seereason.com>, Clifford Beshers <beshers@seereason.com>
+  Upstream-Maintainer: Clifford Beshers <beshers@seereason.com>
+
+Package: clckwrks-dot-com-testing
+Architecture: all
+Section: misc
+Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}
+Description: Server clckwrks.com
+ Server clckwrks.com
+ .
+  Author: David Fox <dsf@seereason.com>, Clifford Beshers <beshers@seereason.com>
+  Upstream-Maintainer: Clifford Beshers <beshers@seereason.com>
+
+Package: clckwrks-dot-com-server
+Architecture: any
+Section: misc
+Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}, libjs-jquery, libjs-jquery-ui, libjs-jcrop
+Description: Server clckwrks.com
+ Server clckwrks.com
+ .
+  Author: David Fox <dsf@seereason.com>, Clifford Beshers <beshers@seereason.com>
+  Upstream-Maintainer: Clifford Beshers <beshers@seereason.com>
+
+Package: clckwrks-dot-com-backups
+Architecture: any
+Section: misc
+Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}, anacron
+Description: backup program for the clckwrks.com site
+  Install this somewhere other than where the server is running get
+  automated backups of the database.
