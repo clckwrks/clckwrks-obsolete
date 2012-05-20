@@ -16,7 +16,7 @@ Flag plugins
      Description: enable dynamic recompilation
      Default: False
 
-Executable clckwrks-server
+Executable clckwrks-dot-com-server
   Main-is: Main.hs
   ghc-options: -threaded -O2
   Extensions: CPP
