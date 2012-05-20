@@ -1,14 +1,18 @@
 #!/usr/bin/make -f
 
-DEB_CABAL_PACKAGE = clckwrks-dot-com
-
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/hlibrary.mk
 
-build/haskell-clckwrks-dot-com-utils:: build-ghc-stamp
-binary-fixup/haskell-clckwrks-dot-com-utils::
-	install -m 755 -s -D dist-ghc/build/clckwrks-server/clckwrks-server debian/haskell-clckwrks-dot-com-utils/usr/bin/clckwrks-server || true
+makebuilddir::
+	SITENAME=clckwrks.com SERVERADMIN=jeremy@seereason.com PROXYPORT=9029 TESTINGPORT=8000 happstack-debianization-install
 
-# How to install an extra file into the documentation package
-#binary-fixup/libghc-clckwrks-dot-com-doc::
-#	echo "Some informative text" > debian/libghc-clckwrks-dot-com-doc/usr/share/doc/libghc-clckwrks-dot-com-doc/AnExtraDocFile
+binary-fixup/clckwrks-dot-com-server::
+	install -Dp -m 755 dist-ghc/build/clckwrks-dot-com-server/clckwrks-dot-com-server debian/clckwrks-dot-com-server/usr/bin/clckwrks-dot-com-server
+
+binary-fixup/clckwrks-dot-com-data::
+	find theme -type f | while read i; do \
+	  install -Dp $$i debian/clckwrks-dot-com-data/usr/share/clckwrks-dot-com-data/$$i; \
+	done
+
+binary-fixup/clckwrks-dot-com-backups::
+	install -Dps -m 755 dist-ghc/build/clckwrks-dot-com-backups/clckwrks-dot-com-backups debian/clckwrks-dot-com-backups/etc/cron.hourly/clckwrks-dot-com
