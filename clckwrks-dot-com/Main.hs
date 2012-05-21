@@ -15,7 +15,16 @@ import Data.Monoid (mappend)
 import Data.Text  (Text)
 import Data.Text.Lazy.Builder (Builder)
 import qualified Data.Text as Text
+import Network.URI (URI(..), URIAuth(..), parseAbsoluteURI)
+import qualified Paths_clckwrks                 as Clckwrks
+import qualified Paths_clckwrks_plugin_media    as Media
+#ifdef CABAL
+import qualified Paths_clckwrks_theme_happstack as Theme
+#endif
+import System.Console.GetOpt
 import System.Environment (getArgs)
+import System.Exit        (exitFailure, exitSuccess)
+import System.FilePath    ((</>))
 import URL
 import Web.Routes.Happstack
 import qualified Theme.Blog as Blog
@@ -27,28 +36,116 @@ import System.Plugins.Auto (PluginHandle, PluginConf(..), defaultPluginConf, ini
 import PageMapper
 #endif
 
-clckwrksConfig :: ClckwrksConfig SiteURL
-clckwrksConfig = ClckwrksConfig
-      { clckHostname     = "localhost"
-      , clckPort         = 8000
-      , clckURL          = C
-      , clckJQueryPath   = "/usr/share/javascript/jquery/"
-      , clckJQueryUIPath = "/usr/share/javascript/jquery-ui/"
-      , clckJSTreePath   = "../jstree/"
-      , clckJSON2Path    = "../json2/"
-      , clckThemeDir     = "../clckwrks-theme-clckwrks/"
-      , clckPluginDir    = [("media", "../clckwrks-plugin-media/")]
-      , clckStaticDir    = "../clckwrks/static"
-      , clckTopDir       = Nothing
-#ifdef PLUGINS
-      , clckPageHandler  = undefined
-#else
-      , clckPageHandler  = staticPageHandler
-#endif
-      , clckBlogHandler  = staticBlogHandler
-      }
+------------------------------------------------------------------------------
+-- Command line options
+------------------------------------------------------------------------------
 
--- * SitePlus
+-- | command-line Flags
+data Flag
+    = ModifyConfig (forall url. ClckwrksConfig url -> ClckwrksConfig url)
+    | Help
+    | Version
+
+-- | Flag selectors
+isHelp, isVersion :: Flag -> Bool
+isHelp    flag = case flag of Help    -> True; _ -> False
+isVersion flag = case flag of Version -> True; _ -> False
+
+-- | Command line options.
+clckwrksOpts :: ClckwrksConfig SiteURL -> [OptDescr Flag]
+clckwrksOpts def =
+    [ -- Option [] ["version"]       (NoArg Version)                 "Display version information"
+      Option [] ["help"]          (NoArg Help)                    "Display this help message"
+    , Option [] ["http-port"]     (ReqArg setPort "port")         ("Port to bind http server, default: " ++ show (clckPort def))
+    , Option [] ["hostname"]      (ReqArg setHostname "hostname") ("Server hostename, default: " ++ show (clckHostname def))
+    , Option [] ["base-uri"]      (ReqArg setBaseURI "URI")       ("Hostname and port, default: " ++ show ("http://" ++ clckHostname def ++ ":" ++ show (clckPort def)))
+    , Option [] ["jquery-path"]   (ReqArg setJQueryPath "path")   ("path to jquery directory, default: " ++ show (clckJQueryPath def))
+    , Option [] ["jqueryui-path"] (ReqArg setJQueryUIPath "path") ("path to jqueryui directory, default: " ++ show (clckJQueryUIPath def))
+    , Option [] ["jstree-path"]   (ReqArg setJSTreePath "path")   ("path to jstree directory, default: " ++ show (clckJSTreePath def))
+    , Option [] ["json2-path"]    (ReqArg setJSON2Path  "path")   ("path to json2 directory, default: " ++ show (clckJSON2Path def))
+    , Option [] ["theme-path"]    (ReqArg setThemeDir   "path")   ("path to theme directory, default: " ++ show (clckThemeDir def))
+    , Option [] ["top"]           (ReqArg setTopDir     "path")   ("path to directory that holds the state directory, uploads, etc")
+    , Option [] ["static"]        (ReqArg noop "ignored")         "unused"
+    , Option [] ["logs"]          (ReqArg noop "ignored")         "unimplemented"
+    , Option [] ["log-mode"]      (ReqArg noop "ignored")         "unimplemented"
+    , Option [] ["enable-analytics"] (NoArg (ModifyConfig id))    "unimplemented"
+    ]
+    where
+      noop            _   = ModifyConfig $ id
+      setPort         str = ModifyConfig $ \c -> c { clckPort         = read str }
+      setHostname     str = ModifyConfig $ \c -> c { clckHostname     = str      }
+      setBaseURI      str = let Just (URI {uriAuthority = Just (URIAuth {uriRegName = host, uriPort = port})}) = parseAbsoluteURI str in
+                            ModifyConfig $ \c -> c { clckHostname = host, clckPort = read port }
+      setJQueryPath   str = ModifyConfig $ \c -> c { clckJQueryPath   = str      }
+      setJQueryUIPath str = ModifyConfig $ \c -> c { clckJQueryUIPath = str      }
+      setJSTreePath   str = ModifyConfig $ \c -> c { clckJSTreePath   = str      }
+      setJSON2Path    str = ModifyConfig $ \c -> c { clckJSON2Path    = str      }
+      setThemeDir     str = ModifyConfig $ \c -> c { clckThemeDir     = str      }
+      setTopDir       str = ModifyConfig $ \c -> c { clckTopDir       = Just str }
+
+-- | Parse the command line arguments into a list of flags. Exits with usage
+-- message, in case of failure.
+parseArgs :: [OptDescr Flag] -> [String] -> IO (ClckwrksConfig url -> ClckwrksConfig url)
+parseArgs opts args =
+    case getOpt Permute opts args of
+      (flags,_,[]) ->
+          if any isHelp flags
+          then do putStr (helpMessage opts)
+                  exitSuccess
+          else do return $ foldr (.) id [f | (ModifyConfig f) <- flags ]
+      (_,_,errs)   ->
+          do putStr ("Failure while parsing command line:\n"++unlines errs)
+             putStr (helpMessage opts)
+             exitFailure
+
+-- | A simple usage message listing all flags possible.
+helpMessage :: [OptDescr Flag] -> String
+helpMessage opts =
+    usageInfo header opts
+    where
+      header = "Usage: clckwrks [OPTION...]"
+
+
+clckwrksConfig :: IO (ClckwrksConfig SiteURL)
+clckwrksConfig =
+    do clckDir    <- Clckwrks.getDataDir
+#ifdef CABAL
+       themeDir   <- Theme.getDataDir
+#else
+       let themeDir = "../clckwrks-theme-clckwrks/"
+#endif
+       mediaDir   <- Media.getDataDir
+       return $ ClckwrksConfig
+                  { clckHostname     = "localhost"
+                  , clckPort         = 8000
+                  , clckURL          = C
+                  , clckJQueryPath   = "/usr/share/javascript/jquery/"
+                  , clckJQueryUIPath = "/usr/share/javascript/jquery-ui/"
+                  , clckJSTreePath   = clckDir </> "jstree"
+                  , clckJSON2Path    = clckDir </> "json2"
+                  , clckThemeDir     = themeDir
+                  , clckPluginDir    = [("media", mediaDir)]
+                  , clckStaticDir    = clckDir </> "static"
+                  , clckTopDir       = Nothing
+#ifdef PLUGINS
+                  , clckPageHandler  = undefined
+#else
+                  , clckPageHandler  = staticPageHandler
+#endif
+                  , clckBlogHandler  = staticBlogHandler
+                  }
+
+getClckwrksConfig :: [OptDescr Flag]
+                  -> ClckwrksConfig SiteURL
+                  -> IO (ClckwrksConfig SiteURL)
+getClckwrksConfig opts cc =
+    do args <- getArgs
+       f    <- parseArgs opts args
+       return (f cc)
+
+------------------------------------------------------------------------------
+-- SitePlus
+------------------------------------------------------------------------------
 
 data SitePlus url a = SitePlus
     { siteSite    :: Site url a
@@ -123,12 +220,8 @@ initPlugins =
        mapM_ addAdminMenu dm
 
 clckwrks :: ClckwrksConfig SiteURL -> IO ()
-clckwrks cc' =
-    do args <- getArgs
-       let cc = case args of
-                  [] -> cc'
-                  (h:_) -> cc' { clckHostname = h }
-       withClckwrks cc $ \clckState ->
+clckwrks cc =
+    do withClckwrks cc $ \clckState ->
            withMediaConfig Nothing "_uploads" $ \mediaConf ->
                let -- site     = mkSite (clckPageHandler cc) clckState mediaConf
                    site     = mkSite2 cc mediaConf
@@ -204,7 +297,9 @@ main :: IO ()
 main =
   do ph <- initPlugins
      putStrLn "Dynamic Server Started."
-     clckwrks (clckwrksConfig { clckPageHandler = dynamicPageHandler ph })
+     defCC <- clckwrksConfig
+     cc    <- getClckwrksConfig (clckwrksOpts defCC) defCC
+     clckwrks (cc { clckPageHandler = dynamicPageHandler ph })
 
 dynamicPageHandler :: PluginHandle -> Clck ClckURL Response
 dynamicPageHandler ph =
@@ -219,7 +314,9 @@ dynamicPageHandler ph =
 main :: IO ()
 main =
   do putStrLn "Static Server Started."
-     clckwrks clckwrksConfig
+     defCC <- clckwrksConfig
+     cc    <- getClckwrksConfig (clckwrksOpts defCC) defCC
+     clckwrks cc
 
 staticPageHandler :: Clck ClckURL Response
 staticPageHandler = toResponse <$> unXMLGenT pageMapper
