@@ -1,10 +1,15 @@
 #!/usr/bin/make -f
 
+DEB_CABAL_PACKAGE = clckwrks-dot-com
+
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/hlibrary.mk
 
 makebuilddir::
 	SITENAME=clckwrks.com SERVERADMIN=jeremy@seereason.com PROXYPORT=9029 TESTINGPORT=8000 happstack-debianization-install
+
+# Required for packages with no Library section in their cabal file
+build/clckwrks-dot-com-server:: build-ghc-stamp
 
 binary-fixup/clckwrks-dot-com-server::
 	install -Dp -m 755 dist-ghc/build/clckwrks-dot-com-server/clckwrks-dot-com-server debian/clckwrks-dot-com-server/usr/bin/clckwrks-dot-com-server

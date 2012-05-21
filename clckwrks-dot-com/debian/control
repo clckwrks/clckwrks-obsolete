@@ -63,7 +63,7 @@ Build-Depends-Indep: ghc-doc,
 Standards-Version: 3.9.1
 Homepage: http://clckwrks.com/
 
-Package: haskell-clckwrks-dot-com-utils
+Package: clckwrks-dot-com-utils
 Architecture: any
 Section: misc
 Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}
