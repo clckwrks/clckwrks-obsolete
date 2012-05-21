@@ -19,7 +19,7 @@ import Network.URI (URI(..), URIAuth(..), parseAbsoluteURI)
 import qualified Paths_clckwrks                 as Clckwrks
 import qualified Paths_clckwrks_plugin_media    as Media
 #ifdef CABAL
-import qualified Paths_clckwrks_theme_happstack as Theme
+import qualified Paths_clckwrks_theme_clckwrks  as Theme
 #endif
 import System.Console.GetOpt
 import System.Environment (getArgs)

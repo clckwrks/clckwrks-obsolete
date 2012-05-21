@@ -129,7 +129,7 @@ Description: Server clckwrks.com
 Package: clckwrks-dot-com-server
 Architecture: any
 Section: misc
-Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}, libjs-jquery, libjs-jquery-ui, libjs-jcrop
+Depends: ${shlibs:Depends}, ${haskell:Depends}, ${misc:Depends}, libjs-jquery, libjs-jquery-ui
 Description: Server clckwrks.com
  Server clckwrks.com
  .
