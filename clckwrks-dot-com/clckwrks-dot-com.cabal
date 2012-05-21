@@ -39,3 +39,8 @@ Executable clckwrks-dot-com-server
   else
     Build-depends:
       clckwrks-theme-clckwrks
+
+Executable clckwrks-dot-com-backups
+ Main-Is: Backups.hs
+ GHC-Options: -threaded -Wall -Wwarn -O2 -fno-warn-name-shadowing -fno-warn-missing-signatures -fwarn-tabs -fno-warn-unused-binds -fno-warn-orphans -fwarn-unused-imports -fno-spec-constr
+ Build-depends: archive >= 1.2.9, base, Extra
