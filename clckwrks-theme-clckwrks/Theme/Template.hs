@@ -25,7 +25,7 @@ template title headers body =
       <link rel="stylesheet" type="text/css" href=(ThemeData "hscolour.css") />
       <% headers %>
       -- TODO: only show when running on live site, not testing/devel
-      <% analyticsAsync (UACCT "UA-7111625-1") %>
+      <% analyticsAsync (UACCT "UA-31793881-1") %>
      </head>
      <body>
          <div id="banner-box">
