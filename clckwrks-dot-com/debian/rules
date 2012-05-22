@@ -13,8 +13,10 @@ build/clckwrks-dot-com-server:: build-ghc-stamp
 
 binary-fixup/clckwrks-dot-com-server::
 	install -Dp -m 755 dist-ghc/build/clckwrks-dot-com-server/clckwrks-dot-com-server debian/clckwrks-dot-com-server/usr/bin/clckwrks-dot-com-server
-	dpkg-query -W -f='haskell:Depends=haskell-clckwrks-theme-clckwrks-utils (=$${Version})\n' libghc-clckwrks-theme-clckwrks-dev >> debian/clckwrks-dot-com-server.substvars
-	dpkg-query -W -f='haskell:Depends=haskell-clckwrks-utils (=$${Version})\n' libghc-clckwrks-dev >> debian/clckwrks-dot-com-server.substvars
+	echo -n 'haskell:Depends=' >> debian/clckwrks-dot-com-server.substvars
+	dpkg-query -W -f='haskell-clckwrks-theme-clckwrks-utils (=$${Version})' libghc-clckwrks-theme-clckwrks-dev >> debian/clckwrks-dot-com-server.substvars
+	dpkg-query -W -f=', haskell-clckwrks-plugin-media-utils (=$${Version})' libghc-clckwrks-plugin-media-dev >> debian/clckwrks-dot-com-server.substvars
+	dpkg-query -W -f=', haskell-clckwrks-utils (=$${Version})\n' libghc-clckwrks-dev >> debian/clckwrks-dot-com-server.substvars
 
 binary-fixup/clckwrks-dot-com-data::
 	find theme -type f | while read i; do \
