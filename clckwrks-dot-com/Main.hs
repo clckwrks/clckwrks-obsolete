@@ -68,7 +68,7 @@ clckwrksOpts def =
     , Option [] ["static"]        (ReqArg noop "ignored")         "unused"
     , Option [] ["logs"]          (ReqArg noop "ignored")         "unimplemented"
     , Option [] ["log-mode"]      (ReqArg noop "ignored")         "unimplemented"
-    , Option [] ["enable-analytics"] (NoArg (ModifyConfig id))    "unimplemented"
+    , Option [] ["enable-analytics"] (NoArg setAnalytics)         "enable google analytics tracking"
     ]
     where
       noop            _   = ModifyConfig $ id
@@ -82,6 +82,7 @@ clckwrksOpts def =
       setJSON2Path    str = ModifyConfig $ \c -> c { clckJSON2Path    = str      }
       setThemeDir     str = ModifyConfig $ \c -> c { clckThemeDir     = str      }
       setTopDir       str = ModifyConfig $ \c -> c { clckTopDir       = Just str }
+      setAnalytics        = ModifyConfig $ \c -> c { clckEnableAnalytics = True  }
 
 -- | Parse the command line arguments into a list of flags. Exits with usage
 -- message, in case of failure.
@@ -133,6 +134,7 @@ clckwrksConfig =
                   , clckPageHandler  = staticPageHandler
 #endif
                   , clckBlogHandler  = staticBlogHandler
+                  , clckEnableAnalytics = False
                   }
 
 getClckwrksConfig :: [OptDescr Flag]
