@@ -20,7 +20,7 @@ page =
         <%>
 
          <blockquote>
-          <p>The relentless, uncompromised power and beauty of Haskell in a web framework.</p>
+          <p><span class="big-quote">“</span>runs smoothly and invisibly<span class="big-quote">”</span> - <span class="quote-author">Katherine Durkes</span></p>
          </blockquote>
 
          <div class="summary-boxes">

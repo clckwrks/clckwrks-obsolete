@@ -182,19 +182,6 @@ ul.page-menu:hover
 
 }
 */
-blockquote
-{
-    font-family: Georgia,"Times New Roman",Times,serif;
-    font-style: italic;
-    text-align: center;
-    font-size: 1.4em;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    padding-top: 1em;
-    padding-bottom: 1em;
-}
 
 .summary-box
 {
@@ -236,4 +223,41 @@ blockquote
 {
     padding-top: 150px;
     text-align: center;
+}
+
+/* blockquote */
+
+blockquote
+{
+    font-family: Georgia,"Times New Roman",Times,serif;
+    font-style: italic;
+    text-align: center;
+    font-size: 1.4em;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 1.2;
+}
+
+blockquote > p
+{
+    padding: 0;
+    margin: 0;
+}
+
+.big-quote
+{
+    font-size: 500%;
+    vertical-align: middle;
+    color: #ccc;
+}
+
+.quote-author
+{
+    font-style: italic;
+    font-size: 0.8em;
+    color: #888;
 }

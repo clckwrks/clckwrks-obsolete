@@ -25,14 +25,14 @@ template title headers body =
       <link rel="stylesheet" type="text/css" href=(ThemeData "hscolour.css") />
       <% headers %>
       -- TODO: only show when running on live site, not testing/devel
-      <% analyticsAsync (UACCT "UA-31793881-1") %>
+      <% googleAnalytics %>
      </head>
      <body>
          <div id="banner-box">
           <div class="mesh"></div>
 
           <div class="img-text-bg"></div>
-          <div class="img-text">The relentless, uncompromised power and beauty of Haskell in a web framework.</div>
+          <div class="img-text"></div>
           <img src=(ThemeData "clckwrks-logo.png") />
          </div>
 
