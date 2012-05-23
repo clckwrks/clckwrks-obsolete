@@ -1,5 +1,5 @@
 Name:                clckwrks-theme-basic
-Version:             0.2.0
+Version:             0.2.1
 Synopsis:            A basic theme for clckwrks
 -- Description:
 Homepage:            http://www.clckwrks.com/
@@ -26,4 +26,4 @@ Library
 
   Build-depends:
         base       < 5,
-        clckwrks  == 0.6.*
+        clckwrks  == 0.7.*
