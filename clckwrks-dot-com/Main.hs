@@ -343,13 +343,13 @@ checkResources cc =
                                       , "Download from http://jquery.com/"
                                       ]
        let json2 = (clckJSON2Path cc) </> "json2.js"
-       checkResource jquery $ unlines [ "Could not find: " ++ json2
+       checkResource json2  $ unlines [ "Could not find: " ++ json2
                                       , "Please make sure json2.js is installed. Use --json2-path to set the path."
                                       , "Download from https://raw.github.com/douglascrockford/JSON-js/master/json2.js"
                                       ]
 
        let jstree = (clckJSTreePath cc) </> "jquery.jstree.js"
-       checkResource jquery $ unlines [ "Could not find: " ++ jstree
+       checkResource jstree $ unlines [ "Could not find: " ++ jstree
                                       , "Please make sure jstree is installed. Use --jstree-path to set the path."
                                       , "Download from http://github.com/downloads/vakata/jstree/jstree_pre1.0_fix_1.zip"
                                       ]
