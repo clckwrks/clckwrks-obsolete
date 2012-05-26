@@ -22,6 +22,7 @@ import qualified Paths_clckwrks_plugin_media    as Media
 import qualified Paths_clckwrks_theme_clckwrks  as Theme
 #endif
 import System.Console.GetOpt
+import System.Directory   (doesFileExist)
 import System.Environment (getArgs)
 import System.Exit        (exitFailure, exitSuccess)
 import System.FilePath    ((</>))
@@ -223,7 +224,8 @@ initPlugins =
 
 clckwrks :: ClckwrksConfig SiteURL -> IO ()
 clckwrks cc =
-    do withClckwrks cc $ \clckState ->
+    do checkResources cc
+       withClckwrks cc $ \clckState ->
            withMediaConfig Nothing "_uploads" $ \mediaConf ->
                let -- site     = mkSite (clckPageHandler cc) clckState mediaConf
                    site     = mkSite2 cc mediaConf
@@ -333,4 +335,27 @@ staticBlogHandler = toResponse <$> unXMLGenT Blog.page
 -- javascript check
 ------------------------------------------------------------------------------
 
--- javascriptCheck :: 
+checkResources :: ClckwrksConfig url -> IO ()
+checkResources cc =
+    do let jquery = (clckJQueryPath cc) </> "jquery.js"
+       checkResource jquery $ unlines [ "Could not find: " ++ jquery
+                                      , "Please make sure jquery is installed. Use --jquery-path to set the path."
+                                      , "Download from http://jquery.com/"
+                                      ]
+       let json2 = (clckJSON2Path cc) </> "json2.js"
+       checkResource jquery $ unlines [ "Could not find: " ++ json2
+                                      , "Please make sure json2.js is installed. Use --json2-path to set the path."
+                                      , "Download from https://raw.github.com/douglascrockford/JSON-js/master/json2.js"
+                                      ]
+
+       let jstree = (clckJSTreePath cc) </> "jquery.jstree.js"
+       checkResource jquery $ unlines [ "Could not find: " ++ jstree
+                                      , "Please make sure jstree is installed. Use --jstree-path to set the path."
+                                      , "Download from http://github.com/downloads/vakata/jstree/jstree_pre1.0_fix_1.zip"
+                                      ]
+
+checkResource  :: FilePath -> String -> IO ()
+checkResource fp msg =
+    do e <- doesFileExist fp
+       when (not e) $ putStrLn msg
+
