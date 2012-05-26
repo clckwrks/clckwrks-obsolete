@@ -52,10 +52,12 @@ template title headers body =
                  do r <- query (HasRole uid (Set.singleton Administrator))
                     if not r
                       then <% () %>
-                      else <%>
-                            <div><a href=(Auth $ AuthURL A_Login)>login</a></div>
-                            <div><a href=(Admin Console)>admin console</a></div>
-                           </%>
+                      else do pid <- lift getPageId
+                              <%>
+                               <div><a href=(Auth $ AuthURL A_Login)>login</a></div>
+                               <div><a href=(Admin Console)>admin console</a></div>
+                               <div><a href=(Admin (EditPage pid))>edit this page</a></div>
+                              </%>
        %>
      <div id="copyright">Powered by Happstack. Copyright 2012, SeeReason Partners LLC</div>
     </div>

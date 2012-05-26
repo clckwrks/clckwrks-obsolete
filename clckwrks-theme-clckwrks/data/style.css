@@ -6,6 +6,8 @@ body
 /* font-family: Arial, Helevtica, Verdana, san-serif;  */
  font-size: 13px;
 /*  background-color: #dde7eb; */
+/* background: #e0ffe0; */
+
  line-height: 1.8;
  outline-color: #333;
  outline-style: none;
@@ -13,6 +15,26 @@ body
  color: #555;
  padding: 0;
  margin: 0;
+ background: white;
+/*
+ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVQIHWNgYGAw/v//PwMjiAABADusBi/shrLOAAAAAElFTkSuQmCC) repeat; 
+ background-color: #ef0f;
+*/
+
+/* background:url('http://ak5.picdn.net/shutterstock/videos/1278652/preview/stock-footage-light-seamless-background.jpg') repeat;  */
+
+
+
+
+/*    background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVQIHWNgYGAw/v//PwMjiAABADusBi/shrLOAAAAAElFTkSuQmCC) repeat; */
+/*    position: absolute;
+    width: 100%;
+    margin-top: 3em;
+    height: 400px;
+    border-radius: 10px;
+    opacity: 0.5; */
+
+
 }
 
 h1.page-title
@@ -33,7 +55,7 @@ h1
 
 h2
 {
-    font-weight: normal;
+
     font-size: 1.25em;
     margin-left: -1em;
 }
@@ -64,12 +86,6 @@ h2
     margin-bottom: 1em; */
     margin: 0;
     background: #33333F;
-    box-shadow: 0px 0px 5px 0px #aaa;
-}
-
-ul.page-menu:hover
-{
-    background: #444;
 }
 
 .menu-inner-div
@@ -96,9 +112,16 @@ ul.page-menu:hover
     display: inline;
     padding-left: 1.5em;
     padding-right: 1.5em;
-    margin-right: -1px;
-    line-height: 2.5em;
+    margin-right: 1em;
+    line-height: 1.5em;
+    box-shadow: 0px 0px 5px 0px #aaa;
 }
+
+.page-menu li:hover
+{
+    background: #444;
+}
+
 
 .page-menu a
 {
@@ -153,6 +176,7 @@ ul.page-menu:hover
 
 #banner-box
 {
+    background: white;
 /*    text-align: center; */
 /*    background: white; */
 }
@@ -260,4 +284,56 @@ blockquote > p
     font-style: italic;
     font-size: 0.8em;
     color: #888;
+}
+
+#blog-content
+{
+/*    border: 1px solid #ddd;
+    box-shadow: 0px 3px 10px 5px #dfdfdf; */
+    padding-bottom: 1em;
+    margin-left: 15em;
+    margin-right: 15em;
+    margin-top: 1em;
+    background: white;
+
+}
+
+#blog-content h1
+{
+    margin-left: 0.5em;
+    margin-top: 0em;
+    margin-bottom: 0em;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+#blog-content h2
+{
+    margin-top: 0.5em;
+    margin-left: 0;
+    margin-bottom: 0;
+    font-size: 1.75em;
+    color: #36afdc;
+    font-weight: bold;
+}
+
+.pub-date
+{
+    font-size: 0.8em;
+    font-style: italic;
+    color: #bbb;
+}
+
+.blog-posts
+{
+}
+
+ol.blog-posts
+{
+    list-style-type: none;
+}
+
+.blog-posts li
+{
+    border-bottom: 1px dotted #aaa;
 }

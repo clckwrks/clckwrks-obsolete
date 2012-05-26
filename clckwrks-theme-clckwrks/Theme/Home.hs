@@ -16,12 +16,16 @@ summaryBox pid title iconURL =
 
 page :: XMLGenT (Clck ClckURL) XML
 page =
-    template "Home" () $
+    template "clckwrks.com" () $
         <%>
 
          <blockquote>
           <p><span class="big-quote">“</span>runs smoothly and invisibly<span class="big-quote">”</span> - <span class="quote-author">Katherine Durkes</span></p>
          </blockquote>
+
+         <div id="page-content">
+          <% getPageContent %>
+         </div>
 
          <div class="summary-boxes">
           <% summaryBox (PageId 5) "Happstack Philosophy" "philosophy-icon.png" %>

@@ -242,6 +242,8 @@ route cc sitePlus =
             , dir "static"      $ serveDirectory DisableBrowsing [] (clckStaticDir cc)
             , dir "login"       $ seeOther ((siteShowURL sitePlus) (C $ Auth $ AuthURL A_Login) []) (toResponse ())
             , dir "admin"       $ seeOther ((siteShowURL sitePlus) (C $ Admin Console) []) (toResponse ())
+            , dir "blog" $ dir "atom.xml" $ seeOther ((siteShowURL sitePlus) (C $ AtomFeed) []) (toResponse ())
+            , dir "blog"        $ seeOther ((siteShowURL sitePlus) (C $ Blog) []) (toResponse ())
             , runSitePlus sitePlus
             ]
 
@@ -327,3 +329,8 @@ staticPageHandler = toResponse <$> unXMLGenT pageMapper
 staticBlogHandler :: Clck ClckURL Response
 staticBlogHandler = toResponse <$> unXMLGenT Blog.page
 
+------------------------------------------------------------------------------
+-- javascript check
+------------------------------------------------------------------------------
+
+-- javascriptCheck :: 
