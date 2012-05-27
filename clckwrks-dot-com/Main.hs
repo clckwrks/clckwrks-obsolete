@@ -8,6 +8,7 @@ import Clckwrks.Page.Atom (fixFeedConfigUUID)
 import Clckwrks.Server
 import Clckwrks.Media
 import Clckwrks.Media.PreProcess (mediaCmd)
+import Clckwrks.Page.PreProcess (pageCmd)
 import qualified Data.ByteString.Char8 as C
 import Data.List (intercalate)
 import qualified Data.Map as Map
@@ -213,11 +214,15 @@ runSitePlus sitePlus =
 
 initPlugins :: ClckT SiteURL IO ()
 initPlugins =
-    do fixFeedConfigUUID
-       showFn <- askRouteFn
+    do showFn <- askRouteFn
        let mediaCmd' :: forall url m. (Monad m) => (Text -> ClckT url m Builder)
            mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
        addPreProcessor "media" mediaCmd'
+
+       let pageCmd' :: forall url m. (Functor m, MonadIO m) => (Text -> ClckT url m Builder)
+           pageCmd' = pageCmd (\u p -> showFn (C u) p)
+       addPreProcessor "page" pageCmd'
+
        nestURL M $ addMediaAdminMenu
        dm <- nestURL C $ defaultAdminMenu
        mapM_ addAdminMenu dm
@@ -358,4 +363,3 @@ checkResource  :: FilePath -> String -> IO ()
 checkResource fp msg =
     do e <- doesFileExist fp
        when (not e) $ putStrLn msg
-
