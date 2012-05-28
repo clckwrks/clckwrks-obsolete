@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Clckwrks.Bugs.PreProcess where
 import Control.Monad.Trans
@@ -7,7 +6,7 @@ import Clckwrks (ClckT, ClckState)
 import Clckwrks.Bugs.URL
 import Clckwrks.Bugs.Types (BugId(..))
 import Data.Attoparsec.Text
-import           Data.Text (Text)
+import           Data.Text (Text, pack)
 import           Data.Text.Lazy.Builder (Builder)
 import qualified Data.Text.Lazy.Builder as B
 import HSP
@@ -24,7 +23,7 @@ parseAttr name =
 
 parseCmd :: Parser BugId
 parseCmd =
-    parseAttr "id" *> (BugId <$> decimal)
+    parseAttr (pack "id") *> (BugId <$> decimal)
 
 bugsCmd :: (Functor m, Monad m) => (BugsURL -> [(Text, Maybe Text)] -> Text) -> Text -> ClckT url m Builder
 bugsCmd

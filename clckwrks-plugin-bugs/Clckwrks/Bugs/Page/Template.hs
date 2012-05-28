@@ -18,4 +18,3 @@ template ttl hdrs bdy =
     do pageTemplate <- bugsPageTemplate <$> ask
        fmap toResponse $ mapClckT lift $ unXMLGenT $
             pageTemplate ttl hdrs bdy
-

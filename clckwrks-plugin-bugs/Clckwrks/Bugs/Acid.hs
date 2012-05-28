@@ -18,7 +18,7 @@ $(deriveSafeCopy 0 'base ''BugsState)
 -- | initial 'BugsState'
 initialBugsState :: BugsState
 initialBugsState = BugsState
-    { nextBugId = BugId 0
+    { nextBugId = BugId 1
     , bugs      = empty
     }
 

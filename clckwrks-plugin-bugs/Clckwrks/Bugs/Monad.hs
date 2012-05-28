@@ -22,7 +22,7 @@ import HSP                  (Attr((:=)), Attribute(MkAttr), EmbedAsAttr(..), Emb
 import System.Directory     (createDirectoryIfMissing)
 import System.FilePath      ((</>))
 import Text.Reform          (CommonFormError, FormError(..))
-import Web.Routes           (showURL)
+import Web.Routes           (URL, MonadRoute, showURL)
 
 data BugsConfig = BugsConfig
     { bugsDirectory    :: FilePath -- ^ directory in which to store uploaded attachments
@@ -97,3 +97,9 @@ addBugsAdminMenu =
 
 instance (Functor m, Monad m, EmbedAsChild m String) => EmbedAsChild m BugId where
     asChild (BugId i) = asChild $ '#' : show i
+{-
+instance (Functor m, Monad m, MonadRoute m, EmbedAsChild m T.Text, URL m ~ BugsURL) => EmbedAsChild m BugsURL where
+    asChild bugURL =
+        do u <- showURL bugURL
+           asChild u
+-}

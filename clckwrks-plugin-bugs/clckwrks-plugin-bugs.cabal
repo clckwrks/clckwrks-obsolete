@@ -20,6 +20,7 @@ Library
     Clckwrks.Bugs
     Clckwrks.Bugs.Acid
     Clckwrks.Bugs.Monad
+--    Clckwrks.Bugs.Page.SubmitBug
     Clckwrks.Bugs.Page.Template
     Clckwrks.Bugs.Page.ViewBug
     Clckwrks.Bugs.PreProcess
