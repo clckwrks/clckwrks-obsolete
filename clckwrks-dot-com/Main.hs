@@ -1,14 +1,18 @@
-{-# LANGUAGE CPP, RankNTypes, RecordWildCards, OverloadedStrings #-}
+{-# LANGUAGE CPP, FlexibleContexts, RankNTypes, RecordWildCards, OverloadedStrings #-}
 module Main where
 
-import Control.Monad.State (evalStateT, get, modify)
 import Clckwrks
 import Clckwrks.Admin.Template (defaultAdminMenu)
+import Clckwrks.Bugs
+import Clckwrks.Bugs.PreProcess (bugsCmd)
 import Clckwrks.Page.Atom (fixFeedConfigUUID)
 import Clckwrks.Server
 import Clckwrks.Media
+import Clckwrks.Monad
 import Clckwrks.Media.PreProcess (mediaCmd)
 import Clckwrks.Page.PreProcess (pageCmd)
+import Control.Monad.Reader     (ReaderT)
+import Control.Monad.State (evalStateT, get, modify)
 import qualified Data.ByteString.Char8 as C
 import Data.List (intercalate)
 import qualified Data.Map as Map
@@ -19,6 +23,7 @@ import qualified Data.Text as Text
 import Network.URI (URI(..), URIAuth(..), parseAbsoluteURI)
 import qualified Paths_clckwrks                 as Clckwrks
 import qualified Paths_clckwrks_plugin_media    as Media
+import qualified Paths_clckwrks_plugin_bugs     as Bugs
 #ifdef CABAL
 import qualified Paths_clckwrks_theme_clckwrks  as Theme
 #endif
@@ -27,6 +32,7 @@ import System.Directory   (doesFileExist)
 import System.Environment (getArgs)
 import System.Exit        (exitFailure, exitSuccess)
 import System.FilePath    ((</>))
+import Theme.Template            (template)
 import URL
 import Web.Routes.Happstack
 import qualified Theme.Blog as Blog
@@ -66,6 +72,7 @@ clckwrksOpts def =
     , Option [] ["jstree-path"]   (ReqArg setJSTreePath "path")   ("path to jstree directory, default: " ++ show (clckJSTreePath def))
     , Option [] ["json2-path"]    (ReqArg setJSON2Path  "path")   ("path to json2 directory, default: " ++ show (clckJSON2Path def))
     , Option [] ["theme-path"]    (ReqArg setThemeDir   "path")   ("path to theme directory, default: " ++ show (clckThemeDir def))
+    , Option [] ["bugs-data-path"] (ReqArg setBugsDataPath   "path")   ("path to theme directory, default: " ++ show (clckThemeDir def))
     , Option [] ["top"]           (ReqArg setTopDir     "path")   ("path to directory that holds the state directory, uploads, etc")
     , Option [] ["static"]        (ReqArg noop "ignored")         "unused"
     , Option [] ["logs"]          (ReqArg noop "ignored")         "unimplemented"
@@ -85,6 +92,7 @@ clckwrksOpts def =
       setThemeDir     str = ModifyConfig $ \c -> c { clckThemeDir     = str      }
       setTopDir       str = ModifyConfig $ \c -> c { clckTopDir       = Just str }
       setAnalytics        = ModifyConfig $ \c -> c { clckEnableAnalytics = True  }
+      setBugsDataPath str = ModifyConfig $ \c -> c { clckPluginDir    = Map.insert "bugs" str (clckPluginDir c) }
 
 -- | Parse the command line arguments into a list of flags. Exits with usage
 -- message, in case of failure.
@@ -118,6 +126,7 @@ clckwrksConfig =
        let themeDir = "../clckwrks-theme-clckwrks/"
 #endif
        mediaDir   <- Media.getDataDir
+       bugsDir    <- Bugs.getDataDir
        return $ ClckwrksConfig
                   { clckHostname     = "localhost"
                   , clckPort         = 8000
@@ -127,7 +136,9 @@ clckwrksConfig =
                   , clckJSTreePath   = clckDir </> "jstree"
                   , clckJSON2Path    = clckDir </> "json2"
                   , clckThemeDir     = themeDir
-                  , clckPluginDir    = [("media", mediaDir)]
+                  , clckPluginDir    = Map.fromList [("media", mediaDir)
+                                                    ,("bugs" , bugsDir)
+                                                    ]
                   , clckStaticDir    = clckDir </> "static"
                   , clckTopDir       = Nothing
 #ifdef PLUGINS
@@ -219,6 +230,10 @@ initPlugins =
            mediaCmd' = mediaCmd (\u p -> showFn (M u) p)
        addPreProcessor "media" mediaCmd'
 
+       let bugsCmd' :: forall url m. (Functor m, Monad m) => (Text -> ClckT url m Builder)
+           bugsCmd' = bugsCmd (\u p -> showFn (B u) p)
+       addPreProcessor "bugs" bugsCmd'
+
        let pageCmd' :: forall url m. (Functor m, MonadIO m) => (Text -> ClckT url m Builder)
            pageCmd' = pageCmd (\u p -> showFn (C u) p)
        addPreProcessor "page" pageCmd'
@@ -231,13 +246,15 @@ clckwrks :: ClckwrksConfig SiteURL -> IO ()
 clckwrks cc =
     do checkResources cc
        withClckwrks cc $ \clckState ->
-           withMediaConfig Nothing "_uploads" $ \mediaConf ->
+           withMediaConfig Nothing "_media_uploads" $ \mediaConf ->
+           withBugsConfig  Nothing "_bugs_attachments" $ \bugsConf ->
                let -- site     = mkSite (clckPageHandler cc) clckState mediaConf
-                   site     = mkSite2 cc mediaConf
+                   site     = mkSite2 cc mediaConf bugsConf
                    sitePlus = mkSitePlus (Text.pack $ clckHostname cc) (clckPort cc) Text.empty site
                in
                  do clckState'    <- execClckT (siteShowURL sitePlus) clckState $ initPlugins
                     let sitePlus' = fmap (evalClckT (siteShowURL sitePlus) clckState') sitePlus
+                    putStrLn $ "Listening on port " ++ show (clckPort cc)
                     simpleHTTP (nullConf { port = clckPort cc }) (route cc sitePlus')
 
 route :: Happstack m => ClckwrksConfig SiteURL -> SitePlus SiteURL (m Response) -> m Response
@@ -278,8 +295,8 @@ In theory, we would like to do some stuff in the ClckT monad before start listen
 
 Though it seems the information we need comes from Site not implSite.
 -}
-routeSite :: ClckwrksConfig u -> MediaConfig -> SiteURL -> Clck SiteURL Response
-routeSite cc mediaConfig url =
+routeSite :: ClckwrksConfig u -> MediaConfig -> BugsConfig -> SiteURL -> Clck SiteURL Response
+routeSite cc mediaConfig bugsConfig url =
     do case url of
         (C clckURL)  -> nestURL C $ routeClck cc clckURL
         (M mediaURL) ->
@@ -287,20 +304,33 @@ routeSite cc mediaConfig url =
                -- FIXME: it is a bit silly that we wait this  long to set the mediaClckURL
                -- would be better to do it before we forkIO on simpleHTTP
                nestURL M $ runMediaT (mediaConfig { mediaClckURL = (showFn . C) })  $ routeMedia mediaURL
-{-
-mkSite :: ClckwrksConfig u -> ClckState -> MediaConfig -> Site SiteURL (ServerPart Response)
-mkSite cc clckState media = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
-    where
-      route' f u =
-          evalStateT (unRouteT (unClckT $ routeSite cc media u) f) clckState
--}
+        (B bugsURL) ->
+            do showFn <- askRouteFn
+               let deRoute :: (ClckURL -> [(Text, Maybe Text)] -> Text) -> Clck ClckURL a -> Clck url a
+                   deRoute sf (ClckT (RouteT r)) = (ClckT (RouteT (\nsf -> (r sf))))
+
+               let template' :: ( EmbedAsChild BugsM headers
+                                , EmbedAsChild BugsM body
+                                ) => String
+                             -> headers
+                             -> body
+                             -> XMLGenT BugsM XML
+                   template' ttl hdrs bdy =
+                       do hdrXml <- map unClckChild <$> asChild hdrs
+                          bdyXml <- map unClckChild <$> asChild bdy
+                          mapXMLGenT (mapClckT lift . (deRoute (showFn . C))) $ template ttl hdrXml bdyXml
+
+               nestURL B $ runBugsT (bugsConfig { bugsClckURL      = (showFn . C)
+                                                , bugsPageTemplate = template'
+                                                }) $ routeBugs bugsURL
+
 -- FIXME: something seems weird here.. we do not use the 'f' in route'
-mkSite2 :: ClckwrksConfig u -> MediaConfig -> Site SiteURL (ClckT SiteURL (ServerPartT IO) Response)
-mkSite2 cc mediaConfig = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
+mkSite2 :: ClckwrksConfig u -> MediaConfig -> BugsConfig -> Site SiteURL (ClckT SiteURL (ServerPartT IO) Response)
+mkSite2 cc mediaConfig bugsConfig = setDefault (C $ ViewPage $ PageId 1) $ mkSitePI route'
     where
       route' :: (SiteURL -> [(Text.Text, Maybe Text.Text)] -> Text.Text) -> SiteURL -> ClckT SiteURL (ServerPartT IO) Response
       route' f url =
-          routeSite cc mediaConfig url
+          routeSite cc mediaConfig bugsConfig url
 
 
 #ifdef PLUGINS

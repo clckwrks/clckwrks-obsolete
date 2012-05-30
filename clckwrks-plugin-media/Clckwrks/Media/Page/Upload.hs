@@ -38,10 +38,9 @@ contentTypeExtension ct = Map.lookup (takeWhile (/= ';') ct) extensionMap
 
 uploadMedium :: MediaURL -> MediaM Response
 uploadMedium here =
-    do action <- showURL here
-       template "Upload Medium" () $
+    do template "Upload Medium" () $
         <%>
-         <% reform (form action) "ep" saveMedium Nothing uploadForm %>
+         <% reform (form here) "ep" saveMedium Nothing uploadForm %>
         </%>
 
     where

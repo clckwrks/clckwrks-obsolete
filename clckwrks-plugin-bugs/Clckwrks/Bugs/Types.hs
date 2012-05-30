@@ -18,7 +18,25 @@ newtype BugTag = BugTag { tagText :: Text }
     deriving (Eq, Ord, Read, Show, Data, Typeable, SafeCopy, PathInfo)
 
 newtype MilestoneId = MilestoneId { unMilestoneId :: Integer }
-    deriving (Eq, Ord, Read, Show, Data, Typeable, SafeCopy, PathInfo)
+    deriving (Eq, Ord, Read, Show, Data, Typeable, SafeCopy, PathInfo, Enum)
+
+data Milestone = Milestone
+    { milestoneId      :: MilestoneId
+    , milestoneTitle   :: Text
+    , milestoneTarget  :: Maybe UTCTime
+    , milestoneReached :: Maybe UTCTime
+
+    }
+    deriving (Eq, Ord, Read, Show, Data, Typeable)
+$(deriveSafeCopy 0 'base ''Milestone)
+
+newtype TargetDate = TargetDate UTCTime
+    deriving (Eq, Ord, Show, Data, Typeable)
+
+instance Indexable Milestone where
+    empty = ixSet [ ixFun ((:[]) . milestoneId)
+                  , ixFun (maybe [] (\d -> [TargetDate d]) . milestoneTarget)
+                  ]
 
 data BugStatus
     = New
@@ -26,7 +44,7 @@ data BugStatus
     | Closed
     | Invalid
     | WontFix
-      deriving (Eq, Ord, Read, Show, Data, Typeable)
+      deriving (Eq, Ord, Read, Show, Data, Typeable, Bounded, Enum)
 
 $(deriveSafeCopy 0 'base ''BugStatus)
 

@@ -1,3 +1,32 @@
-#view-bug
+#view-bug dt
 {
+    font-weight: bold;
+}
+
+#view-bug dd
+{
+
+}
+
+.bugs ol
+{
+    list-style-type: none;
+}
+
+fieldset.bugs
+{
+    border: 1px solid #aaa;
+    margin-left: 3em;
+    margin-right: 3em;
+    box-shadow: 5px 5px 1px -2px #bbe;
+}
+
+.bugs textarea
+{
+    font-family: monospace;
+}
+
+.bugs input[type='text']
+{
+    font-family: monospace;
 }

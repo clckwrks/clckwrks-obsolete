@@ -19,7 +19,6 @@ Data-Files:
         data/8-icon.png
         data/philosophy-icon.png
 
-
 Library
   Exposed-modules:     Theme.Blog,
                        Theme.Home,

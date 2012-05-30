@@ -6,10 +6,14 @@ import Web.Routes.TH (derivePathInfo)
 
 data BugsAdminURL
     = EditBug BugId
+    | EditMilestones
 $(derivePathInfo ''BugsAdminURL)
 
 data BugsURL
     = ViewBug BugId
+    | SubmitBug
     | SearchBugs
     | BugsAdmin BugsAdminURL
+    | BugsData FilePath
+    | Timeline
 $(derivePathInfo ''BugsURL)

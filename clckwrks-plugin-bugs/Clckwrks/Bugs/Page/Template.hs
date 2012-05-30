@@ -1,14 +1,16 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# OPTIONS_GHC -F -pgmFtrhsx #-}
 module Clckwrks.Bugs.Page.Template where
 
 import Clckwrks
 import Clckwrks.Bugs.Monad
+import Clckwrks.Bugs.URL
 import Control.Monad.Reader
 import HSP
 import Happstack.Server.HSP.HTML
 
-template :: ( EmbedAsChild (Clck ClckURL) headers
-            , EmbedAsChild (Clck ClckURL) body
+template :: ( EmbedAsChild BugsM headers
+            , EmbedAsChild BugsM body
             ) =>
             String
          -> headers
@@ -16,5 +18,5 @@ template :: ( EmbedAsChild (Clck ClckURL) headers
          -> BugsM Response
 template ttl hdrs bdy =
     do pageTemplate <- bugsPageTemplate <$> ask
-       fmap toResponse $ mapClckT lift $ unXMLGenT $
-            pageTemplate ttl hdrs bdy
+       fmap toResponse $ unXMLGenT $
+            pageTemplate ttl <%> <link rel="stylesheet" type="text/css" href=(BugsData "style.css") /> <% hdrs %></%> bdy

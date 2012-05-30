@@ -24,12 +24,11 @@ import Text.Reform
 
 submitBug :: BugsURL -> BugsM Response
 submitBug here =
-    do pt <- bugsPageTemplate <$> ask
-       pt "Submit a Bug Report" ()
-        <%>
-         <% reform (form here) "sbr" addReport Nothing submitForm %>
---           <% undefined :: BugsM [XMLGenT BugsM XML] %>
-        </%>
+    do template "Submit a Report" ()
+              <%>
+               <h1>Submit Report</h1>
+               <% reform (form here) "sbr" addReport Nothing submitForm %>
+              </%>
     where
       addReport :: Bug -> BugsM Response
       addReport bug =
@@ -49,7 +48,7 @@ submitForm =
         <*> bugBodyForm
         <*> pure Set.empty
         <*> pure Nothing
-        <*  inputSubmit (pack "submit")
+        <*  (li $ inputSubmit (pack "submit"))
     where
       submittorIdForm :: BugsForm UserId
       submittorIdForm = impure (fromJust <$> getUserId)

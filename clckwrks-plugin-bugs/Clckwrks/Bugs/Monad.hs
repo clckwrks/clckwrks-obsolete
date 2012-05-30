@@ -28,18 +28,18 @@ data BugsConfig = BugsConfig
     { bugsDirectory    :: FilePath -- ^ directory in which to store uploaded attachments
     , bugsState        :: AcidState BugsState
     , bugsClckURL      :: ClckURL -> [(T.Text, Maybe T.Text)] -> T.Text
-    , bugsPageTemplate :: ( EmbedAsChild (Clck ClckURL) headers
-                          , EmbedAsChild (Clck ClckURL) body
+    , bugsPageTemplate :: ( EmbedAsChild BugsM headers
+                          , EmbedAsChild BugsM body
                           ) =>
                           String
                        -> headers
                        -> body
-                       -> XMLGenT (Clck BugsURL) XML
+                       -> XMLGenT BugsM XML
 
     }
 
 type BugsT m = ClckT BugsURL (ReaderT BugsConfig m)
-type BugsM = ClckT BugsURL (ReaderT BugsConfig (ServerPartT IO))
+type BugsM   = ClckT BugsURL (ReaderT BugsConfig (ServerPartT IO))
 
 data BugsFormError
     = BugsCFE (CommonFormError [Input])
@@ -64,6 +64,9 @@ instance (IsName n) => EmbedAsAttr BugsM (Attr n ClckURL) where
             do showFn <- bugsClckURL <$> ask
                asAttr $ MkAttr (toName n, pAttrVal (T.unpack $ showFn url []))
 
+instance (Functor m, Monad m, EmbedAsChild m String) => EmbedAsChild m BugId where
+    asChild (BugId i) = asChild $ '#' : show i
+
 runBugsT :: BugsConfig -> BugsT m a -> ClckT BugsURL m a
 runBugsT mc m = mapClckT f m
     where
@@ -82,8 +85,6 @@ withBugsConfig :: Maybe FilePath
                -> (BugsConfig -> IO a) -> IO a
 withBugsConfig mBasePath bugsDir f =
     do let basePath = fromMaybe "_state" mBasePath
-           cacheDir  = bugsDir </> "_cache"
-       createDirectoryIfMissing True cacheDir
        bracket (openLocalStateFrom (basePath </> "bugs") initialBugsState) (createCheckpointAndClose) $ \bugsState ->
            f (BugsConfig { bugsDirectory    = bugsDir
                          , bugsState        = bugsState
@@ -94,12 +95,3 @@ withBugsConfig mBasePath bugsDir f =
 addBugsAdminMenu :: ClckT BugsURL IO ()
 addBugsAdminMenu =
     do addAdminMenu ("Bugs", [])
-
-instance (Functor m, Monad m, EmbedAsChild m String) => EmbedAsChild m BugId where
-    asChild (BugId i) = asChild $ '#' : show i
-{-
-instance (Functor m, Monad m, MonadRoute m, EmbedAsChild m T.Text, URL m ~ BugsURL) => EmbedAsChild m BugsURL where
-    asChild bugURL =
-        do u <- showURL bugURL
-           asChild u
--}

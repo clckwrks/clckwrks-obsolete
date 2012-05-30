@@ -1,25 +1,45 @@
 {-# LANGUAGE DeriveDataTypeable, RecordWildCards, TemplateHaskell, TypeFamilies #-}
 module Clckwrks.Bugs.Acid where
 
+import Control.Applicative    ((<$>))
 import Control.Monad.Reader   (ask)
-import Control.Monad.State    (get, put)
+import Control.Monad.State    (get, modify, put)
 import Data.Acid              (Query, Update, makeAcidic)
-import Data.IxSet             (IxSet, (@=), getOne, empty, toList, updateIx)
-import Data.SafeCopy          (base, deriveSafeCopy)
-import Clckwrks.Bugs.Types    (Bug(..), BugId(..))
+import Data.IxSet             (IxSet, Proxy(..), (@=), (@+), getOne, empty, toAscList, toList, fromList, updateIx)
+import qualified Data.IxSet   as IxSet
+import Data.Map               (Map)
+import qualified Data.Map     as Map
+import Data.SafeCopy          (base, deriveSafeCopy, extension, Migrate(..))
+import           Data.Text    (Text)
+import qualified Data.Text    as Text
+import Clckwrks.Bugs.Types    (Bug(..), BugId(..), Milestone(..), MilestoneId(..), TargetDate(..))
+
+data BugsState_0 = BugsState_0
+    { nextBugId_0       :: BugId
+    , bugs_0            :: IxSet Bug
+    }
+$(deriveSafeCopy 0 'base ''BugsState_0)
 
 -- | 'BugsState' stores all the bugs
 data BugsState = BugsState
-    { nextBugId :: BugId
-    , bugs        :: IxSet Bug
+    { nextBugId       :: BugId
+    , bugs            :: IxSet Bug
+    , nextMilestoneId :: MilestoneId
+    , milestones      :: IxSet Milestone
     }
-$(deriveSafeCopy 0 'base ''BugsState)
+$(deriveSafeCopy 1 'extension ''BugsState)
+
+instance Migrate BugsState where
+    type MigrateFrom BugsState = BugsState_0
+    migrate (BugsState_0 n b) = BugsState n b (MilestoneId 1) empty
 
 -- | initial 'BugsState'
 initialBugsState :: BugsState
 initialBugsState = BugsState
-    { nextBugId = BugId 1
-    , bugs      = empty
+    { nextBugId       = BugId 1
+    , bugs            = empty
+    , nextMilestoneId = MilestoneId 1
+    , milestones      = empty
     }
 
 -- | get the next unused 'BugsId'
@@ -46,10 +66,61 @@ allBugIds =
     do BugsState{..} <- ask
        return $ map bugId (toList bugs)
 
+------------------------------------------------------------------------------
+-- Milestones
+------------------------------------------------------------------------------
+
+-- | add a new, empty 'Milestone' to the database and return the 'MilestoneId'
+newMilestone :: Update BugsState MilestoneId
+newMilestone =
+    do bs@BugsState{..} <- get
+       let milestone = Milestone { milestoneId      = nextMilestoneId
+                                 , milestoneTitle   = Text.empty
+                                 , milestoneTarget  = Nothing
+                                 , milestoneReached = Nothing
+                                 }
+       put $ bs { nextMilestoneId = succ nextMilestoneId
+                , milestones      = IxSet.insert milestone milestones
+                }
+       return nextMilestoneId
+
+-- | get the milestones
+getMilestones :: Query BugsState [Milestone]
+getMilestones =
+    do ms <- milestones <$> ask
+       return (toList ms)
+
+-- | get all the 'MilestoneId's
+getMilestoneIds :: Query BugsState [MilestoneId]
+getMilestoneIds =
+    do ms <- milestones <$> ask
+       return (map milestoneId $ toList ms)
+
+getMilestoneTitle :: MilestoneId -> Query BugsState (Maybe Text)
+getMilestoneTitle mid =
+    do ms <- milestones <$> ask
+       return $ milestoneTitle <$> getOne (ms @= mid)
+
+-- | get the milestones sorted by target date
+setMilestones :: [Milestone] -> Update BugsState ()
+setMilestones ms =
+    modify $ \bs -> bs { milestones = fromList ms }
+
+-- | get all the 'Bug's with one of the target 'MilestoneId's
+bugsForMilestones :: [MilestoneId] -> Query BugsState (IxSet Bug)
+bugsForMilestones mids =
+    do bs <- bugs <$> ask
+       return $ (bs @+ mids)
+
 $(makeAcidic ''BugsState
    [ 'genBugId
    , 'getBugById
    , 'putBug
    , 'allBugIds
+   , 'newMilestone
+   , 'getMilestones
+   , 'getMilestoneTitle
+   , 'setMilestones
+   , 'bugsForMilestones
    ]
  )
