@@ -9,10 +9,11 @@ import Data.IxSet             (IxSet, Proxy(..), (@=), (@+), getOne, empty, toAs
 import qualified Data.IxSet   as IxSet
 import Data.Map               (Map)
 import qualified Data.Map     as Map
+import Data.Ratio             ((%))
 import Data.SafeCopy          (base, deriveSafeCopy, extension, Migrate(..))
 import           Data.Text    (Text)
 import qualified Data.Text    as Text
-import Clckwrks.Bugs.Types    (Bug(..), BugId(..), Milestone(..), MilestoneId(..), TargetDate(..))
+import Clckwrks.Bugs.Types    (Bug(..), BugStatus(..), BugId(..), Milestone(..), MilestoneId(..), TargetDate(..))
 
 data BugsState_0 = BugsState_0
     { nextBugId_0       :: BugId
@@ -96,6 +97,7 @@ getMilestoneIds =
     do ms <- milestones <$> ask
        return (map milestoneId $ toList ms)
 
+-- | get the 'milestoneTitle' for a 'MilestoneId'
 getMilestoneTitle :: MilestoneId -> Query BugsState (Maybe Text)
 getMilestoneTitle mid =
     do ms <- milestones <$> ask
@@ -112,6 +114,18 @@ bugsForMilestones mids =
     do bs <- bugs <$> ask
        return $ (bs @+ mids)
 
+-- | return the percentage completion of a 'MilestoneId'
+--
+-- Will return 'Nothing' if no bugs were found for the 'MilestoneId'
+milestoneCompletion :: MilestoneId
+                    -> Query BugsState (Maybe Rational)
+milestoneCompletion mid =
+    do bs <- IxSet.getEQ mid . bugs <$> ask
+       case IxSet.size bs of
+         0     -> return Nothing
+         total -> let closed = IxSet.size (bs @+ [Closed, Invalid, WontFix])
+                  in return $ Just (toRational (closed % total))
+
 $(makeAcidic ''BugsState
    [ 'genBugId
    , 'getBugById
@@ -122,5 +136,6 @@ $(makeAcidic ''BugsState
    , 'getMilestoneTitle
    , 'setMilestones
    , 'bugsForMilestones
+   , 'milestoneCompletion
    ]
  )

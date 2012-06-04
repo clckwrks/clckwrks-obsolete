@@ -65,4 +65,5 @@ $(deriveSafeCopy 0 'base ''Bug)
 instance Indexable Bug where
     empty = ixSet [ ixFun ((:[]) . bugId)
                   , ixFun (maybeToList . bugMilestone)
+                  , ixFun ((:[]) . bugStatus)
                   ]

@@ -38,7 +38,7 @@ submitBug here =
 
 submitForm :: BugsForm Bug
 submitForm =
-  fieldset $ ol $
+  (fieldset $ ol $
     Bug <$> pure (BugId 0)
         <*> submittorIdForm
         <*> nowForm
@@ -49,6 +49,7 @@ submitForm =
         <*> pure Set.empty
         <*> pure Nothing
         <*  (li $ inputSubmit (pack "submit"))
+  ) `setAttrs` ["class" := "bugs"]
     where
       submittorIdForm :: BugsForm UserId
       submittorIdForm = impure (fromJust <$> getUserId)
