@@ -24,8 +24,8 @@ Executable clckwrks-dot-com-server
   Build-depends:
         base                   < 5,
         bytestring            == 0.9.*,
-        clckwrks              == 0.7.*,
-        clckwrks-plugin-bugs  == 0.1.*,
+        clckwrks              == 0.8.*,
+        clckwrks-plugin-bugs  == 0.2.*,
         clckwrks-plugin-media == 0.2.*,
         containers            == 0.4.*,
         directory             == 1.1.*,

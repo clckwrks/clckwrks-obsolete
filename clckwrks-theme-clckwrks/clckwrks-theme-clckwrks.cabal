@@ -28,7 +28,7 @@ Library
 
   Build-depends:
         base          < 5,
-        clckwrks      >= 0.7.1 && < 0.8,
+        clckwrks      >= 0.7.1 && < 0.9,
         containers    == 0.4.*,
         happstack-hsp == 7.1.0,
         text

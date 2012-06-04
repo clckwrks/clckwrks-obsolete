@@ -1,5 +1,5 @@
 Name:                clckwrks-plugin-bugs
-Version:             0.2.0
+Version:             0.2.1
 Synopsis:            bug tracking plugin for clckwrks
 Homepage:            http://clckwrks.com/
 License:             BSD3
@@ -20,8 +20,11 @@ Library
     Clckwrks.Bugs
     Clckwrks.Bugs.Acid
     Clckwrks.Bugs.Monad
---    Clckwrks.Bugs.Page.SubmitBug
+    Clckwrks.Bugs.Page.EditBug
+    Clckwrks.Bugs.Page.EditMilestones
     Clckwrks.Bugs.Page.Template
+    Clckwrks.Bugs.Page.Timeline
+    Clckwrks.Bugs.Page.SubmitBug
     Clckwrks.Bugs.Page.ViewBug
     Clckwrks.Bugs.PreProcess
     Clckwrks.Bugs.Route
@@ -39,12 +42,14 @@ Library
     directory              == 1.1.*,
     filepath               >= 1.2 && < 1.4,
     gd                     == 3000.*,
+    happstack-authenticate == 0.9.*,
     happstack-server       == 7.0.*,
     happstack-hsp          == 7.1.*,
     hsp                    == 0.7.*,
     ixset                  == 1.0.*,
     magic                  == 1.0.*,
     mtl                    >= 2.0 && < 2.3,
+    network                == 2.3.*,
     reform                 == 0.1.*,
     reform-happstack       == 0.1.*,
     reform-hsp             >= 0.1.1 && < 0.2,
