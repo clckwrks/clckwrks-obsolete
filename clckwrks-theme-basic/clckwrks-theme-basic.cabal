@@ -18,7 +18,7 @@ Data-Files:
         data/style.css
 
 Library
-  Build-tools:         trhsx
+--  Build-tools:         trhsx
   Exposed-modules:     Theme.Blog,
                        Theme.Home,
                        Theme.Page
@@ -26,4 +26,4 @@ Library
 
   Build-depends:
         base       < 5,
-        clckwrks  >= 0.7 && < 0.9,
+        clckwrks  >= 0.7 && < 0.9
