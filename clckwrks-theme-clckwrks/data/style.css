@@ -62,11 +62,14 @@ h2
 
 #logo
 {
-    position: absolute;
-    font-size: 2em;
-    color: #ccc;
-    padding-left: 1em;
-    display: none;
+    margin: auto;
+    width: 500px;
+}
+
+#logo img
+{
+    width: 500px;
+    height: 500px;
 }
 
 #page-content
@@ -77,57 +80,83 @@ h2
     margin-right: 15em;
 }
 
+#menu-logo
+{
+    position: absolute;
+    font-size: 2em;
+    color: #777;
+    padding-left: 1em;
+}
+
+
 .page-menu
 {
-/*    position: absolute;  */
-/*    width: 800px; */
-/*    right: 199em;
-    margin: auto;
-    margin-bottom: 1em; */
-    margin: 0;
-    background: #33333F;
+
+}
+
+div.page-menu
+{
+    box-shadow: 0 0 10px 0 #525F0E;
 }
 
 .menu-inner-div
 {
-    width: auto;
-    margin-left: 0;
+    margin-bottom: 1em;
     text-align: center;
-/*    background: blue; */
-    padding-left: 12em;
-    padding-right: 12em;
+    background: #D3F32D;
+    padding-bottom: 2em;
+    line-height: 1;
+    padding-top: 1em;
 }
 
 .page-menu ul
 {
-    padding: 0;
-    font-size: 1.5em;
     display: inline;
+    font-size: 1.5em;
     list-style-type: none;
+    margin: 0;
+    padding: 0 0 0 10em;
 }
 
 .page-menu li
 {
-/*    background: green; */
     display: inline;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
+    background-color: #B8D32C;
     margin-right: 1em;
-    line-height: 1.5em;
-    box-shadow: 0px 0px 5px 0px #aaa;
-}
 
-.page-menu li:hover
-{
-    background: #444;
-}
+    white-space: nowrap;
+    border-radius: 0 0 10px 10px;
+    padding-top: 0;
+    margin-top: 0;
+    padding-bottom: 0.5em;
+    padding-top: 0.5em;
 
+}
 
 .page-menu a
 {
     text-decoration: none;
-    color: #eee;
+    color: white;
+    border-bottom: 1px dotted white;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-weight: bold;
+    display: inline;
+    white-space: nowrap;
 }
+
+.page-menu li:hover
+{
+    background: white;
+}
+
+.page-menu li:hover a
+{
+    color: #B8D32C;
+    border-bottom: 1px dotted #B8D32C;
+}
+
+
 
 #background-box
 {

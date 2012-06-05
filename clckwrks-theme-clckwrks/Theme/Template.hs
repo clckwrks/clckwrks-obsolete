@@ -24,42 +24,35 @@ template title headers body =
       <link rel="stylesheet" type="text/css" href=(ThemeData "style.css") />
       <link rel="stylesheet" type="text/css" href=(ThemeData "hscolour.css") />
       <% headers %>
-      -- TODO: only show when running on live site, not testing/devel
       <% googleAnalytics %>
      </head>
      <body>
-         <div id="banner-box">
-          <div class="mesh"></div>
-
-          <div class="img-text-bg"></div>
-          <div class="img-text"></div>
-          <img src=(ThemeData "clckwrks-logo.png") />
-         </div>
 
       <div class="page-menu">
-       <span id="logo">Clckwrks</span>
+       <span id="menu-logo">clckwrks.com</span>
        <div class="menu-inner-div">
         <% getMenu %>
        </div>
       </div>
+
       <% body %>
 
-    <div id="footer">
-     <% do mu <- getUserId
-           case mu of
-             Nothing -> <% () %>
-             (Just uid) ->
-                 do r <- query (HasRole uid (Set.singleton Administrator))
-                    if not r
-                      then <% () %>
-                      else do pid <- lift getPageId
-                              <%>
-                               <div><a href=(Auth $ AuthURL A_Login)>login</a></div>
-                               <div><a href=(Admin Console)>admin console</a></div>
-                               <div><a href=(Admin (EditPage pid))>edit this page</a></div>
-                              </%>
+      <div id="footer">
+       <% do mu <- getUserId
+             case mu of
+               Nothing -> <% () %>
+               (Just uid) ->
+                   do r <- query (HasRole uid (Set.singleton Administrator))
+                      if not r
+                        then <% () %>
+                        else do pid <- lift getPageId
+                                <%>
+                                 <div><a href=(Auth $ AuthURL A_Login)>login</a></div>
+                                 <div><a href=(Admin Console)>admin console</a></div>
+                                 <div><a href=(Admin (EditPage pid))>edit this page</a></div>
+                                </%>
        %>
-     <div id="copyright">Powered by Happstack. Copyright 2012, SeeReason Partners LLC</div>
-    </div>
-   </body>
+       <div id="copyright">Powered by Happstack. Copyright 2012, SeeReason Partners LLC</div>
+      </div>
+     </body>
   </html>

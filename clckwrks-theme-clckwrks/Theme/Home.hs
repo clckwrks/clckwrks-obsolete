@@ -19,6 +19,10 @@ page =
     template "clckwrks.com" () $
         <%>
 
+         <div id="logo">
+          <img src=(ThemeData "clckwrks-logo.png") />
+         </div>
+
          <blockquote>
           <p><span class="big-quote">“</span>runs smoothly and invisibly<span class="big-quote">”</span> - <span class="quote-author">Katherine Durkes</span></p>
          </blockquote>
