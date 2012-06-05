@@ -4,6 +4,7 @@ import Control.Monad.Trans
 import Control.Applicative
 import Clckwrks (ClckT, ClckState)
 import Clckwrks.Bugs.URL
+import Clckwrks.Bugs.Page.Timeline (timelineWidget)
 import Clckwrks.Bugs.Types (BugId(..))
 import Data.Attoparsec.Text
 import           Data.Text (Text, pack)
@@ -21,9 +22,15 @@ parseAttr name =
        char '='
        skipMany space
 
-parseCmd :: Parser BugId
+parseCmd :: Parser BugsCmd
 parseCmd =
-    parseAttr (pack "id") *> (BugId <$> decimal)
+    choice [ parseAttr (pack "id") *> (ShowBug . BugId <$> decimal)
+           , stringCI (pack "timeline") *> pure ShowTimeline
+           ]
+
+data BugsCmd
+    = ShowBug BugId
+    | ShowTimeline
 
 bugsCmd :: (Functor m, Monad m) => (BugsURL -> [(Text, Maybe Text)] -> Text) -> Text -> ClckT url m Builder
 bugsCmd
@@ -32,7 +39,13 @@ bugsCmd
        case mi of
          (Left e) ->
                return $ B.fromString e -- FIXME: format the error more nicely or something?
-         (Right bid) ->
+         (Right (ShowBug bid)) ->
              do html <- unXMLGenT $ <a href=(showURLFn (ViewBug bid) [])>#<% show $ unBugId bid  %></a>
                 return $ B.fromString $ concat $ lines $ renderAsHTML html
+{-
+         -- types are not setup to allow us to do this yet :(
+         (Right ShowTimeline) ->
+             do html <- unXMLGenT $ timelineWidget
+                return $ B.fromString $ concat $ lines $ renderAsHTML html
+-}
 

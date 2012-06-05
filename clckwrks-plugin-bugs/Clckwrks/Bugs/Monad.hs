@@ -5,7 +5,6 @@ import Clckwrks                 (Clck, ClckT(..), ClckFormT, ClckState(..), Clck
 import Clckwrks.Acid
 import Clckwrks.IOThread        (IOThread(..), startIOThread, killIOThread)
 import Clckwrks.Bugs.Acid
-import Clckwrks.Bugs.PreProcess (bugsCmd)
 import Clckwrks.Bugs.Types
 import Clckwrks.Bugs.URL
 import Control.Applicative ((<$>))

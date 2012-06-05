@@ -14,13 +14,19 @@ import Numeric (showFFloat)
 
 timeline :: BugsM Response
 timeline =
+    template "Timeline" ()
+        <%>
+          <h1>Timeline</h1>
+          <% timelineWidget %>
+        </%>
+
+timelineWidget :: XMLGenT BugsM XML
+timelineWidget =
     do ms     <- query GetMilestones
        ixBugs <- query $ BugsForMilestones (map milestoneId ms)
-       template "Timeline" ()
-           <%>
-             <h1>Timeline</h1>
-             <% mapM (showMilestone ms) (IxSet.groupBy ixBugs) %>
-           </%>
+       <div class="timeline">
+        <% mapM (showMilestone ms) (IxSet.groupBy ixBugs) %>
+       </div>
 
 showMilestone :: [Milestone] -> (MilestoneId, [Bug]) -> XMLGenT BugsM [ChildType BugsM]
 showMilestone ms (mid, bugs) =
