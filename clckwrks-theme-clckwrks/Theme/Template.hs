@@ -18,6 +18,20 @@ template ::
     -> body
     -> XMLGenT (Clck ClckURL) XML
 template title headers body =
+    template' title headers $
+         <div id="page-content">
+           <% body %>
+         </div>
+
+template' ::
+    ( EmbedAsChild (Clck ClckURL) headers
+    , EmbedAsChild (Clck ClckURL) body
+    ) =>
+       String
+    -> headers
+    -> body
+    -> XMLGenT (Clck ClckURL) XML
+template' title headers body =
     <html>
      <head>
       <title><% title %></title>
@@ -29,7 +43,7 @@ template title headers body =
      <body>
 
       <div class="page-menu">
-       <span id="menu-logo">clckwrks.com</span>
+       <a href="/" id="menu-logo">clckwrks.com</a>
        <div class="menu-inner-div">
         <% getMenu %>
        </div>

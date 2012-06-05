@@ -1,8 +1,16 @@
-@import url(http://fonts.googleapis.com/css?family=Gudea);
+/* @import url(http://fonts.googleapis.com/css?family=Gudea); */
+/* @import url(http://fonts.googleapis.com/css?family=Lato);*/
+@import url(http://fonts.googleapis.com/css?family=Raleway:100);
+@import url(http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911);
+/* @import url(http://fonts.googleapis.com/css?family=Nobile); */
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
+@import url(http://fonts.googleapis.com/css?family=Lora);
+@import url(http://fonts.googleapis.com/css?family=Lato);
+
 body
 {
 /* font-family:"Lucida Sans Unicode","Lucida Grande","Trebuchet MS",Helvetica,Arial,sans-serif;*/
- font-family: 'Gudea', Verdana,Arial,sans-serif;
+/* font-family: 'Gudea', Verdana,Arial,sans-serif; */
 /* font-family: Arial, Helevtica, Verdana, san-serif;  */
  font-size: 13px;
 /*  background-color: #dde7eb; */
@@ -12,7 +20,7 @@ body
  outline-color: #333;
  outline-style: none;
  outline-width:  0px;
- color: #555;
+ color: black;
  padding: 0;
  margin: 0;
  background: white;
@@ -37,6 +45,28 @@ body
 
 }
 
+body
+{
+/*    font-family: 'Goudy Bookletter 1911';  */
+    font-family: 'Lora';
+}
+
+h1, h2, h3
+{
+    font-family: Raleway;
+    color: #000;
+}
+
+.page-menu a
+{
+    font-family: Lato;
+}
+
+pre
+{
+    font-family: 'Droid Sans Mono';
+}
+
 h1.page-title
 {
     font-size: 1.75em;
@@ -44,6 +74,7 @@ h1.page-title
 
 h1
 {
+
     font-weight: normal;
     margin-top: 0;
     font-size: 1.5em;
@@ -63,13 +94,13 @@ h2
 #logo
 {
     margin: auto;
-    width: 500px;
+    width: 600px;
 }
 
 #logo img
 {
-    width: 500px;
-    height: 500px;
+    width: 600px;
+    height: 600px;
 }
 
 #page-content
@@ -82,12 +113,16 @@ h2
 
 #menu-logo
 {
+    font-family: 'Goudy Bookletter 1911';
     position: absolute;
     font-size: 2em;
     color: #777;
     padding-left: 1em;
+    margin-top: -0.40em;
+    text-decoration: none;
+    font-weight: normal;
+    border: none;
 }
-
 
 .page-menu
 {
@@ -96,15 +131,17 @@ h2
 
 div.page-menu
 {
-    box-shadow: 0 0 10px 0 #525F0E;
+    box-shadow: 0 0 10px 0 #444;
 }
 
 .menu-inner-div
 {
     margin-bottom: 1em;
     text-align: center;
-    background: #D3F32D;
-    padding-bottom: 2em;
+    background: #ddd;
+/*    background: #5A9E3A;*/
+/*    background: #5A9E3A;  */
+/*    padding-bottom: 2em; */
     line-height: 1;
     padding-top: 1em;
 }
@@ -112,7 +149,7 @@ div.page-menu
 .page-menu ul
 {
     display: inline;
-    font-size: 1.5em;
+    font-size: 1em;
     list-style-type: none;
     margin: 0;
     padding: 0 0 0 10em;
@@ -121,26 +158,27 @@ div.page-menu
 .page-menu li
 {
     display: inline;
-    background-color: #B8D32C;
+    background-color: #1E360E;
     margin-right: 1em;
 
     white-space: nowrap;
     border-radius: 0 0 10px 10px;
     padding-top: 0;
     margin-top: 0;
-    padding-bottom: 0.5em;
-    padding-top: 0.5em;
+    padding-bottom: .9em;
+    padding-top: 1em;
+    box-shadow: 0 0 3px 0 #444;
 
 }
 
 .page-menu a
 {
     text-decoration: none;
+/*    color: #DFDF36; */
     color: white;
     border-bottom: 1px dotted white;
     padding-left: 1em;
     padding-right: 1em;
-    font-weight: bold;
     display: inline;
     white-space: nowrap;
 }
