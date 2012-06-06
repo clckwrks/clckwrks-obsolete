@@ -196,7 +196,7 @@ mkSitePlus domain port approot site =
       prefix = Text.concat $ [ Text.pack "http://"
                              , domain
                              ] ++
-                             (if port == 80
+                             (if port == 80 || port == 9029
                                 then []
                                 else [Text.pack ":", Text.pack $ show port]
                              ) ++
