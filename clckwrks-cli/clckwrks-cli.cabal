@@ -19,5 +19,5 @@ Executable clckwrks-cli
   Build-depends:
      acid-state == 0.6.*,
      base        < 5,
-     clckwrks   == 0.8.0,
+     clckwrks   >= 0.8.0 && < 0.8.2,
      network    == 2.3.*
