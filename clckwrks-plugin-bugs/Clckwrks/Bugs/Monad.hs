@@ -93,4 +93,5 @@ withBugsConfig mBasePath bugsDir f =
 
 addBugsAdminMenu :: ClckT BugsURL IO ()
 addBugsAdminMenu =
-    do addAdminMenu ("Bugs", [])
+    do editMilestonesURL <- showURL (BugsAdmin EditMilestones)
+       addAdminMenu ("Bugs", [("Edit Milestones", editMilestonesURL)])

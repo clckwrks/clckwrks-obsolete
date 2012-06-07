@@ -59,7 +59,7 @@ submitForm =
 
       bugTitleForm :: BugsForm Text
       bugTitleForm =
-          (li $ label (pack "Summary:")) ++> inputText mempty
+          (li $ label (pack "Summary:")) ++> (inputText mempty `setAttrs` ["size" := "80"])
 
       bugBodyForm :: BugsForm Markup
       bugBodyForm =
