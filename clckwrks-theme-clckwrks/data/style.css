@@ -116,7 +116,7 @@ h2
     font-family: 'Goudy Bookletter 1911';
     position: absolute;
     font-size: 2em;
-    color: #777;
+    color: #888;
     padding-left: 1em;
     margin-top: -0.40em;
     text-decoration: none;
@@ -138,7 +138,7 @@ div.page-menu
 {
     margin-bottom: 1em;
     text-align: center;
-    background: #ddd;
+    background: #000;
 /*    background: #5A9E3A;*/
 /*    background: #5A9E3A;  */
 /*    padding-bottom: 2em; */
@@ -158,7 +158,7 @@ div.page-menu
 .page-menu li
 {
     display: inline;
-    background-color: #1E360E;
+    background-color: #04888D;
     margin-right: 1em;
 
     white-space: nowrap;
