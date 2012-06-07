@@ -72,7 +72,7 @@ clckwrksOpts def =
     , Option [] ["jstree-path"]   (ReqArg setJSTreePath "path")   ("path to jstree directory, default: " ++ show (clckJSTreePath def))
     , Option [] ["json2-path"]    (ReqArg setJSON2Path  "path")   ("path to json2 directory, default: " ++ show (clckJSON2Path def))
     , Option [] ["theme-path"]    (ReqArg setThemeDir   "path")   ("path to theme directory, default: " ++ show (clckThemeDir def))
-    , Option [] ["bugs-data-path"] (ReqArg setBugsDataPath   "path")   ("path to theme directory, default: " ++ show (clckThemeDir def))
+    , Option [] ["bugs-data-path"] (ReqArg setBugsDataPath   "path")   ("path to bugs theme directory, default: " ++ show (Map.lookup "bugs" $ clckPluginDir def))
     , Option [] ["top"]           (ReqArg setTopDir     "path")   ("path to directory that holds the state directory, uploads, etc")
     , Option [] ["static"]        (ReqArg noop "ignored")         "unused"
     , Option [] ["logs"]          (ReqArg noop "ignored")         "unimplemented"

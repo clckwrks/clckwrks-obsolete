@@ -16,6 +16,7 @@ binary-fixup/clckwrks-dot-com-server::
 	echo -n 'haskell:Depends=' >> debian/clckwrks-dot-com-server.substvars
 	dpkg-query -W -f='haskell-clckwrks-theme-clckwrks-utils (=$${Version})' libghc-clckwrks-theme-clckwrks-dev >> debian/clckwrks-dot-com-server.substvars
 	dpkg-query -W -f=', haskell-clckwrks-plugin-media-utils (=$${Version})' libghc-clckwrks-plugin-media-dev >> debian/clckwrks-dot-com-server.substvars
+	dpkg-query -W -f=', haskell-clckwrks-plugin-bugs-utils (=$${Version})'  libghc-clckwrks-plugin-bugs-dev  >> debian/clckwrks-dot-com-server.substvars
 	dpkg-query -W -f=', haskell-clckwrks-utils (=$${Version})\n' libghc-clckwrks-dev >> debian/clckwrks-dot-com-server.substvars
 
 binary-fixup/clckwrks-dot-com-data::
