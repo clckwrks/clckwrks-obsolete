@@ -43,11 +43,10 @@ routeBugs unsecureURL =
                 case Map.lookup (pack "bugs") pp of
                   Nothing -> notFound (toResponse ())
                   (Just bugsDir) ->
-                      let fp'' = makeRelative "/" (unEscapeString fp') in
+                   do let fp'' = makeRelative "/" (unEscapeString fp')
                       if not (isSafePath (splitDirectories fp''))
-                        then do liftIO $ print (bugsDir, fp', fp'')
-                                notFound (toResponse ())
-                        else serveFile (guessContentTypeM mimeTypes) (bugsDir </> fp'')
+                        then notFound (toResponse ())
+                        else serveFile (guessContentTypeM mimeTypes) (bugsDir </> "data" </> fp'')
          Timeline ->
              timeline
          BugsAdmin (EditBug bid) ->
