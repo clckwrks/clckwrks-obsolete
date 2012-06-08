@@ -54,6 +54,7 @@ body
 h1, h2, h3
 {
     font-family: Raleway;
+    font-weight: normal;
     color: #000;
 }
 

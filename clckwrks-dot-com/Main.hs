@@ -246,8 +246,8 @@ clckwrks :: ClckwrksConfig SiteURL -> IO ()
 clckwrks cc =
     do checkResources cc
        withClckwrks cc $ \clckState ->
-           withMediaConfig (clckTopDir cc) "_media_uploads" $ \mediaConf ->
-           withBugsConfig  (clckTopDir cc) "_bugs_attachments" $ \bugsConf ->
+           withMediaConfig (fmap (\p -> p </> "_state") $ clckTopDir cc ) "_media_uploads" $ \mediaConf ->
+           withBugsConfig  (fmap (\p -> p </> "_state") $ clckTopDir cc ) "_bugs_attachments" $ \bugsConf ->
                let -- site     = mkSite (clckPageHandler cc) clckState mediaConf
                    site     = mkSite2 cc mediaConf bugsConf
                    sitePlus = mkSitePlus (Text.pack $ clckHostname cc) (clckPort cc) Text.empty site
