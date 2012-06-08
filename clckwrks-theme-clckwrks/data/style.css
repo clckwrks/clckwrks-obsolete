@@ -135,7 +135,7 @@ div.page-menu
 
 .menu-inner-div
 {
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
     text-align: center;
     background: #000;
 /*    background: #5A9E3A;*/
@@ -151,7 +151,7 @@ div.page-menu
     font-size: 1em;
     list-style-type: none;
     margin: 0;
-    padding: 0 0 0 10em;
+    padding: 0 0 0 15em;
 }
 
 .page-menu li
