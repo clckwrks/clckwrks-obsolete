@@ -54,7 +54,6 @@ body
 h1, h2, h3
 {
     font-family: Raleway;
-    font-weight: normal;
     color: #000;
 }
 
@@ -71,11 +70,11 @@ pre
 h1.page-title
 {
     font-size: 1.75em;
+    font-weight: bold;
 }
 
 h1
 {
-
     font-weight: normal;
     margin-top: 0;
     font-size: 2.5em;
@@ -87,7 +86,8 @@ h1
 
 h2
 {
-    font-size: 2em;
+    font-size: 1.75em;
+    font-weight: bold;
 /*    margin-left: -1em; */
 }
 
@@ -122,6 +122,18 @@ h2
     text-decoration: none;
     font-weight: normal;
     border: none;
+}
+
+#login-link
+{
+    float: right;
+    padding-right: 1em;
+}
+
+#login-link a
+{
+    color: white;
+    text-decoration: none;
 }
 
 .page-menu
@@ -171,7 +183,7 @@ div.page-menu
 
 }
 
-.page-menu a
+.page-menu li > a
 {
     text-decoration: none;
 /*    color: #DFDF36; */
@@ -357,10 +369,11 @@ blockquote > p
 {
 /*    border: 1px solid #ddd;
     box-shadow: 0px 3px 10px 5px #dfdfdf; */
+/*
     padding-bottom: 1em;
     margin-left: 15em;
     margin-right: 15em;
-    margin-top: 1em;
+    margin-top: 1em; */
     background: white;
 
 }
