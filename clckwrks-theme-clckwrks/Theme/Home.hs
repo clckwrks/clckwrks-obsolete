@@ -24,7 +24,7 @@ page =
 
          <blockquote>
 --          <p><span class="big-quote">“</span>runs smoothly and invisibly<span class="big-quote">”</span> - <span class="quote-author">Katherine Durkes</span></p>
-          <p><span class="big-quote">“</span>An open-source CMS you can trust, built with the capability of Haskell.<span class="big-quote">”</span></p>
+          <p><span class="big-quote">“</span>An open-source CMS you can trust, built with the dexterity of Haskell.<span class="big-quote">”</span></p>
          </blockquote>
 
          <div id="page-content">

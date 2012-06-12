@@ -44,13 +44,14 @@ template' title headers body =
 
       <div class="page-menu">
        <a href="/" id="menu-logo">clckwrks.com</a>
-      <% do mu <- getUserId
-            case mu of
-              Nothing  -> <span id="login-link"><a href=(Auth $ AuthURL A_Login)>login</a></span>
-              (Just _) -> <span id="login-link"><a href=(Auth $ AuthURL A_Logout)>logout</a></span>
-       %>
        <div class="menu-inner-div">
         <% getMenu %>
+      <% do mu <- getUserId
+            case mu of
+              Nothing  -> <span id="login-link"><a href=(Auth $ AuthURL A_Login)>Login</a></span>
+              (Just _) -> <span id="login-link"><a href=(Auth $ AuthURL A_Logout)>Logout</a></span>
+       %>
+
        </div>
 
       </div>
