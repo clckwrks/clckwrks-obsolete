@@ -8,8 +8,8 @@ Author:              Jeremy Shaw
 Maintainer:          jeremy@n-heptane.com
 Copyright:           2012 Jeremy Shaw, SeeReason Partners LLC
 Category:            Clckwrks
-Build-type:          Simple
-Cabal-version:       >=1.2
+Build-type:          Custom
+Cabal-version:       >=1.6
 Data-Files:
     data/style.css
 

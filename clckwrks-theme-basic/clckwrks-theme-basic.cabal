@@ -9,7 +9,7 @@ Author:              Jeremy Shaw
 Maintainer:          jeremy@n-heptane.com
 -- Copyright:
 Category:            Clckwrks
-Build-type:          Simple
+Build-type:          Custom
 Cabal-version:       >=1.2
 Data-Files:
         data/bluebox.png
