@@ -3,7 +3,7 @@
 @import url(http://fonts.googleapis.com/css?family=Raleway:100);
 @import url(http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911);
 /* @import url(http://fonts.googleapis.com/css?family=Nobile); */
-@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
+@import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono);
 @import url(http://fonts.googleapis.com/css?family=Lora);
 @import url(http://fonts.googleapis.com/css?family=Lato);
 
@@ -65,7 +65,7 @@ h1, h2, h3
 
 pre
 {
-    font-family: 'Droid Sans Mono';
+    font-family: 'Ubuntu Mono';
 }
 
 h1.page-title
