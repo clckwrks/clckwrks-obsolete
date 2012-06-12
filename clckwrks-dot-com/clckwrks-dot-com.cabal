@@ -16,6 +16,10 @@ Flag plugins
      Description: enable dynamic recompilation
      Default: False
 
+Flag backups
+     Description: enable the backups executable (currently disabled by default do to wacky dependencies not on hackage)
+     Default: False
+
 Executable clckwrks-dot-com-server
   Main-is: Main.hs
   ghc-options: -threaded -O2 -rtsopts
@@ -46,7 +50,11 @@ Executable clckwrks-dot-com-server
       clckwrks-theme-clckwrks
 
 Executable clckwrks-dot-com-backups
- Buildable: False
- Main-Is: Backups.hs
- GHC-Options: -threaded -Wall -Wwarn -O2 -fno-warn-name-shadowing -fno-warn-missing-signatures -fwarn-tabs -fno-warn-unused-binds -fno-warn-orphans -fwarn-unused-imports -fno-spec-constr
- Build-depends: archive >= 1.2.9, base, Extra
+   Main-Is: Backups.hs
+ if flag(backups)
+   Buildable: True
+   GHC-Options: -threaded -Wall -Wwarn -O2 -fno-warn-name-shadowing -fno-warn-missing-signatures -fwarn-tabs -fno-warn-unused-binds -fno-warn-orphans -fwarn-unused-imports -fno-spec-constr
+   Build-depends: archive >= 1.2.9, base, Extra
+ else
+   Buildable: False
+
