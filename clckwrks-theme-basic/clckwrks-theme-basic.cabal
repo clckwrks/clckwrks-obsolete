@@ -26,4 +26,4 @@ Library
 
   Build-depends:
         base       < 5,
-        clckwrks  >= 0.7 && < 0.9
+        clckwrks  >= 0.7 && < 0.10
