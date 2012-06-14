@@ -1,21 +1,11 @@
-/* @import url(http://fonts.googleapis.com/css?family=Gudea); */
-/* @import url(http://fonts.googleapis.com/css?family=Lato);*/
-@import url(http://fonts.googleapis.com/css?family=Raleway:100);
-@import url(http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911);
-/* @import url(http://fonts.googleapis.com/css?family=Nobile); */
 @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono);
 @import url(http://fonts.googleapis.com/css?family=Lora);
-@import url(http://fonts.googleapis.com/css?family=Lato);
+@import url(http://fonts.googleapis.com/css?family=Oswald);
+
 
 body
 {
-/* font-family:"Lucida Sans Unicode","Lucida Grande","Trebuchet MS",Helvetica,Arial,sans-serif;*/
-/* font-family: 'Gudea', Verdana,Arial,sans-serif; */
-/* font-family: Arial, Helevtica, Verdana, san-serif;  */
- font-size: 13px;
-/*  background-color: #dde7eb; */
-/* background: #e0ffe0; */
-
+ font-size: 14px;
  line-height: 1.8;
  outline-color: #333;
  outline-style: none;
@@ -25,42 +15,39 @@ body
  margin: 0;
  background: white;
  min-width: 700px;
-/*
- background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVQIHWNgYGAw/v//PwMjiAABADusBi/shrLOAAAAAElFTkSuQmCC) repeat; 
- background-color: #ef0f;
-*/
-
-/* background:url('http://ak5.picdn.net/shutterstock/videos/1278652/preview/stock-footage-light-seamless-background.jpg') repeat;  */
-
-
-
-
-/*    background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVQIHWNgYGAw/v//PwMjiAABADusBi/shrLOAAAAAElFTkSuQmCC) repeat; */
-/*    position: absolute;
-    width: 100%;
-    margin-top: 3em;
-    height: 400px;
-    border-radius: 10px;
-    opacity: 0.5; */
-
-
 }
+
+/* Fonts */
 
 body
 {
-/*    font-family: 'Goudy Bookletter 1911';  */
-    font-family: 'Lora';
+   font-family: 'Lora', sans-serif;
 }
 
 h1, h2, h3
 {
-    font-family: Raleway;
+    font-family: 'Oswald', serif;
     color: #000;
+}
+
+h1.page-title
+{
+    font-size: 2em;
+}
+
+h1
+{
+    font-size: 1.75em;
+}
+
+h2
+{
+    font-size: 1.25em;
 }
 
 .page-menu a
 {
-    font-family: Lato;
+    font-family: 'Oswald';
 }
 
 pre
@@ -68,40 +55,19 @@ pre
     font-family: 'Ubuntu Mono';
 }
 
-h1.page-title
-{
-    font-size: 1.75em;
-    font-weight: bold;
-}
-
-h1
-{
-    font-weight: normal;
-    margin-top: 0;
-    font-size: 2.5em;
-    border-bottom: 1px dotted #ddd;
-    margin-bottom: 2em;
-    margin-top: 2em;
-/*    margin-left: -1em;*/
-}
-
-h2
-{
-    font-size: 1.75em;
-    font-weight: bold;
-/*    margin-left: -1em; */
-}
 
 #logo
 {
-    margin: auto;
-    width: 600px;
+
+    width: 45em;
+    text-align: center;
+    display: none;
 }
 
 #logo img
 {
-    width: 600px;
-    height: 600px;
+    width: 300px;
+    height: 300px;
 }
 
 #page-content
@@ -114,47 +80,15 @@ h2
 
 #menu-logo
 {
-    font-family: 'Goudy Bookletter 1911';
+    font-family: 'Oswald';
     position: absolute;
     font-size: 2em;
     color: #888;
     padding-left: 1em;
-    margin-top: -0.40em;
+    margin-top: -0.45em;
     text-decoration: none;
     font-weight: normal;
     border: none;
-}
-
-#login-link
-{
-
-    display: inline;
-    background-color: #04888D;
-    margin-right: 1em;
-
-    white-space: nowrap;
-    border-radius: 0 0 10px 10px;
-    padding-top: 0;
-    margin-top: 0;
-    padding-bottom: .9em;
-    padding-top: 1em;
-    box-shadow: 0 0 3px 0 #444;
-
-
-}
-
-#login-link a
-{
-    color: white;
-    text-decoration: none;
-    color: white;
-    border-bottom: 1px dotted white;
-    padding-left: 1em;
-    padding-right: 1em;
-    display: inline;
-    white-space: nowrap;
-
-
 }
 
 .page-menu
@@ -170,7 +104,7 @@ div.page-menu
 .menu-inner-div
 {
     margin-bottom: 1.5em;
-    text-align: center;
+
     background: #000;
     width: 100%;
     overflow: visible;
@@ -193,9 +127,15 @@ div.page-menu
 .page-menu li
 {
     display: inline;
+}
+
+.page-menu li > a, #login-link a
+{
+    display: inline;
+    text-decoration: none;
     background-color: #04888D;
     margin-right: 1em;
-
+    color: white;
     white-space: nowrap;
     border-radius: 0 0 10px 10px;
     padding-top: 0;
@@ -203,117 +143,21 @@ div.page-menu
     padding-bottom: .9em;
     padding-top: 1em;
     box-shadow: 0 0 3px 0 #444;
-
-}
-
-.page-menu li > a
-{
-    text-decoration: none;
-/*    color: #DFDF36; */
-    color: white;
-    border-bottom: 1px dotted white;
     padding-left: 1em;
     padding-right: 1em;
-    display: inline;
-    white-space: nowrap;
 }
 
-.page-menu li:hover
+.page-menu li > a:hover, #login-link a:hover
 {
     background: white;
+    color: #04888D;
 }
-
-.page-menu li:hover a
-{
-    color: #B8D32C;
-    border-bottom: 1px dotted #B8D32C;
-}
-
-
-
-#background-box
-{
-    position: absolute;
-    background: #fff;
-/*     background: #F2FBFF; */
-    width: 100%;
-    height: 500px;
-    z-index: -1;
-/*    box-shadow: 0px 0px 10px 0px #aaa;  */
-}
-
-.img-text {
-    position: absolute;
-    width: 800px;
-    height: 100px;
-    top: 400px;
-    color: #555;
-    padding: 1em;
-    font-size: 14px;
-    line-height: 75px;
-    display: none;
-}
-
-.img-text-bg {
-    position: absolute;
-    width: 800px;
-    height: 100px;
-    top: 400px;
-    background: white;
-    opacity: 0.8;
-    display: none;
-/*    border-radius: 0 0 10px 10px; */
-}
-
-.mesh {
-    background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFUlEQVQIHWNgYGAw/v//PwMjiAABADusBi/shrLOAAAAAElFTkSuQmCC) repeat;
-    position: absolute;
-    width: 100%;
-    margin-top: 3em;
-    height: 400px;
-    border-radius: 10px;
-    opacity: 0.5;
-    display: none;
-}
-
-#banner-box
-{
-    background: white;
-/*    text-align: center; */
-/*    background: white; */
-}
-
-#banner-box img
-{
-/*    margin-top: 5em; */
-/*    margin-top: -2em;*/
-    height: 150px;
-}
-/*
-#banner-box
-{
-    width: 800px;
-    height: 400px;
-    margin: auto;
-    margin-top: 60px;
-    margin-bottom: 80px;
-    box-shadow: 0px 0px 10px 0px #aaa;
-    border-radius: 10px;
-}
-
-
-#banner-box img
-{
-    border-radius: 10px;
-
-}
-*/
 
 .summary-box
 {
-    width: 30%;
+    width: 13em;
     display: inline-block;
-    margin-right: 3%;
+    margin-right: 2em;
     vertical-align: text-top;
 }
 
@@ -326,14 +170,17 @@ div.page-menu
 
 .summary-boxes
 {
-    margin: auto;
-    width: 60%;
-    font-size: 14px;
+    width: 45em;
+}
+
+p
+{
+    width: 45em;
 }
 
 #footer
 {
-    height: 200px;
+/*    height: 20px; */
     background-color: #333;
     margin-top: 25em;
     padding: 1em;
@@ -347,7 +194,7 @@ div.page-menu
 
 #copyright
 {
-    padding-top: 150px;
+/*    padding-top: 150px;*/
     text-align: center;
 }
 
@@ -355,23 +202,19 @@ div.page-menu
 
 blockquote
 {
-    font-family: Georgia,"Times New Roman",Times,serif;
+/*    font-family: Georgia,"Times New Roman",Times,serif;*/
+/*    font-family: 'Lora', sans-serif;*/
     font-style: italic;
-    text-align: center;
-    font-size: 1.4em;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    padding-top: 0;
-    padding-bottom: 0;
-    line-height: 1.2;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
 }
 
 blockquote > p
 {
     padding: 0;
     margin: 0;
+    width: 100%;
 }
 
 .big-quote
@@ -379,6 +222,8 @@ blockquote > p
     font-size: 500%;
     vertical-align: middle;
     color: #ccc;
+    margin: 0;
+    padding: 0;
 }
 
 .quote-author
@@ -399,25 +244,6 @@ blockquote > p
     margin-top: 1em; */
     background: white;
 
-}
-
-#blog-content h1
-{
-    margin-left: 0.5em;
-    margin-top: 0em;
-    margin-bottom: 0em;
-    font-size: 2em;
-    font-weight: bold;
-}
-
-#blog-content h2
-{
-    margin-top: 0.5em;
-    margin-left: 0;
-    margin-bottom: 0;
-    font-size: 1.75em;
-    color: #36afdc;
-    font-weight: bold;
 }
 
 .pub-date
