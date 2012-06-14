@@ -173,6 +173,11 @@ div.page-menu
     width: 45em;
 }
 
+.summary-boxes p
+{
+    width: auto;
+}
+
 p
 {
     width: 45em;
