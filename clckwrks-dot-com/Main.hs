@@ -5,7 +5,6 @@ import Clckwrks
 import Clckwrks.Admin.Template (defaultAdminMenu)
 import Clckwrks.Bugs
 import Clckwrks.Bugs.PreProcess (bugsCmd)
-import Clckwrks.Page.Atom (fixFeedConfigUUID)
 import Clckwrks.Server
 import Clckwrks.Media
 import Clckwrks.Monad
