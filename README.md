@@ -98,7 +98,7 @@ Looking at the code, we see it is divided into three packages: clckwrks, clckwrk
 
 ### clckwrks
 
-A majority of the code lives in clckwrks. As an end-user, you would install this library, but never need to modify the code in it. It contains all the codefor the core features. 
+A majority of the code lives in clckwrks. As an end-user, you would install this library, but never need to modify the code in it. It contains all the code for the core features. 
 
 ### clckwrks-theme-basic
 
