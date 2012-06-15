@@ -73,7 +73,7 @@ template' title headers body =
                                  <div><a href=(Admin (EditPage pid))>edit this page</a></div>
                                 </%>
        %>
-       <div id="copyright">Powered by Happstack. Copyright 2012, SeeReason Partners LLC</div>
+       <div id="copyright">Powered by Happstack & Clckwrks. Copyright 2012, SeeReason Partners LLC</div>
       </div>
      </body>
   </html>
